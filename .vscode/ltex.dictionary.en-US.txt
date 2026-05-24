@@ -1,0 +1,11 @@
+CircaLog
+Supabase
+Vercel
+Vite
+TailwindCSS
+Recharts
+Firestore
+actogram
+Glassmorphism
+insha
+subpath
