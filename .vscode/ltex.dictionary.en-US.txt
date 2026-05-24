@@ -9,3 +9,5 @@ actogram
 Glassmorphism
 insha
 subpath
+Machina
+Oura

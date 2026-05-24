@@ -1,3 +1,5 @@
+<!-- Markdown ignore - MD0032 -->
+
 # 🌙 CircaLog — Development Planning Q&A
 
 **Sleep Tracking PWA for Non-24-Hour Sleep-Wake Disorder, any circadian rhythm disorder or sleep disorder**
@@ -204,7 +206,7 @@ Answer: C, with the option to toggle between calendar date and cycle number in t
 - D) A heatmap (like GitHub's contribution graph) showing sleep coverage
 - E) Multiple views — I want to switch between them
 
-Answer: E. The default visualization would be a diagonal drift chart — time of day on the Y axis, cycle number or calendar date on the X axis — where you can see the sleep band slowly sliding downward (or upward) across weeks. This is sometimes called an actogram and it's what sleep researchers actually use for Non-24 and circadian rhythm disorders.
+Answer: E. The default visualization would be a diagonal drift chart — time of day on the Y axis, cycle number or calendar date on the X axis — where you can see the sleep band slowly sliding downward (or upward) across weeks. This is sometimes called an actogram, and it's what sleep researchers actually use for Non-24 and circadian rhythm disorders.
 
 ---
 
@@ -577,6 +579,8 @@ Answer: C + D combined.
 - C) Maybe — as an optional add-on, not core
 - D) No — I have other tools for journaling
 
+Answer: A and B.
+
 ---
 
 **Q46. Should CircaLog integrate with any other services?**
@@ -587,6 +591,8 @@ Answer: C + D combined.
 - D) Google Calendar (show sleep blocks as events)
 - E) No integrations — keep it self-contained
 
+Answer: E. I want CircaLog to remain self-contained, focusing on sleep logging and visualization for Non-24, avoiding the complexity and privacy issues of third-party integrations for now. Future versions may consider integrations if there's demand, and they can be implemented securely.
+
 ---
 
 **Q47. Would you like a "streak" or gamification element?**
@@ -595,6 +601,8 @@ Answer: C + D combined.
 - B) Yes, but subtle — just a streak counter, nothing flashy
 - C) No — this is a medical tool, not a game
 - D) Maybe for motivation in early days, then I'll want it removed
+
+Answer: B.
 
 ---
 
@@ -605,6 +613,8 @@ Answer: C + D combined.
 - C) Both
 - D) No — I'll open the app normally
 
+Answer: A and B.
+
 ---
 
 **Q49. Should the app include a "Sleep Debt" tracker?**
@@ -613,6 +623,8 @@ Answer: C + D combined.
 - B) Yes, but I know Non-24 makes standard targets tricky — still want it
 - C) Not in V1 — too complex for now
 - D) No — this concept doesn't apply well to Non-24
+
+Answer: B 😔
 
 ---
 
@@ -623,6 +635,8 @@ Answer: C + D combined.
 - C) The data export depth of Oura Ring app
 - D) The simplicity of a plain timer/stopwatch
 - E) I'll describe it in my own words — none of these fit
+
+Answer: B and C. I want the logging UX to be as clean and intuitive as apps like Sleep Cycle or Pillow, where it's easy to start and stop sleep sessions with minimal friction. Additionally, I want the data export capabilities to be robust, similar to the Oura Ring app, allowing me to export detailed sleep data in formats like CSV and PDF for analysis and sharing with healthcare providers.
 
 ---
 
