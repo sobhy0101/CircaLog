@@ -15,6 +15,7 @@
 - [x] 🔴 Set up project folder structure
 - [x] 🔴 Create GitHub repository
 - [x] 🔴 Connect GitHub repo to Vercel for auto-deployment, it is currently assigned the domain name <https://circalog.vercel.app/>
+- [x] 🟢 Set up Vercel Analytics and Speed Insights
 - [x] 🟢 Write `.gitignore`
 - [x] 🟢 Write `README.md`
 - [x] 🟢 Write `LICENSE` (MIT)

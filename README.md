@@ -32,7 +32,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - **Actogram** — the primary chart. A diagonal drift visualization showing
   your sleep band shifting over time, exactly as sleep researchers view Non-24
   data. Time of day on the Y axis, cycle number and calendar date on the X axis.
-- Time range toggle: `[ 1W ]  [ 1M ]  [ 3M ]  [ 6M ]  [ 1Y ]  [ All ]`
+- Time range toggle: `[ 1W ]  [ 2W ]  [ 1M ]  [ 3M ]  [ 6M ]  [ 1Y ]  [ All ]`
 - Each entry displays both **calendar date** and **cycle number** simultaneously
 - Free-running period estimation, displayed automatically after 14+ days of data
   using linear regression on sleep onset times
