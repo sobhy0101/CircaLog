@@ -13,7 +13,7 @@ Examples: `REPORT_phase0-tasks-1-to-5_25-may-2026.md`, `REPORT_phase1-routing_01
 
 **Why:** The user prefers a consistent, scannable naming convention so all reports are easy to find and sort by phase/task range and date.
 
-**How to apply:** Every time a CC session report is written, use this naming pattern. If only one task is covered, use `tasks-{N}` (no "to"). Save all reports in `docs/tasks/cc-reports/`.
+**How to apply:** Every time a CC session report is written, use this naming pattern. If only one task is covered, use `tasks-{N}` (no "to"). Save all reports in `tasks/cc-reports/`.
 
 Always write zero markdownlint warnings or errors in report files. The project has `.markdownlint.json` active in VSCode.
 
