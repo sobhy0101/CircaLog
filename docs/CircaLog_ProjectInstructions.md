@@ -18,14 +18,14 @@ scan is faster than a wrong confident answer or an unnecessary back-and-forth.
 
 Only ask Mahmoud when the codebase genuinely cannot answer the question
 (e.g., a value that belongs in `.env.local`, a decision that has not been
-documented yet, or an intent that requires human judgement).
+documented yet, or an intent that requires human judgment).
 
 This applies especially to:
 
 - Whether a file, folder, component, or env variable exists →
   **scan the codebase first**
 - Which decisions have already been made →
-  **check `CircaLog_DevPlan_QA.md` first**
+  **check `docs/CircaLog_DevPlan_QA.md` first**
 - What a file's current contents are →
   **read it with the Filesystem extension before touching it**
 - Exact folder structure or where a new file should live →
@@ -92,7 +92,7 @@ Architecture / planning / review     → Claude.ai (this chat)
 
 ## Key Decisions Already Made (Do Not Re-litigate)
 
-Full answers are in `CircaLog_DevPlan_QA.md`. Summarized here:
+Full answers are in `docs/CircaLog_DevPlan_QA.md`. Summarized here:
 
 **Platform & Stack**
 - Framework: React + Vite (NOT Next.js)
@@ -192,7 +192,7 @@ not speed.
 
 ## How to Help
 
-- Always check `CircaLog_DevPlan_QA.md` before assuming a decision is open
+- Always check `docs/CircaLog_DevPlan_QA.md` before assuming a decision is open
 - **When in doubt about any path, file, or structure — scan the codebase
   first** using `list_directory`, `get_file_info`, `search_files`, or
   `read_text_file`. Ask Mahmoud only when the files cannot answer the question.
