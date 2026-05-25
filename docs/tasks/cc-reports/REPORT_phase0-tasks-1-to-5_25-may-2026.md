@@ -54,9 +54,11 @@ Five Phase 0 TO-DO items were completed and committed:
 ### Step 1 — Scaffold Vite + React + TypeScript Project
 
 **What the task asked:**
+
 ```bash
 npm create vite@latest . -- --template react-ts
 ```
+
 Choose "Ignore files and continue" when prompted about existing files.
 
 **Problem encountered:**
@@ -94,6 +96,7 @@ described — here is the mapping:
 | *(kept)* | `public/favicon.svg` | Kept as favicon placeholder |
 
 Also updated:
+
 - `package.json` — changed `name` from `"temp-scaffold"` to `"circalog"`
 - `index.html` — changed `<title>` from `"temp-scaffold"` to `"CircaLog"`
 
@@ -104,11 +107,13 @@ Then ran `npm install` to install the base dependencies (152 packages).
 ### Step 2 — Install and Configure TailwindCSS v4
 
 **Installed:**
+
 ```bash
 npm install tailwindcss @tailwindcss/vite
 ```
 
 **`vite.config.ts` — replaced entire contents** as specified:
+
 ```ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -130,6 +135,7 @@ export default defineConfig({
 ```
 
 **`src/index.css` — replaced entire contents:**
+
 ```css
 /* This single line imports all of TailwindCSS's utility classes. */
 @import "tailwindcss";
@@ -153,23 +159,27 @@ the package itself.
 ### Step 4 — Configure ESLint + Prettier
 
 **Installed:**
+
 ```bash
 npm install --save-dev prettier eslint-config-prettier
 ```
 
 **Problem encountered — ESLint config API mismatch:**
 The task provided an ESLint config based on:
+
 - `eslint-plugin-react-hooks` **v5/v6** API: `reactHooks.configs.recommended.rules`
 - `eslint-plugin-react-refresh` **v0.4** API: manual `plugins` + `rules` setup
 - ESLint **9** flat config style: `tseslint.config()` with `extends` array
 
 The installed versions were:
+
 - `eslint-plugin-react-hooks` **v7.1.1** — removed `configs.recommended.rules`,
   now exports `configs.flat.recommended` for flat config
 - `eslint-plugin-react-refresh` **v0.5.2** — exports `configs.vite` preset
 - ESLint **10.3.0** — fully compatible with `tseslint.config()` wrapper
 
 **Fix applied — adapted config for v7 APIs while keeping the same structure:**
+
 ```js
 import js from '@eslint/js'
 import globals from 'globals'
@@ -204,6 +214,7 @@ object (not just a rules spread) and `reactRefresh.configs.vite` bundles the
 **Other files created:**
 
 `.prettierrc`:
+
 ```json
 {
   "semi": false,
@@ -215,18 +226,21 @@ object (not just a rules spread) and `reactRefresh.configs.vite` bundles the
 ```
 
 `.prettierignore`:
-```
+
+```text
 dist/
 node_modules/
 .env*
 ```
 
 `package.json` — added `format` script:
+
 ```json
 "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
 ```
 
 `.vscode/settings.json` — format on save, ESLint fix on save:
+
 ```json
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -240,6 +254,7 @@ node_modules/
 ```
 
 `.vscode/extensions.json` — recommended extensions:
+
 ```json
 {
   "recommendations": [
@@ -267,7 +282,8 @@ The task specified adding `"baseUrl": "."` and `"paths"`. However, TypeScript 6.
 > `Option 'baseUrl' is deprecated and will stop functioning in TypeScript 7.0`
 
 **Fix applied:** Removed `baseUrl` entirely. TypeScript 6 allows `paths` without
-`baseUrl` — this is actually the migration path TS recommends:
+`baseUrl` — this is the migration path TS recommends:
+
 ```json
 "paths": {
   "@/*": ["./src/*"]
@@ -278,7 +294,8 @@ Note: `./src/*` (explicit relative path) is used instead of `src/*` because
 without `baseUrl`, paths must be relative to the `tsconfig` file location.
 
 **Folder structure created** (all with `.gitkeep` so Git tracks empty folders):
-```
+
+```text
 src/
 ├── assets/           .gitkeep
 ├── components/
@@ -293,6 +310,7 @@ src/
 ```
 
 **`src/App.tsx` — replaced** with CircaLog placeholder shell:
+
 ```tsx
 function App() {
   return (
@@ -309,11 +327,14 @@ export default App
 ### Step 6 — Verification
 
 **Build:**
+
 ```bash
 npm run build
 ```
+
 Result: ✅ Clean build — `tsc -b` + Vite bundle succeeded.
-```
+
+```text
 vite v8.0.14 building client environment for production...
 ✓ 16 modules transformed.
 dist/index.html       0.45 kB │ gzip:  0.29 kB
@@ -323,9 +344,11 @@ dist/assets/index.js  190.58 kB │ gzip: 60.07 kB
 ```
 
 **Linter:**
+
 ```bash
 npm run lint
 ```
+
 Result: ✅ No errors, no warnings.
 
 **Note on dev server:** Attempted to start with `npm run dev` to visually confirm
@@ -344,13 +367,15 @@ Marked all five Phase 0 items `[x]` in `docs/CircaLog-TO-DO-list.md`.
 ### Step 8 — Git Commit
 
 Pre-existing unstaged modifications were left out of this commit:
+
 - `.vscode/ltex.dictionary.en-US.txt` — VSCode spell-check dictionary (user's)
 - `.vscode/ltex.hiddenFalsePositives.en-US.txt` — spell-check false positives (user's)
 - `docs/CircaLog_ProjectInstructions.md` — project instructions doc (user's)
 - `tasks/` — task files directory, was untracked at session start (intentional)
 
 Committed 25 files:
-```
+
+```text
 commit 7653772
 chore: Phase 0 setup — Vite, TailwindCSS, Recharts, ESLint, Prettier, folder structure
 ```
@@ -359,7 +384,8 @@ chore: Phase 0 setup — Vite, TailwindCSS, Recharts, ESLint, Prettier, folder s
 
 ## Files Created / Modified
 
-### New files added to the repo:
+### New files added to the repo
+
 | File | Purpose |
 |------|---------|
 | `package.json` | Project manifest + all dependency declarations |
@@ -387,7 +413,8 @@ chore: Phase 0 setup — Vite, TailwindCSS, Recharts, ESLint, Prettier, folder s
 | `src/types/.gitkeep` | Placeholder — TypeScript type definitions |
 | `src/utils/.gitkeep` | Placeholder — pure helper functions |
 
-### Modified files:
+### Modified files
+
 | File | Change |
 |------|--------|
 | `docs/CircaLog-TO-DO-list.md` | Marked 5 Phase 0 items `[x]` |
