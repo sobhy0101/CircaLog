@@ -8,11 +8,11 @@
 
 ## ⚙️ PHASE 0 — Project Setup
 
-- [ ] 🔴 Initialize React + Vite project
-- [ ] 🔴 Install and configure TailwindCSS
-- [ ] 🔴 Install Recharts
-- [ ] 🔴 Configure ESLint + Prettier
-- [ ] 🔴 Set up project folder structure
+- [x] 🔴 Initialize React + Vite project
+- [x] 🔴 Install and configure TailwindCSS
+- [x] 🔴 Install Recharts
+- [x] 🔴 Configure ESLint + Prettier
+- [x] 🔴 Set up project folder structure
 - [x] 🔴 Create GitHub repository
 - [ ] 🔴 Connect GitHub repo to Vercel for auto-deployment
 - [x] 🟢 Write `.gitignore`
