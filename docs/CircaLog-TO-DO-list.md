@@ -14,7 +14,7 @@
 - [x] 🔴 Configure ESLint + Prettier
 - [x] 🔴 Set up project folder structure
 - [x] 🔴 Create GitHub repository
-- [ ] 🔴 Connect GitHub repo to Vercel for auto-deployment
+- [x] 🔴 Connect GitHub repo to Vercel for auto-deployment, it is currently assigned the domain name <https://circalog.vercel.app/>
 - [x] 🟢 Write `.gitignore`
 - [x] 🟢 Write `README.md`
 - [x] 🟢 Write `LICENSE` (MIT)

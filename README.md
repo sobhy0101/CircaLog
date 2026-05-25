@@ -1,4 +1,4 @@
-# 🌙 CircaLog
+# 🌙 CircaLog (<https://circalog.vercel.app/>)
 
 > A sleep tracking PWA built for humans whose bodies don't run on a 24-hour clock.
 
