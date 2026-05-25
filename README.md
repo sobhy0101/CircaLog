@@ -70,9 +70,10 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 
 | Layer              | Technology                                      |
 |--------------------|-------------------------------------------------|
-| Framework          | React + Vite                                    |
-| Styling            | TailwindCSS                                     |
-| Charts             | Recharts                                        |
+| Framework          | React 19 + Vite 8                               |
+| Language           | TypeScript 6                                    |
+| Styling            | TailwindCSS 4                                   |
+| Charts             | Recharts 3                                      |
 | Local Storage      | IndexedDB                                       |
 | Cloud Database     | Supabase (PostgreSQL)                           |
 | Authentication     | Google Sign-In (optional)                       |
@@ -127,8 +128,8 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Node.js 20+ (LTS recommended; required by Vite 8)
+- npm
 
 ### Installation
 
@@ -137,6 +138,16 @@ git clone https://github.com/sobhy0101/CircaLog.git
 cd CircaLog
 npm install
 npm run dev
+```
+
+### Available Scripts
+
+```bash
+npm run dev       # Start dev server at http://localhost:5173
+npm run build     # TypeScript check + production bundle
+npm run lint      # Run ESLint
+npm run format    # Format src/**/*.{ts,tsx,css} with Prettier
+npm run preview   # Preview the production build locally
 ```
 
 ### Environment Variables
