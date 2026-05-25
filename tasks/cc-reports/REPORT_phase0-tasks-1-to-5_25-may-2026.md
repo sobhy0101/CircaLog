@@ -432,7 +432,7 @@ chore: Phase 0 setup — Vite, TailwindCSS, Recharts, ESLint, Prettier, folder s
 | 5 | `baseUrl` deprecation error | TypeScript 6 deprecated `baseUrl` | Removed `baseUrl`; used `paths` alone with `./src/*` prefix |
 | 6 | `@types/node` already installed | create-vite 9 includes it in template | Skipped the separate install step — already present |
 | 7 | New template asset structure | Vite 9 uses `hero.png`, `icons.svg`, `vite.svg` in new locations | Deleted all Vite branding files; kept `favicon.svg` |
-| 8 | `npm.ps1` opened in VSCode | Windows prompted to open the npm PowerShell wrapper when a PowerShell script was executed | Normal system behaviour — file should be ignored/closed |
+| 8 | `npm.ps1` opened in VSCode | Windows prompted to open the npm PowerShell wrapper when a PowerShell script was executed | Normal system behavior — file should be ignored/closed |
 
 ---
 
