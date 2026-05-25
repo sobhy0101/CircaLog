@@ -133,15 +133,19 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 ### Installation
 
 ```bash
-git clone https://github.com/[username]/circalog.git
-cd circalog
+git clone https://github.com/sobhy0101/CircaLog.git
+cd CircaLog
 npm install
 npm run dev
 ```
 
 ### Environment Variables
 
-Create a `.env.local` file in the project root:
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
 
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url

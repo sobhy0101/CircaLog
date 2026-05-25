@@ -13,12 +13,12 @@
 - [ ] 🔴 Install Recharts
 - [ ] 🔴 Configure ESLint + Prettier
 - [ ] 🔴 Set up project folder structure
-- [ ] 🔴 Create GitHub repository
+- [x] 🔴 Create GitHub repository
 - [ ] 🔴 Connect GitHub repo to Vercel for auto-deployment
-- [✅] 🟢 Write `.gitignore`
-- [✅] 🟢 Write `README.md`
-- [✅] 🟢 Write `LICENSE` (MIT)
-- [ ] 🟢 Create `.env.local` template (`.env.example`)
+- [x] 🟢 Write `.gitignore`
+- [x] 🟢 Write `README.md`
+- [x] 🟢 Write `LICENSE` (MIT)
+- [x] 🟢 Create `.env.local` template (`.env.example`)
 - [ ] 🟢 Set up Supabase project (tables, RLS policies)
 - [ ] 🟢 Configure PWA manifest (`manifest.json`)
 - [ ] 🟢 Configure Vite PWA plugin (service worker)
