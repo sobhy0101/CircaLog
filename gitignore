@@ -1,0 +1,64 @@
+# ─── Dependencies ─────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build Output ─────────────────────────────────────────────
+dist/
+dist-ssr/
+build/
+
+# ─── Environment Variables ────────────────────────────────────
+# Never commit secrets or API keys
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ─── Vite ─────────────────────────────────────────────────────
+*.local
+vite.config.ts.timestamp-*
+
+# ─── PWA / Service Worker ─────────────────────────────────────
+dev-dist/
+sw.js
+workbox-*.js
+
+# ─── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── Editor & OS ──────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ─── VS Code ──────────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.code-workspace
+
+# ─── Testing ──────────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── TypeScript ───────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Misc ─────────────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.pem

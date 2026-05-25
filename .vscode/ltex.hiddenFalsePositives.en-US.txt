@@ -1,2 +1,4 @@
 {"rule":"LOG_IN","sentence":"^\\QA) No — the app IS the landing page; redirect to login/dashboard directly\nB) Yes — a simple landing page explaining the app, then enter\nC) Yes — a beautiful marketing page, with the app at /app or /dashboard\nD) Later — V1 just needs the app running\\E$"}
 {"rule":"WHITESPACE_RULE","sentence":"^\\Qcircalog.app          → Landing/coming soon page (V1), evolves into full marketing page (V2+)\ncircalog.app/log      → The PWA app itself (always)\nRoot domain is the public face of CircaLog\nApp lives permanently at /log — clean, descriptive, never changes\\E$"}
+{"rule":"ENGLISH_WORD_REPEAT_BEGINNING_RULE","sentence":"^\\QYour choice.\\E$"}
+{"rule":"ENGLISH_WORD_REPEAT_BEGINNING_RULE","sentence":"^\\QItems marked 🟢 are independent and can be started at any time.\\E$"}
