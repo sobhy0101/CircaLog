@@ -14,9 +14,9 @@ CircaLog is an open-source, offline-first Progressive Web App (PWA) for people l
 **How to apply:** Frame all design and feature decisions around the core user: someone whose sleep cycle drifts around the clock continuously. Prioritize the Actogram visualization and drift-aware data modeling over conventional "sleep score" or bedtime-based UX.
 
 ## Tech Stack
-- Framework: React + Vite
-- Styling: TailwindCSS
-- Charts: Recharts
+- Framework: React 19 + Vite 8
+- Styling: TailwindCSS v4 (Vite plugin — no PostCSS, no tailwind.config.js)
+- Charts: Recharts v3
 - Local Storage: IndexedDB
 - Cloud DB: Supabase (PostgreSQL)
 - Auth: Google Sign-In (optional)
@@ -24,8 +24,58 @@ CircaLog is an open-source, offline-first Progressive Web App (PWA) for people l
 - Serverless: Vercel Functions (V1) → Cloudflare Workers (V2+)
 - Updates: PWA Service Worker (silent auto-update)
 
+## Installed Versions (Phase 0 — 2026-05-25, commit 7653772)
+- Vite: ^8.0.12 (@vitejs/plugin-react ^6.0.1)
+- React: ^19.2.6 / React DOM: ^19.2.6
+- TypeScript: ~6.0.2
+- TailwindCSS: ^4.3.0 / @tailwindcss/vite: ^4.3.0
+- Recharts: ^3.8.1
+- ESLint: ^10.3.0
+- eslint-plugin-react-hooks: ^7.1.1
+- eslint-plugin-react-refresh: ^0.5.2
+- typescript-eslint: ^8.59.2
+- prettier: ^3.8.3 / eslint-config-prettier: ^10.1.8
+- @types/node: ^24.12.3 (included in template — not separately installed)
+
+## Critical API Notes for Future Tasks
+These versions differ from what common tutorials show — use these patterns:
+
+**TypeScript 6:** `baseUrl` is deprecated and will error. Use `paths` alone:
+```json
+"paths": { "@/*": ["./src/*"] }
+```
+`./src/*` must be an explicit relative path (not `src/*`) when `baseUrl` is absent.
+
+**ESLint 10 + react-hooks v7:** Plugin API changed. Use flat config style:
+```js
+reactHooks.configs.flat.recommended  // NOT reactHooks.configs.recommended.rules
+reactRefresh.configs.vite            // NOT manual plugins + rules setup
+```
+
+**Vite 9 template:** Does NOT generate `src/vite-env.d.ts`. Vite client types
+are declared via `"types": ["vite/client"]` in `tsconfig.app.json` instead.
+
 ## Architecture
 Local-first: fully functional offline (IndexedDB), optional Google Sign-In to sync to Supabase cloud. Data lives on device first.
+
+## Project Structure
+```
+C:\Projects\CircaLog\
+  docs/          — project documentation (TO-DO list, DevPlan Q&A, etc.)
+  src/
+    assets/      — images, icons, fonts
+    components/
+      ui/        — primitive building-block components
+    hooks/       — custom React hooks
+    lib/
+      db/        — IndexedDB service
+      supabase/  — Supabase client (V2)
+    pages/       — page-level components
+    types/       — TypeScript type definitions
+    utils/       — pure helper functions
+  tasks/         — CC task files (untracked in git as of Phase 0)
+  public/        — static assets (favicon.svg placeholder)
+```
 
 ## Key URLs
 - `circalog.app` — landing page (V1 coming soon, V2+ marketing)

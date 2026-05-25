@@ -23,3 +23,12 @@ Filesystem
 dotfile
 Sobhy
 Vite-generated
+create-vite
+vite
+eslint-plugin-react-hooks
+eslint-plugin-react-refresh
+typescript-eslint
+eslint-config-prettier
+react-ts
+VSCode
+Lockfile
