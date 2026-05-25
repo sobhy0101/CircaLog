@@ -4,7 +4,7 @@
 **Stack:** React + Vite + TypeScript + TailwindCSS + Recharts + IndexedDB + Supabase + Vercel
 **Project root:** `C:\Projects\CircaLog\`
 **Domain:** `circalog.app` (purchasing June 1st, insha'Allah)
-**GitHub:** https://github.com/sobhy0101/CircaLog
+**GitHub:** <https://github.com/sobhy0101/CircaLog>
 
 ---
 
