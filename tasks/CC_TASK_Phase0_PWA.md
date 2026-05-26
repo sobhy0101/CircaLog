@@ -245,9 +245,9 @@ import { useRegisterSW } from 'virtual:pwa-register/react'
 
 export function useAppUpdate() {
   const {
-    // needsRefresh: true when a new service worker has been downloaded and
+    // needRefresh: true when a new service worker has been downloaded and
     // is waiting to activate. This is when we'd show the changelog modal.
-    needsRefresh: [needsUpdate],
+    needRefresh: [needsUpdate],
 
     // updateServiceWorker: call this to tell the waiting service worker to
     // activate now. Pass 'true' to also reload the page after activation.
