@@ -2,9 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- Standard favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Tells mobile browsers to use the device's full width and prevent
+         auto-zoom. Critical for any mobile-first PWA. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Page title shown in browser tab and in the OS app switcher -->
     <title>CircaLog</title>
+
+    <!-- PWA: color of the browser/OS chrome surrounding the app on Android -->
+    <meta name="theme-color" content="#171717" />
+
+    <!-- PWA: tells iOS Safari to allow "Add to Home Screen" as a full-screen app -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- PWA: sets the iOS status bar style when running as a home screen app -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- PWA: the name shown below the app icon on iOS home screens -->
+    <meta name="apple-mobile-web-app-title" content="CircaLog" />
+
+    <!-- vite-plugin-pwa injects the manifest link automatically during build.
+         The line below is a fallback for environments that don't use the plugin. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
   </head>
   <body>
     <div id="root"></div>

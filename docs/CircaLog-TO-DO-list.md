@@ -20,9 +20,9 @@
 - [x] 🟢 Write `README.md`
 - [x] 🟢 Write `LICENSE` (MIT)
 - [x] 🟢 Create `.env.local` template (`.env.example`)
-- [ ] 🟢 Set up Supabase project (tables, RLS policies)
-- [ ] 🟢 Configure PWA manifest (`manifest.json`)
-- [ ] 🟢 Configure Vite PWA plugin (service worker)
+- [x] 🟢 Set up Supabase project (tables, RLS policies)
+- [x] 🟢 Configure PWA manifest (`manifest.json`)
+- [x] 🟢 Configure Vite PWA plugin (service worker)
 
 ---
 
