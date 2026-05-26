@@ -220,3 +220,29 @@ not speed.
 - Do not touch the coming-soon landing page logic when working on `/log`,
   and vice versa — they are separate concerns
 - Do not invent a file path — scan first, always
+
+---
+
+## CC Task File Requirements
+
+Every task file written for Claude Code **must** include a session report
+step as the second-to-last step, immediately before the git commit step.
+
+This is non-negotiable — do not write a task file without it.
+
+**What the report step must tell CC to do:**
+
+- Write a comprehensive Markdown report covering all steps, outcomes,
+  packages installed (with exact versions), build output, deviations from
+  the task instructions, and a full list of files created or modified
+- Save the report to `tasks/cc-reports/` using the naming convention in
+  `.claude/memory/feedback_report_conventions.md`:
+  `REPORT_phase{N}-{slug}_{DD}-{mon}-{YYYY}.md`
+- Follow the markdownlint rules: blank line before and after every fenced
+  code block, zero warnings allowed
+- Paste a short summary into the Claude.ai chat and **wait for confirmation**
+  before running the git commit
+
+The full policy for CC lives in `.claude/memory/session_report_policy.md`.
+
+When in doubt about what to include in the report step, read that file.

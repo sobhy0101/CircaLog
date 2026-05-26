@@ -32,3 +32,11 @@ eslint-config-prettier
 react-ts
 VSCode
 Lockfile
+Markdownlint
+vite-plugin-pwa
+destructured
+destructuring
+vite-env
+maskable
+installability
+useRegisterSW
