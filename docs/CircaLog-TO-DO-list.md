@@ -29,9 +29,9 @@
 ## 🚀 V1 — Core MVP
 
 ### 🌐 Routing & Layout
-- [ ] 🔴 Set up React Router
-- [ ] 🔴 Create route: `/log` → main PWA app
-- [ ] 🔴 Create route: `/` → coming soon landing page
+- [x] 🔴 Set up React Router
+- [x] 🔴 Create route: `/log` → main PWA app
+- [x] 🔴 Create route: `/` → coming soon landing page
 - [ ] 🟡 Build base app shell (bottom tab bar + side drawer layout)
 - [ ] 🟡 Build bottom tab bar: `[ Log ] [ Chart ] [ History ] [ Insights ]`
 - [ ] 🟡 Add bottom padding for Android/iOS system navigation bars

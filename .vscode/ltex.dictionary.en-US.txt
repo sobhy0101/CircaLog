@@ -40,3 +40,6 @@ vite-env
 maskable
 installability
 useRegisterSW
+BrowserRouter
+tsx
+wordmark

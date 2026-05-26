@@ -1,17 +1,18 @@
-// App.tsx — the root component of CircaLog.
-// React Router and the main layout will be added in the next phase.
-// For now, this is a placeholder that confirms the stack is working.
+// App.tsx — root component of CircaLog.
+// Defines which page component renders for each URL path.
 
-function App() {
+import { Routes, Route } from 'react-router-dom' // URL-to-component mapping
+import ComingSoon from '@/pages/ComingSoon'       // Route: /
+import AppShell   from '@/pages/AppShell'         // Route: /log
+
+export default function App() {
   return (
-    // min-h-screen: makes the div at least as tall as the browser window
-    // bg-neutral-950: very dark charcoal background (our default dark mode color)
-    // text-white: white text for contrast
-    <div className="min-h-screen bg-neutral-950 text-white">
-      {/* This paragraph will be replaced with the real app layout */}
-      <p className="p-4 text-violet-400">CircaLog — development build ✓</p>
-    </div>
+    <Routes>
+      {/* / → coming soon landing page */}
+      <Route path="/" element={<ComingSoon />} />
+
+      {/* /log → the main PWA application */}
+      <Route path="/log" element={<AppShell />} />
+    </Routes>
   )
 }
-
-export default App
