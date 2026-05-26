@@ -21,7 +21,7 @@ no errors.
 
 ### Step 1 — Install vite-plugin-pwa ✅
 
-```
+```bash
 npm install --save-dev vite-plugin-pwa
 ```
 
@@ -86,7 +86,7 @@ The task spec destructured `needsRefresh` from `useRegisterSW`. The
 actual property name in `vite-plugin-pwa@1.3.0` is `needRefresh`
 (no trailing 's'). TypeScript caught this immediately:
 
-```
+```text
 error TS2339: Property 'needsRefresh' does not exist on type '...'
 ```
 
@@ -114,7 +114,7 @@ type so TypeScript doesn't raise "cannot find module" errors.
 
 **First build attempt — ❌ TypeScript error:**
 
-```
+```text
 src/hooks/useAppUpdate.ts(19,5): error TS2339: Property 'needsRefresh'
 does not exist on type '{ needRefresh: [...]; ... }'
 ```
@@ -123,7 +123,7 @@ does not exist on type '{ needRefresh: [...]; ... }'
 
 **Second build attempt — ✅ Clean:**
 
-```
+```text
 vite v8.0.14 building client environment for production...
 ✓ 18 modules transformed.
 
@@ -154,7 +154,7 @@ files generated
 
 **Preview server:**
 
-```
+```text
 npm run preview
 ➜  Local:   http://localhost:4173/
 ```

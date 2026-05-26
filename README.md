@@ -150,6 +150,17 @@ npm run format    # Format src/**/*.{ts,tsx,css} with Prettier
 npm run preview   # Preview the production build locally
 ```
 
+### Supabase CLI
+
+These commands are only needed for V2+ cloud sync work. The app runs
+fully offline without them.
+
+```bash
+supabase login                                    # Authenticate with the Supabase CLI
+supabase init                                     # Initialize Supabase in the project (creates supabase/ directory)
+supabase link --project-ref iarozmvqcsrkdgytqzws # Link to the CircaLog Supabase project
+```
+
 ### Environment Variables
 
 Copy `.env.example` to `.env.local` and fill in your values:
@@ -161,6 +172,7 @@ cp .env.example .env.local
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
 ```
 
 ---
