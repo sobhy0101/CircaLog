@@ -246,3 +246,22 @@ This is non-negotiable — do not write a task file without it.
 The full policy for CC lives in `.claude/memory/session_report_policy.md`.
 
 When in doubt about what to include in the report step, read that file.
+
+---
+
+## CC Skills
+
+Project skills live in `.claude/skills/`. Each skill encodes conventions for
+a recurring task type, so CC does not rediscover them from scratch each session.
+
+When writing a CC task file that involves any of the domains below, include
+an explicit step telling CC to read the relevant skill first:
+
+| Task involves | Skill to reference |
+|---|---|
+| Starting dev server or running Playwright | `.claude/skills/run/SKILL.md` |
+| Visual browser verification | `.claude/skills/visual-check/SKILL.md` |
+| Using or extending color tokens | `.claude/skills/token-usage/SKILL.md` |
+
+As new skills are added, update this table and the routing table in `CLAUDE.md`
+(project root) in the same session.

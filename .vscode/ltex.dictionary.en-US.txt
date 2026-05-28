@@ -50,3 +50,6 @@ preconnect
 FOUC
 hardcoding
 FOUC-Prevention
+circa-bg
+ComingSoon
+markdownlint
