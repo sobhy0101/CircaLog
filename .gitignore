@@ -58,6 +58,12 @@ Desktop.ini
 coverage/
 .nyc_output/
 
+# ─── CC Session Artifacts ─────────────────────────────────────
+# Playwright screenshots generated during visual verification.
+# Never committed — verification only.
+tasks/screenshots/
+tasks/*.png
+
 # ─── TypeScript ───────────────────────────────────────────────
 *.tsbuildinfo
 

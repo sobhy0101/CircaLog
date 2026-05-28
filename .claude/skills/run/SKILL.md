@@ -1,39 +1,54 @@
 # CircaLog — Dev Server & Browser Automation
 
+> Windows machine. All commands are PowerShell. Do not use bash syntax
+> (`&`, `kill`, `curl`, `lsof`) — it will fail.
+
+---
+
 ## Start the dev server
 
-Run in the background so it stays alive throughout the session:
+`Start-Process` creates a truly detached process that survives after the
+command returns. Use `cmd.exe /c` as the wrapper so npm.cmd resolves correctly:
 
-```bash
-npm run dev &
+```powershell
+Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "npm run dev" -WindowStyle Hidden
+Start-Sleep -Seconds 3
 ```
 
 Server URL: `http://localhost:5173`
 
-Wait 2–3 seconds before opening a browser or running Playwright.
+The 3-second sleep gives Vite time to finish binding the port before any
+Playwright call tries to open the page.
 
-## Check if already running
+## Check if the server is already running
 
-```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:5173
+```powershell
+try {
+    $status = (Invoke-WebRequest -Uri "http://localhost:5173" -UseBasicParsing -TimeoutSec 2).StatusCode
+    Write-Host "Server running — HTTP $status"
+} catch {
+    Write-Host "Server not running"
+}
 ```
 
-Returns `200` if live. Skip starting if already alive — do not start a second instance.
+If the server is already running, skip the Start-Process step — do not start
+a second instance.
 
 ## Stop the server
 
-```bash
-kill $(lsof -t -i:5173)
+```powershell
+$conn = Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue
+if ($conn) { Stop-Process -Id $conn.OwningProcess -Force }
 ```
 
 ## Playwright
 
-Already installed as a dev dependency (`npm install --save-dev playwright` was run on
-28 May 2026). No extra install step needed between sessions.
+Already installed as a dev dependency (`npm install --save-dev playwright` was
+run on 28 May 2026). No extra install step needed between sessions.
 
 First time after a fresh `npm install`, install the browser binary once:
 
-```bash
+```powershell
 npx playwright install chromium
 ```
 
@@ -52,5 +67,11 @@ For what to check once the page is open, see `.claude/skills/visual-check/SKILL.
 
 ## Screenshots
 
-Save to `tasks/screenshots/`. Create the directory if it does not exist.
-Screenshots are for session verification only — never commit them.
+Save to `tasks/screenshots/`. Create the directory if it does not exist:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "tasks/screenshots"
+```
+
+Screenshots are for session verification only — `tasks/screenshots/` is in
+`.gitignore` and must never be committed.
