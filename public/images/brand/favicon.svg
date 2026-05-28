@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><g clip-path="url(#SvgjsClipPath1022)"><rect width="1000" height="1000" fill="#0f0f1e"></rect><g transform="matrix(1.3671875,0,0,1.3671875,150,150)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><defs>
+    <style>
+      .cls-1 {
+        fill: #0f0f1e;
+      }
+
+      .cls-2 {
+        fill: #7c3aed;
+      }
+
+      .cls-3 {
+        fill: #6d28d9;
+      }
+
+      .cls-4 {
+        fill: #a78bfa;
+      }
+
+      .cls-5 {
+        fill: #8b5cf6;
+      }
+    </style>
+  <clipPath id="SvgjsClipPath1022"><rect width="1000" height="1000" x="0" y="0" rx="350" ry="350"></rect></clipPath></defs><rect class="cls-1" width="512" height="512"></rect><g id="Layer_1" data-name="Layer 1">
+    <g>
+      <path class="cls-3" d="M248.33,128.98H36.23c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
+      <path class="cls-2" d="M324.86,234.4H112.76c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
+      <path class="cls-5" d="M399.96,339.82h-212.1c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
+      <path class="cls-4" d="M475.77,445.24h-212.1c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
+    </g>
+  </g></svg></g></g></svg>
