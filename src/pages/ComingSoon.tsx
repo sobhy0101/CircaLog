@@ -5,7 +5,7 @@
 export default function ComingSoon() {
   return (
     // Full-screen dark background, centred layout
-    <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-6 text-center">
+    <div className="min-h-screen bg-circa-bg flex flex-col items-center justify-center px-6 text-center">
 
       {/* ── Logo placeholder ───────────────────────────────────────────── */}
       {/* A styled circle with the initials "CL" stands in for the real logo.
@@ -14,36 +14,36 @@ export default function ComingSoon() {
         <div
           className="
             w-24 h-24 rounded-full
-            bg-violet-950 border-2 border-violet-500
+            bg-circa-accent-subtle border-2 border-circa-accent
             flex items-center justify-center
           "
         >
           {/* Initials placeholder — swap for <img> or <svg> when logo exists */}
-          <span className="text-3xl font-bold tracking-widest text-violet-300 select-none">
+          <span className="text-3xl font-bold tracking-widest text-circa-accent-light select-none">
             CL
           </span>
         </div>
 
         {/* App name — styled as the wordmark until a proper logo is designed */}
-        <h1 className="text-4xl font-bold tracking-tight text-white">
-          Circa<span className="text-violet-400">Log</span>
+        <h1 className="text-4xl font-bold tracking-tight text-circa-text-primary">
+          Circa<span className="text-circa-accent">Log</span>
         </h1>
       </div>
 
       {/* ── Headline ───────────────────────────────────────────────────── */}
-      <p className="text-2xl font-semibold text-violet-200 mb-3">
+      <p className="text-2xl font-semibold text-circa-accent-light mb-3">
         Coming Soon
       </p>
 
       {/* ── Tagline ────────────────────────────────────────────────────── */}
-      <p className="max-w-sm text-neutral-400 text-base leading-relaxed">
+      <p className="max-w-sm text-circa-text-secondary text-base leading-relaxed">
         A sleep tracker built for Non-24-Hour Sleep–Wake Disorder.
         <br />
         Something's taking shape, hopefully in the dark.
       </p>
 
       {/* ── Subtle footer note ─────────────────────────────────────────── */}
-      <p className="mt-16 text-xs text-neutral-700 select-none">
+      <p className="mt-16 text-xs text-circa-text-muted select-none">
         circalog.app
       </p>
 

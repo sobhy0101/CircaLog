@@ -36,15 +36,32 @@
 
 ### 🎨 Design System
 
-- [ ] 🟢 Define CSS variables / Tailwind theme tokens:
-       - Primary: dark charcoal background
-       - Accent: purple/violet
-       - Text: high contrast white/light gray
-       - Subtle: muted tones for secondary elements
-- [ ] 🟢 Choose and configure typography (no generic fonts)
-- [ ] 🟢 Build dark/light mode toggle (dark default)
-- [ ] 🟢 Store theme preference in localStorage
+- [x] 🟢 Define CSS variables / Tailwind theme tokens
+       (circa-bg/surface/surface-raised, circa-border/border-strong,
+       circa-accent/accent-subtle/accent-light, circa-text-primary/secondary/muted —
+       dark + light mode, @variant dark, FOUC script, ComingSoon.tsx migrated)
+- [ ] 🟢 Integrate Google Fonts — Exo 2 (Semibold 600) and Inter (variable):
+       - Add preconnect hints to `index.html`
+       - Add `@import` in `index.css` and define font-family tokens in `@theme inline`
+       (Fonts decided — see `docs/CircaLog_DevPlan_QA.md` → Typography section)
+- [ ] 🟢 Build dark/light mode toggle:
+       - `useTheme` hook (reads/writes `localStorage` key `circalog-theme`)
+       - Export `THEME_KEY = 'circalog-theme'` as a named constant from `useTheme.ts`
+       - Update FOUC script comment in `index.html` to reference `THEME_KEY` in `useTheme.ts`
+       - `ThemeToggle` component
+       - Wire into `App.tsx` / side drawer
+       (FOUC script is in the token task above; this task is the reactive UI layer)
 - [ ] 🟢 Design app logo / splash screen
+       (Brand logo SVG + PWA icons already generated under `public/images/brand/`.
+       Remaining: review splash screen coverage on Android; design branded splash if needed.)
+
+### 🌐 Landing Page (circalog.app root)
+
+- [ ] 🟢 Design and build coming soon page
+- [ ] 🟢 App name + tagline
+- [ ] 🟢 Brief description of what CircaLog is and who it's for
+- [ ] 🟢 "Get notified at launch" email capture (optional, simple)
+- [ ] 🟢 Link to `/log` for early access
 
 ### 🏠 App Shell & Navigation
 
@@ -68,7 +85,6 @@
        - Dreams / Nightmares (yes/no + text)
        - Interruptions (count + type: bathroom/thirst/hunger/pain/other)
        - Medication taken (before/during/after, yes/no)
-       - Food/snacks (meal type, time, notes)
 - [ ] 🟡 Auto-detect session type: Main Sleep (≥3h) vs. Nap (<3h)
 - [ ] 🟡 Assign cycle number to each entry
 - [ ] 🟡 Display both calendar date AND cycle number on each entry
@@ -111,14 +127,6 @@
        - Calculated via linear regression on sleep onset times
        - Show "Pending — log 14+ days to unlock" until threshold is met
        - Display prominently once available
-
-### 🌐 Landing Page (circalog.app root)
-
-- [ ] 🟢 Design and build coming soon page
-- [ ] 🟢 App name + tagline
-- [ ] 🟢 Brief description of what CircaLog is and who it's for
-- [ ] 🟢 "Get notified at launch" email capture (optional, simple)
-- [ ] 🟢 Link to `/log` for early access
 
 ### 🔧 PWA & Deployment
 

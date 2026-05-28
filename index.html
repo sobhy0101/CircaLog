@@ -3,6 +3,17 @@
   <head>
     <meta charset="UTF-8" />
 
+    <!-- FOUC prevention: reads the saved theme from localStorage and adds .dark
+         to <html> before React renders, ensuring zero flash on first load.
+         'circalog-theme' is the canonical key — the useTheme hook must match it. -->
+    <script>
+      (function () {
+        if (localStorage.getItem('circalog-theme') !== 'light') {
+          document.documentElement.classList.add('dark');
+        }
+      }());
+    </script>
+
     <!-- Favicon: SVG (modern browsers, auto-adapts to light/dark if authored that way) -->
     <link rel="icon" type="image/svg+xml" href="/images/brand/favicon.svg?v=20260528" />
     <!-- Favicon: PNG fallback for browsers that don't support SVG favicons -->

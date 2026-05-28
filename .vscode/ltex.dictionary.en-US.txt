@@ -45,3 +45,8 @@ tsx
 wordmark
 bg
 Exo
+FOUC-prevention
+preconnect
+FOUC
+hardcoding
+FOUC-Prevention

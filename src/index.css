@@ -1,3 +1,75 @@
 /* This single line imports all of TailwindCSS's utility classes.
    No other CSS setup needed — Tailwind generates everything from here. */
 @import "tailwindcss";
+
+/* Override the built-in dark: variant to use a .dark class on <html>
+   instead of the default prefers-color-scheme media query.
+   This is required for user-selectable theme switching.
+   See Step 2 of CC_TASK_Phase1_ColorTokens.md for syntax verification. */
+@variant dark (&:is(.dark *));
+
+/* ── Light mode — :root values (active when .dark is absent) ────────────
+   These are the default values the app uses in light mode.             */
+:root {
+  /* Backgrounds */
+  --circa-bg:             #F8F8FF; /* App background — barely-there violet tint */
+  --circa-surface:        #FFFFFF; /* Cards, panels */
+  --circa-surface-raised: #EEECFF; /* Elevated cards, dropdowns */
+
+  /* Borders */
+  --circa-border:         #D0D0E8; /* Subtle dividers */
+  --circa-border-strong:  #9090B8; /* Focused inputs, active borders */
+
+  /* Accent — purple/violet */
+  --circa-accent:         #7C3AED; /* Primary CTA, active states */
+  --circa-accent-subtle:  #EDE9FE; /* Badge / chip backgrounds (light surface) */
+  --circa-accent-light:   #5B21B6; /* Accent text on light surfaces */
+
+  /* Text */
+  --circa-text-primary:   #1A1A2E; /* Headings, body copy */
+  --circa-text-secondary: #4A4A6A; /* Labels, captions */
+  --circa-text-muted:     #8A8AAA; /* Placeholder, disabled */
+}
+
+/* ── Dark mode — .dark overrides (active when .dark is on <html>) ───────
+   The FOUC-prevention script in index.html applies .dark before React
+   renders, so the correct values are active on the very first paint.   */
+.dark {
+  /* Backgrounds */
+  --circa-bg:             #0F0F1E; /* App background — deep charcoal */
+  --circa-surface:        #17172A; /* Cards, panels */
+  --circa-surface-raised: #1E1E35; /* Elevated cards, dropdowns */
+
+  /* Borders */
+  --circa-border:         #2D2D4A; /* Subtle dividers */
+  --circa-border-strong:  #4A4A70; /* Focused inputs, active borders */
+
+  /* Accent — identical base, different light variant */
+  --circa-accent:         #7C3AED; /* Same in both modes — vivid enough */
+  --circa-accent-subtle:  #2D1B6E; /* Muted accent background (dark surface) */
+  --circa-accent-light:   #A78BFA; /* Accent text on dark surfaces */
+
+  /* Text */
+  --circa-text-primary:   #F0F0FA; /* Headings, body copy */
+  --circa-text-secondary: #A0A0C0; /* Labels, captions */
+  --circa-text-muted:     #5A5A7A; /* Placeholder, disabled */
+}
+
+/* ── Tailwind v4 theme mapping ──────────────────────────────────────────
+   @theme inline maps each circa-* variable to a Tailwind utility name.
+   'inline' is required — without it Tailwind resolves var() at build
+   time and the runtime theme toggle won't work.
+   These mappings generate: bg-circa-*, text-circa-*, border-circa-*, etc. */
+@theme inline {
+  --color-circa-bg:             var(--circa-bg);
+  --color-circa-surface:        var(--circa-surface);
+  --color-circa-surface-raised: var(--circa-surface-raised);
+  --color-circa-border:         var(--circa-border);
+  --color-circa-border-strong:  var(--circa-border-strong);
+  --color-circa-accent:         var(--circa-accent);
+  --color-circa-accent-subtle:  var(--circa-accent-subtle);
+  --color-circa-accent-light:   var(--circa-accent-light);
+  --color-circa-text-primary:   var(--circa-text-primary);
+  --color-circa-text-secondary: var(--circa-text-secondary);
+  --color-circa-text-muted:     var(--circa-text-muted);
+}
