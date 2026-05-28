@@ -49,15 +49,34 @@ export default defineConfig({
         // background_color is shown on the splash screen while the app loads.
         background_color: '#171717',
 
-        // Icons — placeholder set for Phase 0.
-        // The full production icon set (all sizes, maskable variants) is a V1 task.
-        // These reference the SVG favicon that already exists in /public/.
+        // Icons — production set added 28 May 2026.
+        // All files live in /public/images/brand/ and were generated via
+        // realfavicongenerator.net from the CircaLog symbol mark SVG.
+        // The PNG icons use purpose 'any maskable' because the artwork was
+        // created with a ~350px safe zone inside a 512px artboard, which
+        // satisfies the maskable icon safe-zone requirement.
         icons: [
           {
-            src: '/favicon.svg',
+            // SVG icon — picked up by modern browsers that support it.
+            src: '/images/brand/favicon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any',
+          },
+          {
+            // 192×192 PNG — required minimum size for Android home screen.
+            src: '/images/brand/web-app-manifest-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+          {
+            // 512×512 PNG — used for the Android splash screen and
+            // high-resolution home screen icons.
+            src: '/images/brand/web-app-manifest-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
           },
         ],
       },

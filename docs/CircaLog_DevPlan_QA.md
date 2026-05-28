@@ -347,6 +347,8 @@ Answer: A and C. I want a blend of clinical/medical aesthetics for clarity and p
 - E) Monochrome — black, white, and one accent color only
 
 Answer: B.
+Dark charcoal: `#0F0F1E`
+Purple/violet - Accents: `#6d28d9`, `#7c3aed`, `#8b5cf6`, `#a78bfa`,`#7c3aed`, `#8b5cf6`, `#a78bfa`
 
 ---
 
