@@ -43,11 +43,11 @@ export default defineConfig({
         orientation: 'any',
 
         // theme_color sets the color of the browser/system chrome around the app
-        // (e.g. the status bar on Android). Matches our dark charcoal palette.
-        theme_color: '#171717',
+        // (e.g. the status bar on Android). Matches the app's deep navy background.
+        theme_color: '#0F0F1E',
 
         // background_color is shown on the splash screen while the app loads.
-        background_color: '#171717',
+        background_color: '#0F0F1E',
 
         // Icons — production set added 28 May 2026.
         // All files live in /public/images/brand/ and were generated via

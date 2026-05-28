@@ -28,18 +28,14 @@
 
 ## 🚀 V1 — Core MVP
 
-### 🌐 Routing & Layout
+### 🌐 Routing
+
 - [x] 🔴 Set up React Router
 - [x] 🔴 Create route: `/log` → main PWA app
 - [x] 🔴 Create route: `/` → coming soon landing page
-- [ ] 🟡 Build base app shell (bottom tab bar + side drawer layout)
-- [ ] 🟡 Build bottom tab bar: `[ Log ] [ Chart ] [ History ] [ Insights ]`
-- [ ] 🟡 Add bottom padding for Android/iOS system navigation bars
-- [ ] 🟡 Build side drawer (hamburger icon top-left)
-- [ ] 🟡 Populate drawer links: Settings, Reports, Export, About,
-       Privacy Policy, Terms & Conditions, Dark Mode Toggle
 
 ### 🎨 Design System
+
 - [ ] 🟢 Define CSS variables / Tailwind theme tokens:
        - Primary: dark charcoal background
        - Accent: purple/violet
@@ -50,7 +46,17 @@
 - [ ] 🟢 Store theme preference in localStorage
 - [ ] 🟢 Design app logo / splash screen
 
+### 🏠 App Shell & Navigation
+
+- [ ] 🟡 Build base app shell (bottom tab bar + side drawer layout)
+- [ ] 🟡 Build bottom tab bar: `[ Log ] [ Chart ] [ History ] [ Insights ]`
+- [ ] 🟡 Add bottom padding for Android/iOS system navigation bars
+- [ ] 🟡 Build side drawer (hamburger icon top-left)
+- [ ] 🟡 Populate drawer links: Settings, Reports, Export, About,
+       Privacy Policy, Terms & Conditions, Dark Mode Toggle
+
 ### 🛏️ Sleep Log — Core
+
 - [ ] 🔴 Design sleep log data model (IndexedDB schema)
 - [ ] 🔴 Build IndexedDB service (CRUD operations)
 - [ ] 🔴 Build "Start Sleep" one-tap timer screen
@@ -62,6 +68,7 @@
        - Dreams / Nightmares (yes/no + text)
        - Interruptions (count + type: bathroom/thirst/hunger/pain/other)
        - Medication taken (before/during/after, yes/no)
+       - Food/snacks (meal type, time, notes)
 - [ ] 🟡 Auto-detect session type: Main Sleep (≥3h) vs. Nap (<3h)
 - [ ] 🟡 Assign cycle number to each entry
 - [ ] 🟡 Display both calendar date AND cycle number on each entry
@@ -70,6 +77,7 @@
 - [ ] 🟢 Delete sleep entries (with confirmation dialog)
 
 ### 📊 Visualization — Actogram
+
 - [ ] 🔴 Build actogram component using Recharts
        - Y axis: time of day (00:00 – 23:59, or extended for >24h sessions)
        - X axis: cycle number (primary) + calendar date (secondary)
@@ -84,6 +92,7 @@
 - [ ] 🟢 Pinch-to-zoom or swipe navigation on mobile
 
 ### 📋 History View
+
 - [ ] 🟡 List view of all past sleep entries
 - [ ] 🟡 Show: cycle number, calendar date, start time, wake time,
        duration, quality rating, session type (sleep/nap)
@@ -91,6 +100,7 @@
 - [ ] 🟢 Sort by: most recent first (default) / the oldest first
 
 ### 💡 Insights View
+
 - [ ] 🟡 Average sleep duration (rolling 7-day and 30-day)
 - [ ] 🟡 Average drift per cycle (how many minutes later per cycle)
 - [ ] 🟡 Longest and shortest sleep sessions
@@ -103,6 +113,7 @@
        - Display prominently once available
 
 ### 🌐 Landing Page (circalog.app root)
+
 - [ ] 🟢 Design and build coming soon page
 - [ ] 🟢 App name + tagline
 - [ ] 🟢 Brief description of what CircaLog is and who it's for
@@ -110,8 +121,9 @@
 - [ ] 🟢 Link to `/log` for early access
 
 ### 🔧 PWA & Deployment
-- [ ] 🔴 Configure Vite PWA plugin (Workbox service worker)
-- [ ] 🔴 Silent auto-update on new deployments
+
+- [x] 🔴 Configure Vite PWA plugin (Workbox service worker)
+- [x] 🔴 Silent auto-update on new deployments
 - [ ] 🔴 In-app changelog modal (show on first load after update)
 - [ ] 🟢 App installable on Android (add to home screen)
 - [ ] 🟢 Offline fallback page
@@ -123,6 +135,7 @@
 ## 🔧 V2 — Enhanced Features
 
 ### 🔐 Auth & Cloud Sync
+
 - [ ] Implement optional Google Sign-In
 - [ ] Connect Supabase auth to Google OAuth
 - [ ] Build sync service: IndexedDB → Supabase on connect
@@ -131,6 +144,7 @@
 - [ ] Allow sign-out (data remains local)
 
 ### 🔔 Notifications
+
 - [ ] Request push notification permission (gracefully)
 - [ ] Bedtime reminder: configurable lead time (default 30–60 min)
 - [ ] Reminder to log sleep after extended wake period
@@ -139,6 +153,7 @@
 - [ ] Ensure notifications are free (PWA Web Push — no cost)
 
 ### 📤 Reports & Export
+
 - [ ] Weekly sleep summary (auto-generated)
 - [ ] Monthly sleep summary
 - [ ] Export as CSV (all fields)
@@ -147,6 +162,7 @@
        free-running period, average cycle length, drift rate
 
 ### 🩺 Health Tracking (Optional Fields)
+
 - [ ] Light exposure field (none / indoor / outdoor / bright)
 - [ ] Physical activity level (none / light / moderate / intense)
 - [ ] Headache / pain level (0–10 scale)
@@ -154,17 +170,20 @@
 - [ ] All fields optional, off by default, toggleable in Settings
 
 ### 💊 Medication Log
+
 - [ ] Separate medication tracking section
 - [ ] Log medication name, dose, timing (before/during/after sleep)
 - [ ] Link medication entries to sleep sessions
 - [ ] View correlation between medication and sleep quality
 
 ### 📚 Educational Resources
+
 - [ ] "About Non-24" section in side drawer
 - [ ] Brief explanation of Non-24, free-running period, actograms
 - [ ] Curated links to reputable resources (NIH, Sleep Foundation, etc.)
 
 ### 😴 Sleep Debt Tracker
+
 - [ ] User-configurable sleep target (default: 8 hours)
 - [ ] Display cumulative sleep debt / surplus
 - [ ] Note in UI that Non-24 makes standard targets approximate
@@ -174,24 +193,29 @@
 ## 🌍 V3 — Public Launch
 
 ### Multi-User Architecture
+
 - [ ] Refactor data model for multi-tenancy
 - [ ] User profiles and account management
 - [ ] Caregiver / shared access (view-only link)
 
 ### Customization
+
 - [ ] Customizable bottom tab bar (choose which features appear)
 - [ ] Features not in tab bar move to side drawer automatically
 
 ### Android Widget
+
 - [ ] One-tap Log Sleep / Wake widget for Android home screen
 - [ ] Last sleep entry summary widget
 
 ### Marketing
+
 - [ ] Full marketing landing page at `circalog.app`
 - [ ] App moves to `circalog.app/log` (already planned)
 - [ ] Screenshots, feature highlights, testimonials
 
 ### Open Source
+
 - [ ] Review codebase for any private/sensitive data
 - [ ] Write `CONTRIBUTING.md`
 - [ ] Write `CODE_OF_CONDUCT.md`
