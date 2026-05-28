@@ -642,4 +642,43 @@ Answer: B and C. I want the logging UX to be as clean and intuitive as apps like
 
 *— End of Q&A —*
 
+---
+
+## 🔤 Supplementary: Typography Decisions
+
+*Decided 28 May 2026 — after the initial Q&A session.*
+
+---
+
+**Exo 2 — Semibold (weight 600)**
+
+URL: <https://fonts.google.com/specimen/Exo+2>
+
+Scope:
+
+- Logo wordmark (in logo asset files under `public/images/brand/`)
+- In-app headings, section titles, and key data callouts
+  (cycle number, free-running period value, quality rating)
+
+Rationale: Chosen over Science Gothic (too sci-fi) and Inter (too neutral
+for a wordmark). Technical and distinctive without being aggressive.
+Letterforms hold well at both large display sizes and smaller heading sizes.
+
+---
+
+**Inter — variable weight, optical-size-aware**
+
+URL: <https://fonts.google.com/specimen/Inter>
+
+Scope: All body text, form inputs, tab labels, navigation items,
+notes, timestamps, and all secondary UI copy.
+
+---
+
+**Rejected fonts**
+
+Science Gothic: evaluated for both the logo and app headings.
+Rejected — letterforms read as technical sci-fi rather than
+medical-adjacent, which conflicts with the trustworthy brief (Q26).
+
 > **Instructions:** Answer each question with the letter(s) that best match your vision. For any question, feel free to answer with multiple letters (e.g., "B + D") or write a custom answer. The more honest your answers, the better the dev plan we can build together.
