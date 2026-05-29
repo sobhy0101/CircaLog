@@ -45,9 +45,10 @@
 - [x] 🔴 Decide and document timezone strategy
        (UTC timestamps + IANA timezone name per entry; field names: sleepStartUtc,
        wakeUtc, ianaTimezone; rationale and full decision in docs/timezone-strategy.md)
-- [ ] 🔴 Decide and document cycle-number storage strategy
-       - Stored vs recalculated on read; recommendation: store but treat as derived
-       - Define when re-assignment runs (after every insert, after every back-fill)
+- [x] 🔴 Decide and document cycle-number storage strategy
+       (store but treat as derived; gapless 1-based sequence; re-assign after every
+       insert, back-fill, delete, and start-time edit; full decision in
+       docs/cycle-number-strategy.md)
 - [ ] 🔴 Define TypeScript interfaces for the domain model
        - `SleepEntry`, `Cycle`, `SessionType`, `Interruption`, `Medication`, etc.
        - Lives in `src/lib/circadian/types.ts`
