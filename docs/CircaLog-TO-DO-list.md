@@ -40,9 +40,12 @@
        (circa-bg/surface/surface-raised, circa-border/border-strong,
        circa-accent/accent-subtle/accent-light, circa-text-primary/secondary/muted —
        dark + light mode, @variant dark, FOUC script, ComingSoon.tsx migrated)
-- [ ] 🟢 Integrate Google Fonts — Exo 2 (Semibold 600) and Inter (variable):
-       - Add preconnect hints to `index.html`
-       - Add `@import` in `index.css` and define font-family tokens in `@theme inline`
+- [x] 🟢 Integrate Google Fonts — Exo 2 (variable weight) and Inter (variable):
+       - Added preconnect hints to `index.html` (fonts.googleapis.com + fonts.gstatic.com)
+       - Added `<link rel="stylesheet">` tags in `index.html` for both fonts (full variable axis, display=swap)
+       - Defined `--font-family-display` and `--font-family-body` tokens in `@theme inline` in `index.css`
+       - Note: used `<link>` in HTML instead of CSS `@import` — parallel loading, not render-blocking
+       - Weight pruning deferred to performance pass (full axis loaded until UI is designed)
        (Fonts decided — see `docs/CircaLog_DevPlan_QA.md` → Typography section)
 - [ ] 🟢 Build dark/light mode toggle:
        - `useTheme` hook (reads/writes `localStorage` key `circalog-theme`)

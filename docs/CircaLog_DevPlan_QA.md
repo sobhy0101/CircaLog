@@ -652,19 +652,16 @@ Answer: B and C. I want the logging UX to be as clean and intuitive as apps like
 
 ---
 
-**Exo 2 — Semibold (weight 600)**
+**Exo 2 — variable weight**
 
 URL: <https://fonts.google.com/specimen/Exo+2>
 
 Scope:
 
 - Logo wordmark (in logo asset files under `public/images/brand/`)
-- In-app headings, section titles, and key data callouts
-  (cycle number, free-running period value, quality rating)
+- In-app headings, section titles, and key data callouts (cycle number, free-running period value, quality rating)
 
-Rationale: Chosen over Science Gothic (too sci-fi) and Inter (too neutral
-for a wordmark). Technical and distinctive without being aggressive.
-Letterforms hold well at both large display sizes and smaller heading sizes.
+Rationale: Chosen over Science Gothic (too sci-fi) and Inter (too neutral for a wordmark). Technical and distinctive without being aggressive. Letterforms hold well at both large display sizes and smaller heading sizes.
 
 ---
 
@@ -672,8 +669,7 @@ Letterforms hold well at both large display sizes and smaller heading sizes.
 
 URL: <https://fonts.google.com/specimen/Inter>
 
-Scope: All body text, form inputs, tab labels, navigation items,
-notes, timestamps, and all secondary UI copy.
+Scope: All body text, form inputs, tab labels, navigation items, notes, timestamps, and all secondary UI copy.
 
 ---
 

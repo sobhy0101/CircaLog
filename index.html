@@ -3,8 +3,7 @@
   <head>
     <meta charset="UTF-8" />
 
-    <!-- FOUC prevention: reads the saved theme from localStorage and adds .dark
-         to <html> before React renders, ensuring zero flash on first load.
+    <!-- FOUC prevention: reads the saved theme from localStorage and adds `.dark` to <html> before React renders, ensuring zero flash on first load.
          'circalog-theme' is the canonical key — the useTheme hook must match it. -->
     <script>
       (function () {
@@ -44,6 +43,25 @@
 
     <!-- vite-plugin-pwa injects the manifest link automatically during build. The line below is a fallback for environments that don't use the plugin. -->
     <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Google Fonts: preconnect hints tell the browser to open the DNS+TLS connections to Google's font servers before the stylesheet is parsed, shaving ~100–300 ms off the first font request on cold loads.
+         The second preconnect (fonts.gstatic.com) is where the actual font files are served — both hints are needed. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Exo 2 (variable: wght 100–900, upright + italic)
+         Used for: logo wordmark, headings, section titles, key data callouts -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap"
+    />
+
+    <!-- Inter (variable: wght 100..900, optical sizing)
+         Used for: all body text, inputs, labels, navigation, secondary UI copy -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    />
   </head>
   <body>
     <div id="root"></div>

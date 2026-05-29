@@ -72,4 +72,11 @@
   --color-circa-text-primary:   var(--circa-text-primary);
   --color-circa-text-secondary: var(--circa-text-secondary);
   --color-circa-text-muted:     var(--circa-text-muted);
+
+  /* Font family tokens — loaded via <link> in index.html.
+     font-display: swap is handled by Google Fonts (display=swap in the URL).
+     'inline' keeps these as var() references at runtime, consistent with
+     how the color tokens above are mapped. */
+  --font-family-display: "Exo 2", sans-serif;   /* headings, callouts, wordmark */
+  --font-family-body:    "Inter",  sans-serif;   /* all body text and UI copy   */
 }

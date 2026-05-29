@@ -53,3 +53,4 @@ FOUC-Prevention
 circa-bg
 ComingSoon
 markdownlint
+circalog-theme
