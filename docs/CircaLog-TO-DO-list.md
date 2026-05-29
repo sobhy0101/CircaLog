@@ -42,11 +42,9 @@
 
 ### 📐 Foundational Decisions (decide before writing code)
 
-- [ ] 🔴 Decide and document timezone strategy
-       - Recommendation: store UTC timestamp + `originalTimezoneOffset` per entry
-       - Must handle: travel across timezones (Mahmoud's Philippines → Egypt move is
-         already in the historical data), DST transitions, historical preservation
-       - Document the decision before any engine code is written
+- [x] 🔴 Decide and document timezone strategy
+       (UTC timestamps + IANA timezone name per entry; field names: sleepStartUtc,
+       wakeUtc, ianaTimezone; rationale and full decision in docs/timezone-strategy.md)
 - [ ] 🔴 Decide and document cycle-number storage strategy
        - Stored vs recalculated on read; recommendation: store but treat as derived
        - Define when re-assignment runs (after every insert, after every back-fill)
