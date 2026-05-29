@@ -58,14 +58,14 @@ export default defineConfig({
         icons: [
           {
             // SVG icon — picked up by modern browsers that support it.
-            src: '/images/brand/favicon.svg',
+            src: '/images/brand/icons/favicon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any',
           },
           {
             // 192×192 PNG — required minimum size for Android home screen.
-            src: '/images/brand/web-app-manifest-192x192.png',
+            src: '/images/brand/icons/web-app-manifest-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any maskable',
@@ -73,7 +73,7 @@ export default defineConfig({
           {
             // 512×512 PNG — used for the Android splash screen and
             // high-resolution home screen icons.
-            src: '/images/brand/web-app-manifest-512x512.png',
+            src: '/images/brand/icons/web-app-manifest-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',

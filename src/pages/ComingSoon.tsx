@@ -12,38 +12,38 @@ export default function ComingSoon() {
           Replace this entire block when the actual SVG logo is ready. */}
       <div className="mb-8 flex flex-col items-center gap-4">
         <div
-          className="
-            w-24 h-24 rounded-full
-            bg-circa-accent-subtle border-2 border-circa-accent
-            flex items-center justify-center
-          "
+         
         >
           {/* Initials placeholder — swap for <img> or <svg> when logo exists */}
           <span className="text-3xl font-bold tracking-widest text-circa-accent-light select-none">
-            CL
+            <img
+              src="/images/brand/logo/circalog-dark-logo.svg"
+              alt="CircaLog Logo "
+              className="w-64 h-auto object-contain mb-8"
+            />
           </span>
         </div>
 
         {/* App name — styled as the wordmark until a proper logo is designed */}
-        <h1 className="text-4xl font-bold tracking-tight text-circa-text-primary">
+        {/* <h1 className="text-4xl font-bold tracking-tight text-circa-text-primary font-family-display">
           Circa<span className="text-circa-accent">Log</span>
-        </h1>
+        </h1> */}
       </div>
 
       {/* ── Headline ───────────────────────────────────────────────────── */}
-      <p className="text-2xl font-semibold text-circa-accent-light mb-3">
+      <p className="text-2xl font-semibold text-circa-accent-light mb-3 font-family-display">
         Coming Soon
       </p>
 
       {/* ── Tagline ────────────────────────────────────────────────────── */}
-      <p className="max-w-sm text-circa-text-secondary text-base leading-relaxed">
+      <p className="max-w-sm text-circa-text-secondary text-base leading-relaxed font-family-body">
         A sleep tracker built for Non-24-Hour Sleep–Wake Disorder.
         <br />
         Something's taking shape, hopefully in the dark.
       </p>
 
       {/* ── Subtle footer note ─────────────────────────────────────────── */}
-      <p className="mt-16 text-xs text-circa-text-muted select-none">
+      <p className="mt-16 text-xs text-circa-text-muted select-none font-family-body">
         circalog.app
       </p>
 
