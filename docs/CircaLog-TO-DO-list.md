@@ -49,10 +49,10 @@
        (store but treat as derived; gapless 1-based sequence; re-assign after every
        insert, back-fill, delete, and start-time edit; full decision in
        docs/cycle-number-strategy.md)
-- [ ] 🔴 Define TypeScript interfaces for the domain model
-       - `SleepEntry`, `Cycle`, `SessionType`, `Interruption`, `Medication`, etc.
-       - Lives in `src/lib/circadian/types.ts`
-       - Framework-independent, database-independent
+- [x] 🔴 Define TypeScript interfaces for the domain model
+       (SleepEntry, Cycle, SessionType, QualityRating, InterruptionType,
+       MedicationTiming, Interruption, Medication, FreeRunningPeriodResult,
+       DriftResult, RollingAverages — all in src/lib/circadian/types.ts)
 
 ### 🧪 Test Infrastructure
 
