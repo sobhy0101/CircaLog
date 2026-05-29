@@ -26,6 +26,62 @@
 
 ---
 
+## 🧠 PHASE 0.5 — Circadian Engine
+
+> The mathematical core of CircaLog. All downstream features (history,
+> actogram, insights, exports, sync) depend on these pure functions
+> producing consistent results. Build and test this layer **before**
+> finalizing the IndexedDB schema — otherwise migrations have to be
+> rewritten later.
+>
+> *This phase was independently recommended by three AI reviewers (Gemini,
+> ChatGPT, Grok) in May 2026, each arriving at the same conclusion: the
+> circadian logic is the product — the UI is secondary. Their full reviews
+> are archived in `docs/archive/reviews/` and serve as the rationale if
+> this architecture is ever questioned by a collaborator or clinician.*
+
+### 📐 Foundational Decisions (decide before writing code)
+
+- [ ] 🔴 Decide and document timezone strategy
+       - Recommendation: store UTC timestamp + `originalTimezoneOffset` per entry
+       - Must handle: travel across timezones (Mahmoud's Philippines → Egypt move is
+         already in the historical data), DST transitions, historical preservation
+       - Document the decision before any engine code is written
+- [ ] 🔴 Decide and document cycle-number storage strategy
+       - Stored vs recalculated on read; recommendation: store but treat as derived
+       - Define when re-assignment runs (after every insert, after every back-fill)
+- [ ] 🔴 Define TypeScript interfaces for the domain model
+       - `SleepEntry`, `Cycle`, `SessionType`, `Interruption`, `Medication`, etc.
+       - Lives in `src/lib/circadian/types.ts`
+       - Framework-independent, database-independent
+
+### 🧪 Test Infrastructure
+
+- [ ] 🔴 Install and configure Vitest
+- [ ] 🔴 Build test fixtures in `src/lib/circadian/__fixtures__/`
+       - Sanitized historical sleep data from Mahmoud's own records
+         (the strongest real-world test corpus available — supersedes any synthetic data)
+       - Synthetic edge cases: timezone switches, DST transitions, long awake periods,
+         back-fill scenarios, fragmented nights, nap-into-main-sleep drift
+
+### 🔧 Pure Utility Functions (all in `src/lib/circadian/`)
+
+- [ ] 🔴 `normalizeSleepSpan(entry)` — overnight + timezone + DST normalization
+- [ ] 🔴 `detectSessionType(durationMs, gapMs)` — returns `'main'` | `'nap'`
+- [ ] 🔴 `assignCycleNumber(entries)` — assigns/recomputes cycle numbers (idempotent; runs after every back-fill)
+- [ ] 🔴 `calculateDrift(entries)` — minutes-per-cycle drift rate
+- [ ] 🔴 `estimateFreeRunningPeriod(entries)` — linear regression on sleep onset times; returns `'pending'` until 14+ entries
+- [ ] 🔴 `groupEntriesByCycle(entries)` — grouping helper for chart and history rendering
+- [ ] 🔴 `detectFragmentation(entry)` — flags fragmented sleep sessions
+- [ ] 🔴 `calculateRollingAverages(entries, windowDays)` — rolling 7/30-day stats
+
+### ✅ Verification
+
+- [ ] 🔴 Vitest test suite passes against both fixture sets (real history + synthetic edge cases)
+       with zero failures before Phase 0.5 is considered complete
+
+---
+
 ## 🚀 V1 — Core MVP
 
 ### 🌐 Routing
@@ -52,7 +108,7 @@
        - Export `THEME_KEY = 'circalog-theme'` as a named constant from `useTheme.ts`
        - Update FOUC script comment in `index.html` to reference `THEME_KEY` in `useTheme.ts`
        - `ThemeToggle` component
-       - Wire into `App.tsx` / side drawer
+       - Mount temporarily in `AppShell.tsx` for testing (will move to side drawer in the App Shell task below)
        (FOUC script is in the token task above; this task is the reactive UI layer)
 - [ ] 🟢 Design app logo / splash screen
        (Brand logo SVG + PWA icons already generated under `public/images/brand/`.
@@ -74,26 +130,47 @@
 - [ ] 🟡 Build side drawer (hamburger icon top-left)
 - [ ] 🟡 Populate drawer links: Settings, Reports, Export, About,
        Privacy Policy, Terms & Conditions, Dark Mode Toggle
+       (move `ThemeToggle` here from its temporary placement in `AppShell.tsx`)
 
 ### 🛏️ Sleep Log — Core
 
 - [ ] 🔴 Design sleep log data model (IndexedDB schema)
-- [ ] 🔴 Build IndexedDB service (CRUD operations)
+       (Derives from Phase 0.5 TypeScript interfaces — do not finalize
+       until the Circadian Engine is stable)
+- [ ] 🔴 Build IndexedDB service with full CRUD (create, read, update, delete) from day 1
+       (Edit/delete capability must exist before serious testing — junk test data
+       accumulates otherwise. Consider Dexie.js once Phase 0.5 query patterns are
+       clear; defer that decision until then.)
+- [ ] 🔴 Build manual time entry form (both start and wake)
+       (Manual entry first — it stress-tests the data model faster than the timer
+       flow and unblocks back-fill of historical data)
 - [ ] 🔴 Build "Start Sleep" one-tap timer screen
 - [ ] 🔴 Build "Wake Up" completion screen
-- [ ] 🔴 Build manual time entry form (both start and wake)
 - [ ] 🟡 Required fields: sleep start, wake time, quality rating (1–5)
 - [ ] 🟡 Optional fields toggle:
        - Notes (free text)
        - Dreams / Nightmares (yes/no + text)
        - Interruptions (count + type: bathroom/thirst/hunger/pain/other)
        - Medication taken (before/during/after, yes/no)
-- [ ] 🟡 Auto-detect session type: Main Sleep (≥3h) vs. Nap (<3h)
-- [ ] 🟡 Assign cycle number to each entry
+- [ ] 🟡 Wire `detectSessionType` from Phase 0.5 into the save path (Main Sleep ≥3h vs. Nap <3h)
+- [ ] 🟡 Wire `assignCycleNumber` from Phase 0.5 into the save path
 - [ ] 🟡 Display both calendar date AND cycle number on each entry
 - [ ] 🟢 Back-fill past entries (date/time picker for historical input)
-- [ ] 🟢 Edit existing sleep entries
-- [ ] 🟢 Delete sleep entries (with confirmation dialog)
+       (Re-runs `assignCycleNumber` across the affected range after insert)
+- [ ] 🟢 Edit existing sleep entries — user-facing form (CRUD layer already exists from above)
+- [ ] 🟢 Delete sleep entries — confirmation dialog UX (CRUD layer already exists from above)
+
+### 📋 History View
+
+> Built **before** the actogram — it is the debugging console for the
+> sleep log data. Chart bugs become tractable when the raw entries are
+> visible in a sortable, filterable list.
+
+- [ ] 🔴 List view of all past sleep entries
+- [ ] 🔴 Show: cycle number, calendar date, start time, wake time,
+       duration, quality rating, session type (sleep/nap)
+- [ ] 🟡 Filter by: date range, session type, quality rating
+- [ ] 🟢 Sort by: most recent first (default) / oldest first
 
 ### 📊 Visualization — Actogram
 
@@ -105,18 +182,13 @@
 - [ ] 🔴 Build time range toggle: `[ 1W ] [ 1M ] [ 3M ] [ 6M ] [ 1Y ] [ All ]`
        - Default: 1W
        - Toggling changes visible range only — no data is hidden
+- [ ] 🟡 Tooltip on hover/tap showing session details
+       (Part of the core build — the chart is unreadable on mobile without it)
+- [ ] 🟡 Basic touch navigation: horizontal pan/swipe
+       (Part of the core build — required for mobile readability)
 - [ ] 🟡 Render actogram in dark and light themes correctly
 - [ ] 🟡 Handle empty state (no data yet — prompt to log first sleep)
-- [ ] 🟢 Tooltip on hover/tap showing session details
-- [ ] 🟢 Pinch-to-zoom or swipe navigation on mobile
-
-### 📋 History View
-
-- [ ] 🟡 List view of all past sleep entries
-- [ ] 🟡 Show: cycle number, calendar date, start time, wake time,
-       duration, quality rating, session type (sleep/nap)
-- [ ] 🟡 Filter by: date range, session type, quality rating
-- [ ] 🟢 Sort by: most recent first (default) / the oldest first
+- [ ] 🟢 Pinch-to-zoom (V2 candidate; basic pan is sufficient for V1)
 
 ### 💡 Insights View
 
@@ -135,11 +207,23 @@
 
 - [x] 🔴 Configure Vite PWA plugin (Workbox service worker)
 - [x] 🔴 Silent auto-update on new deployments
-- [ ] 🔴 In-app changelog modal (show on first load after update)
-- [ ] 🟢 App installable on Android (add to home screen)
+- [ ] 🟡 Verify PWA icons are wired into the manifest (all sizes for Android, iOS, PWA)
+       (Icons already generated under `public/images/brand/` — this is configuration verification)
+- [ ] 🟡 Verify Android splash screen coverage; design branded splash if needed
+- [ ] 🟡 App installable on Android (add to home screen — verify after icons are wired)
 - [ ] 🟢 Offline fallback page
-- [ ] 🟢 App icons (all sizes for Android, iOS, PWA)
-- [ ] 🟢 Splash screen
+- [ ] 🟢 In-app changelog modal — show on first load after update
+       (UX polish, not a blocker for V1 functionality)
+
+### 🛟 Data Resilience
+
+> IndexedDB can be evicted by browser storage cleanup. Export/import is
+> the safety net before cloud sync arrives in V2 — for a tool tracking
+> months or years of personal health data, this is not optional.
+
+- [ ] 🔴 Export all data as JSON (manual backup)
+- [ ] 🔴 Import JSON backup (manual restore, with merge-vs-replace prompt)
+- [ ] 🟡 Schema migration handler (for when the engine model evolves)
 
 ---
 
@@ -237,7 +321,8 @@
 
 ## 🐛 Ongoing / Always
 
-- [ ] Write unit tests for core data logic (cycle numbering, drift calc)
+- [ ] Extend unit test coverage beyond the Phase 0.5 Circadian Engine
+       (UI components, IndexedDB service, integration flows)
 - [ ] Test on Android (Chrome PWA)
 - [ ] Test on iOS (Safari PWA — limited but functional)
 - [ ] Test on PC (Chrome, Firefox, Edge)
