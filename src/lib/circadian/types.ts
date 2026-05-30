@@ -44,6 +44,10 @@ export type InterruptionType =
 
 /**
  * When a medication was taken relative to the sleep session.
+ *
+ * Used only on the inline `medications` field of `SleepEntry` (V1 legacy).
+ * The V2 medication system is a separate linked model — see `MedicationDefinition`,
+ * `MealDefinition`, `DoseLogEntry`, and `MealLogEntry` at the bottom of this file.
  */
 export type MedicationTiming = 'before' | 'during' | 'after';
 
@@ -65,6 +69,12 @@ export interface Interruption {
 
 /**
  * A medication or supplement taken in relation to a sleep session.
+ *
+ * ⚠️  V1 legacy inline field — kept for backward compatibility.
+ * The V2 medication system replaces free-text name entry with a
+ * user-configured library (`MedicationDefinition`) and a separate
+ * per-dose log (`DoseLogEntry`). Do NOT extend this interface;
+ * new fields belong on `MedicationDefinition` or `DoseLogEntry`.
  */
 export interface Medication {
   /** Name of the medication or supplement (e.g. "Melatonin 3mg"). */
@@ -277,4 +287,267 @@ export interface RollingAverages {
 
   /** Number of entries that fell within the window. */
   entryCount: number;
+}
+
+// ---------------------------------------------------------------------------
+// V2 — Medication & Meal Library + Daily Log Types
+// ---------------------------------------------------------------------------
+//
+// Architecture note
+// -----------------
+// Non-24 breaks the link between clock-time medication schedules and
+// biological readiness (eating, sleeping). A patient who woke at 5 PM
+// has already missed two anchor points (10 AM and a post-lunch dose)
+// and must now reason about food gaps, sleep gaps, and the next valid
+// window—all simultaneously.
+//
+// The model here separates three concerns:
+//   1. MedicationDefinition — the user’s one-time-configured library of
+//      medications, each with its prescribed schedule and food/sleep rules.
+//   2. MealDefinition — the user’s named meal slots (e.g. “Breakfast”,
+//      “Lunch”), with an optional ideal clock-time anchor.
+//   3. DoseLogEntry / MealLogEntry — the daily record of what actually
+//      happened: when a dose was taken (or missed/skipped), and when a
+//      meal was eaten.
+//
+// On the logging screen, the user taps a medication from a pre-populated
+// list, enters the actual time taken, and the app computes compliance
+// against the configured rules. No free-text typing of drug names.
+//
+// Supabase tables (V2): medication_definitions, meal_definitions,
+//   dose_log_entries, meal_log_entries.
+// IndexedDB stores (V2): same four names, synced on connect.
+// ---------------------------------------------------------------------------
+
+/**
+ * How a medication relates to food timing.
+ *
+ * - `with_food`    — must be taken during or immediately after a meal.
+ * - `after_food`   — must be taken after food is in the stomach (e.g. 30 min
+ *                     after eating).
+ * - `before_food`  — must be taken on an empty stomach (e.g. 30–60 min
+ *                     before eating).
+ * - `independent`  — no food restriction.
+ */
+export type FoodRelationship =
+  | 'with_food'
+  | 'after_food'
+  | 'before_food'
+  | 'independent';
+
+/**
+ * What to do when a scheduled dose is late or missed.
+ *
+ * - `skip`       — if the window has passed, skip entirely; never double-dose.
+ * - `take_late`  — take it late within the same cycle if safe to do so.
+ * - `ask`        — flag it and let the user decide.
+ */
+export type MissedDoseAction = 'skip' | 'take_late' | 'ask';
+
+/**
+ * The status of a single dose in `DoseLogEntry`.
+ *
+ * - `taken`    — taken at the recorded time.
+ * - `missed`   — the scheduled window passed without a dose.
+ * - `skipped`  — intentionally omitted (user-confirmed, e.g. doctor-advised).
+ */
+export type DoseStatus = 'taken' | 'missed' | 'skipped';
+
+/**
+ * One medication or supplement in the user’s personal library.
+ *
+ * Configured once at setup; each entry generates daily dose log rows.
+ * Linked to `DoseLogEntry` via `medicationId`.
+ */
+export interface MedicationDefinition {
+  // ── Identity ─────────────────────────────────────────────────────────────────────
+
+  /** UUID, stable across IndexedDB and Supabase. */
+  id: string;
+
+  /** Display name shown in all log and report screens (e.g. "Metformin 500mg"). */
+  name: string;
+
+  // ── Schedule ───────────────────────────────────────────────────────────────────
+
+  /**
+   * Prescribed dose times, expressed as local HH:MM strings
+   * (e.g. ["10:00", "16:00", "22:00"]).
+   *
+   * Stored as clock-time strings, not UTC, because a prescription
+   * says "10 AM" regardless of timezone. The engine converts to UTC
+   * at log time using the user’s current ianaTimezone.
+   */
+  scheduledTimes: string[];
+
+  /**
+   * Acceptable window around each scheduled time, in minutes.
+   * A dose taken within ±windowMinutes of the scheduled time is
+   * considered on-time. Default: 60.
+   */
+  windowMinutes: number;
+
+  // ── Food & sleep rules ──────────────────────────────────────────────────────
+
+  /** Relationship to food. See `FoodRelationship` for semantics. */
+  foodRelationship: FoodRelationship;
+
+  /**
+   * How long before or after food this medication should be taken,
+   * in minutes. Interpreted with `foodRelationship`:
+   *   - `before_food`: take at least N minutes before eating.
+   *   - `after_food`: take at least N minutes after eating.
+   *   - `with_food` / `independent`: field is ignored.
+   * Optional; defaults to 0 when not clinically specified.
+   */
+  foodGapMinutes?: number;
+
+  /**
+   * Minimum gap between the dose and the next sleep onset, in minutes.
+   * Protects against taking a stimulating medication too close to
+   * bedtime (or a sedating one too far from it).
+   * Optional; omit when there is no sleep-proximity restriction.
+   */
+  minGapBeforeSleepMinutes?: number;
+
+  // ── Missed-dose policy ─────────────────────────────────────────────────────
+
+  /** What to do when a scheduled window is missed. */
+  missedDoseAction: MissedDoseAction;
+
+  // ── State ───────────────────────────────────────────────────────────────────────
+
+  /**
+   * When false, this medication is excluded from all log prompts and
+   * reports. Allows a user to retire a medication without deleting its
+   * history. Matches the `is_deleted` soft-delete pattern on SleepEntry.
+   */
+  isActive: boolean;
+
+  // ── Record-keeping ───────────────────────────────────────────────────────────
+
+  /** ISO 8601 UTC. Set once at creation. */
+  createdAt: string;
+
+  /** ISO 8601 UTC. Updated on every edit. */
+  updatedAt: string;
+}
+
+/**
+ * One named meal slot in the user’s meal library.
+ *
+ * Keeps the list short and user-defined (e.g. "Breakfast", "Lunch",
+ * "Dinner", "Late Snack"). The user picks from this list when logging
+ * a meal rather than typing a description each time.
+ *
+ * Linked to `MealLogEntry` via `mealId`.
+ */
+export interface MealDefinition {
+  /** UUID, stable across IndexedDB and Supabase. */
+  id: string;
+
+  /**
+   * Display label (e.g. "Breakfast", "Lunch", "Dinner").
+   * User-defined; there are no system-enforced names.
+   */
+  label: string;
+
+  /**
+   * Typical clock time for this meal, expressed as a local HH:MM string
+   * (e.g. "07:30").
+   * Optional. Used only as a soft UI hint; never used for compliance
+   * calculations (because Non-24 makes typical meal times irrelevant).
+   */
+  typicalTime?: string;
+
+  /** When false, excluded from log prompts. Soft-retire without history loss. */
+  isActive: boolean;
+
+  /** ISO 8601 UTC. Set once at creation. */
+  createdAt: string;
+
+  /** ISO 8601 UTC. Updated on every edit. */
+  updatedAt: string;
+}
+
+/**
+ * A single dose event in the daily medication log.
+ *
+ * Created automatically (as `missed`) for every scheduled dose that
+ * passes without a user action, and updated to `taken` or `skipped`
+ * when the user logs it. This gives the doctor report a complete
+ * compliance picture, not just a list of taken doses.
+ *
+ * Linked to `MedicationDefinition` via `medicationId`.
+ * Optionally linked to a `SleepEntry` via `sleepEntryId` when the dose
+ * is logged in the context of a sleep/wake session.
+ */
+export interface DoseLogEntry {
+  /** UUID. */
+  id: string;
+
+  /** References `MedicationDefinition.id`. */
+  medicationId: string;
+
+  /**
+   * The clock-time the dose was scheduled for, copied from
+   * `MedicationDefinition.scheduledTimes` at row-creation time.
+   * Stored as ISO 8601 UTC so it can be compared directly to
+   * `actualTimeUtc`.
+   */
+  scheduledTimeUtc: string;
+
+  /** Status of this dose. */
+  status: DoseStatus;
+
+  /**
+   * The UTC time the dose was actually taken.
+   * Null when `status` is `missed` or `skipped`.
+   */
+  actualTimeUtc: string | null;
+
+  /**
+   * Optional link to the sleep session this dose was logged against.
+   * Enables sleep–medication correlation in the Insights view.
+   */
+  sleepEntryId?: string;
+
+  /** Free-text note (e.g. "felt nauseous, took half dose"). Optional. */
+  note?: string;
+
+  /** ISO 8601 UTC. Set once at creation. */
+  createdAt: string;
+
+  /** ISO 8601 UTC. Updated on every edit. */
+  updatedAt: string;
+}
+
+/**
+ * A single meal event in the daily meal log.
+ *
+ * The user picks a `MealDefinition` from their library and records the
+ * actual time they ate. This gives the medication engine the food anchor
+ * it needs to evaluate food-gap compliance (e.g. "Metformin requires
+ * food; last meal was 4 hours ago — window is valid").
+ *
+ * Linked to `MealDefinition` via `mealId`.
+ */
+export interface MealLogEntry {
+  /** UUID. */
+  id: string;
+
+  /** References `MealDefinition.id`. */
+  mealId: string;
+
+  /** The UTC time the meal was eaten. */
+  eatenAtUtc: string;
+
+  /** Free-text note (e.g. "only had a small snack"). Optional. */
+  note?: string;
+
+  /** ISO 8601 UTC. Set once at creation. */
+  createdAt: string;
+
+  /** ISO 8601 UTC. Updated on every edit. */
+  updatedAt: string;
 }

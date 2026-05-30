@@ -433,6 +433,50 @@ Answer: B and C. I want to have a separate medication log that allows me to trac
 
 ---
 
+### 💡 Supplementary: Medication & Meal Tracking Architecture
+
+*Decided 30 May 2026 — arose from observing that clock-based medication
+schedules break when the sleep cycle rotates. Full rationale below.*
+
+**The problem**
+
+For a Non-24 patient, prescribed drug schedules ("10 AM / 4 PM / 10 PM")
+are anchored to a clock that no longer aligns with their biological
+readiness to eat or sleep. A patient who wakes at 5 PM has already missed
+two dose windows and must simultaneously reason about food gaps, sleep
+gaps, and the next valid window — unaided and every single day.
+Free-text entry of drug names on a phone every session is not a viable UX
+for a person in that state.
+
+**Architectural decision**
+
+The V2 medication system uses **four linked tables/stores**, not the
+simple inline `Medication[]` array on `SleepEntry` (which is kept only as
+a V1 legacy field and must not be extended):
+
+| Store / Table | Purpose |
+|---|---|
+| `medication_definitions` | One-time-configured medication library per user. Each entry holds the drug name, scheduled times (HH:MM), acceptable window, food relationship, food gap, min gap before sleep, and missed-dose policy. |
+| `meal_definitions` | User-defined meal slots (e.g. “Breakfast”, “Lunch”). Picked from a list — not typed fresh each time. Optional typical clock-time hint (UI only; never used for compliance). |
+| `dose_log_entries` | Daily dose record. A row is created automatically as `missed` for every scheduled dose; updated to `taken` or `skipped` when the user logs it. Produces a compliance record, not just a list of taken doses. |
+| `meal_log_entries` | Actual meal times. The engine uses these as the food anchor for dose-compliance checks (e.g. “Metformin requires food; last meal was 4 hours ago — window is valid”). |
+
+**On the logging screen:** the user taps a medication from a
+pre-populated list and enters only the actual time taken (or marks it
+skipped). No typing drug names.
+
+**TypeScript types** — all in `src/lib/circadian/types.ts`:
+`FoodRelationship`, `MissedDoseAction`, `DoseStatus`,
+`MedicationDefinition`, `MealDefinition`, `DoseLogEntry`, `MealLogEntry`.
+
+**IndexedDB and Supabase** use the same four store/table names.
+
+**Doctor report (V2):** medication compliance summary (taken / missed /
+skipped per drug, with scheduled vs. actual times) is included in the
+one-tap PDF alongside the actogram.
+
+---
+
 **Q34. Should CircaLog track other health factors that affect sleep?**
 
 - A) Light exposure (did you get sunlight / bright light?)

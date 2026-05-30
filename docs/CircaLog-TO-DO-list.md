@@ -263,12 +263,58 @@
 - [ ] Mood / energy upon waking (1–5 scale)
 - [ ] All fields optional, off by default, toggleable in Settings
 
-### 💊 Medication Log
+### 💊 Medication & Meal Log
 
-- [ ] Separate medication tracking section
-- [ ] Log medication name, dose, timing (before/during/after sleep)
-- [ ] Link medication entries to sleep sessions
-- [ ] View correlation between medication and sleep quality
+> Designed around the Non-24 reality: clock-based medication schedules
+> break when your sleep cycle rotates. A patient who wakes at 5 PM has
+> already missed two anchor points and must reason about food gaps, sleep
+> gaps, and the next valid window simultaneously.
+>
+> The model uses four linked tables/stores: a one-time-configured
+> **medication library** and **meal library**, plus a daily
+> **dose log** and **meal log**. On the logging screen the user taps
+> from a pre-populated list — no typing drug names on a phone.
+>
+> Full TypeScript types are in `src/lib/circadian/types.ts`:
+> `MedicationDefinition`, `MealDefinition`, `DoseLogEntry`, `MealLogEntry`.
+> Supabase tables and IndexedDB stores share the same four names.
+
+- [ ] Settings — Medication Library screen
+       - Add / edit / deactivate medications
+       - Fields: name, scheduled times (multi-value HH:MM), window ± minutes
+       - Food relationship: `with_food` | `after_food` | `before_food` | `independent`
+       - Food gap (minutes before/after eating)
+       - Min gap before sleep onset (minutes)
+       - Missed-dose policy: `skip` | `take_late` | `ask`
+       - `isActive` toggle (retire without losing history)
+- [ ] Settings — Meal Library screen
+       - Add / edit / deactivate meal slots (e.g. “Breakfast”, “Lunch”, “Dinner”)
+       - Optional typical clock-time hint per slot (UI hint only — never used
+         for compliance calculations because Non-24 makes fixed meal times
+         irrelevant)
+- [ ] Daily dose log — auto-generation
+       - Create a `DoseLogEntry` row (status: `missed`) for every scheduled
+         dose at the start of each day; update to `taken`/`skipped` on user
+         action
+       - This produces a compliance record, not just a list of taken doses
+- [ ] Daily meal log — quick entry
+       - User picks a `MealDefinition` from their library and records actual
+         eat time; the engine uses this as the food anchor for dose
+         compliance checks
+- [ ] Logging screen integration
+       - When waking, show a pre-populated list of today’s due/overdue doses
+       - Tap a medication → enter actual time taken (or mark skipped)
+       - Optional free-text note per dose
+       - Meal log entry accessible from the same screen
+- [ ] Insights — compliance view
+       - Taken / missed / skipped counts per medication over 7-day and 30-day
+         windows
+       - Highlight doses taken outside their food-gap rule (warning, not
+         blocking)
+       - Link dose compliance data to sleep quality correlation
+- [ ] Doctor report integration (V2 reports task)
+       - Include medication compliance summary in the one-tap PDF
+       - Show which doses were missed, when, and against which scheduled time
 
 ### 📚 Educational Resources
 
