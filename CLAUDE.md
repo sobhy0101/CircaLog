@@ -35,6 +35,22 @@ This project runs on a Windows machine. All terminal commands must be PowerShell
 
 ---
 
+## React Import Rules (Vite + react-jsx transform)
+
+The project uses `"jsx": "react-jsx"` in `tsconfig.app.json` and `"noUnusedLocals": true`.
+These two settings together mean:
+
+- **`.tsx` files** — do NOT add `import React from 'react'`. The JSX transform
+  handles it automatically, and the unused-locals rule will error on the import.
+- **`.ts` files that call React APIs directly** (e.g. `React.useState`, `React.useEffect`)
+  — keep `import React from 'react'` OR switch to named imports
+  (`import { useState } from 'react'`). Either works; named imports are preferred
+  for consistency with the rest of the codebase.
+
+Violation produces `TS6133: 'React' is declared but its value is never read.`
+
+---
+
 ## Non-Negotiable Rules
 
 **Read before editing.** Always read a file's current contents before modifying it. Never edit blind.

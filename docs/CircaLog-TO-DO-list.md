@@ -102,13 +102,9 @@
        - Note: used `<link>` in HTML instead of CSS `@import` — parallel loading, not render-blocking
        - Weight pruning deferred to performance pass (full axis loaded until UI is designed)
        (Fonts decided — see `docs/CircaLog_DevPlan_QA.md` → Typography section)
-- [ ] 🟢 Build dark/light mode toggle:
-       - `useTheme` hook (reads/writes `localStorage` key `circalog-theme`)
-       - Export `THEME_KEY = 'circalog-theme'` as a named constant from `useTheme.ts`
-       - Update FOUC script comment in `index.html` to reference `THEME_KEY` in `useTheme.ts`
-       - `ThemeToggle` component
-       - Mount temporarily in `AppShell.tsx` for testing (will move to side drawer in the App Shell task below)
-       (FOUC script is in the token task above; this task is the reactive UI layer)
+- [x] 🟢 Build dark/light mode toggle
+       (useTheme hook with THEME_KEY export, ThemeToggle component with SVG icons,
+       mounted temporarily in AppShell.tsx; FOUC comment updated to reference THEME_KEY)
 - [ ] 🟢 Design app logo / splash screen
        (Brand logo SVG + PWA icons already generated under `public/images/brand/`.
        Remaining: review splash screen coverage on Android; design branded splash if needed.)

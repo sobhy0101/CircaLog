@@ -90,6 +90,58 @@ Architecture / planning / review     → Claude.ai (this chat)
 
 ---
 
+## Task Complexity Tiers
+
+Before writing a CC task file, Claude.ai must assess the task and tell
+Mahmoud which tier it falls into. Mahmoud does not always know how complex
+a task is under the hood — this assessment is Claude.ai's responsibility.
+
+### Tier 1 — Direct edit (Claude.ai writes the files here)
+
+**Criteria — ALL of the following must be true:**
+- 3 files or fewer
+- No new dependencies (`npm install` not needed)
+- No shell commands required
+- No architectural decision involved
+- Low risk of cascading breakage if something is wrong
+
+**Process:** Claude.ai reads the relevant files, writes or patches them
+directly via the Filesystem extension, then Mahmoud reviews and commits
+manually. No formal CC task file. No session report.
+
+**Example tasks:** fixing a typo in a component, updating a CSS token value,
+adding a comment, tweaking a layout class.
+
+### Tier 2 — Full CC task file
+
+**Criteria — ANY of the following is true:**
+- Touches 4 or more files
+- Requires `npm install` or any shell command
+- Involves a build step or visual verification
+- Has meaningful risk: wrong code here could break something else
+- Introduces a new pattern the rest of the codebase will follow
+
+**Process:** Claude.ai writes a structured task file in `tasks/`, hands it
+to CC, CC executes and writes a session report, Mahmoud confirms before commit.
+
+**Example tasks:** new hook + component + page update + build check,
+installing a library, setting up a new subsystem.
+
+### How Claude.ai flags the tier
+
+When Mahmoud brings a task, Claude.ai must open with one of these:
+
+> **Tier 1 — I can do this directly here.** [one sentence on why]
+> Shall I go ahead?
+
+> **Tier 2 — This needs a CC task file.** [one sentence on why]
+> Shall I write it?
+
+Mahmoud confirms, then work begins. Claude.ai must never silently assume
+a tier and start working without flagging it first.
+
+---
+
 ## Key Decisions Already Made (Do Not Re-litigate)
 
 Full answers are in `docs/CircaLog_DevPlan_QA.md`. Summarized here:
@@ -165,6 +217,29 @@ Full answers are in `docs/CircaLog_DevPlan_QA.md`. Summarized here:
 
 **Analytics (V2+)**
 - TBD — nothing set up yet
+
+---
+
+## Lessons Learned — Stack Gotchas
+
+Hard-won facts discovered during development. Check this section before
+writing any task file that touches the relevant area.
+
+### React imports (`"jsx": "react-jsx"` + `"noUnusedLocals": true`)
+
+The project uses the automatic JSX transform (`"jsx": "react-jsx"` in
+`tsconfig.app.json`) together with `"noUnusedLocals": true`. These two
+settings together determine the import rule:
+
+- **`.tsx` files** — do NOT add `import React from 'react'`. The transform
+  injects React automatically; the unused-locals rule will produce
+  `TS6133: 'React' is declared but its value is never read` if the import
+  is present.
+- **`.ts` files that call React APIs directly** — use named imports:
+  `import { useState } from 'react'` (preferred for consistency) or keep
+  `import React from 'react'` and call `React.useState`. Either compiles.
+
+*Discovered during Phase 1 ThemeToggle task (May 2026).*
 
 ---
 

@@ -41,12 +41,15 @@ CircaLog is an open-source, offline-first Progressive Web App (PWA) for people l
 These versions differ from what common tutorials show — use these patterns:
 
 **TypeScript 6:** `baseUrl` is deprecated and will error. Use `paths` alone:
+
 ```json
 "paths": { "@/*": ["./src/*"] }
 ```
+
 `./src/*` must be an explicit relative path (not `src/*`) when `baseUrl` is absent.
 
 **ESLint 10 + react-hooks v7:** Plugin API changed. Use flat config style:
+
 ```js
 reactHooks.configs.flat.recommended  // NOT reactHooks.configs.recommended.rules
 reactRefresh.configs.vite            // NOT manual plugins + rules setup
@@ -55,10 +58,21 @@ reactRefresh.configs.vite            // NOT manual plugins + rules setup
 **Vite 9 template:** Does NOT generate `src/vite-env.d.ts`. Vite client types
 are declared via `"types": ["vite/client"]` in `tsconfig.app.json` instead.
 
+**React import rule (`"jsx": "react-jsx"` + `"noUnusedLocals": true`):**
+
+- `.tsx` files — do NOT add `import React from 'react'`. The JSX transform
+  injects it automatically; the unused-locals rule will produce `TS6133` if
+  the import is present.
+- `.ts` files that call React APIs directly — use named imports:
+  `import { useState } from 'react'` (preferred) or `import React from 'react'`
+  with `React.useState`. Either compiles; named imports are consistent with the
+  rest of the codebase.
+
 ## Architecture
 Local-first: fully functional offline (IndexedDB), optional Google Sign-In to sync to Supabase cloud. Data lives on device first.
 
 ## Project Structure
+
 ```
 C:\Projects\CircaLog\
   docs/          — project documentation (TO-DO list, DevPlan Q&A, etc.)

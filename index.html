@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
 
     <!-- FOUC prevention: reads the saved theme from localStorage and adds `.dark` to <html> before React renders, ensuring zero flash on first load.
-         'circalog-theme' is the canonical key — the useTheme hook must match it. -->
+         The key string 'circalog-theme' is defined as THEME_KEY in src/hooks/useTheme.ts — if it ever changes, update it there and here together. -->
     <script>
       (function () {
         if (localStorage.getItem('circalog-theme') !== 'light') {
