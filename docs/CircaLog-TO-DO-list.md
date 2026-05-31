@@ -105,7 +105,7 @@
 - [x] 🟢 Build dark/light mode toggle
        (useTheme hook with THEME_KEY export, ThemeToggle component with SVG icons,
        mounted temporarily in AppShell.tsx; FOUC comment updated to reference THEME_KEY)
-- [ ] 🟢 Design app logo / splash screen
+- [x] 🟢 Design app logo / splash screen
        (Brand logo SVG + PWA icons already generated under `public/images/brand/`.
        Remaining: review splash screen coverage on Android; design branded splash if needed.)
 
