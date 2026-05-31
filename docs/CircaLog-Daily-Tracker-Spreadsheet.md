@@ -14,7 +14,7 @@ CircaLog once the app reaches a usable state.
 Built during a late-night session (3 AM, 30 May 2026) when the need to start
 logging immediately became urgent. The patient has Non-24-Hour Sleep-Wake
 Disorder, Type 2 diabetes, neuropathy, GERD, and hypertension. The spreadsheet
-was designed around the real daily suffering of Non-24 — particularly the way
+was designed around the real daily suffering from Non-24 — particularly the way
 rotating sleep cycles break clock-based medication schedules and food-timing
 rules simultaneously.
 
@@ -153,7 +153,7 @@ Conditional formatting on col E:
 
 - Taken → green
 - Missed → red
-- Skipped → grey
+- Skipped → gray
 
 ### Medication Schedule Notes
 
