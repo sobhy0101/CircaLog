@@ -43,7 +43,7 @@ None — no new dependencies added.
 
 ## 5. Build Output
 
-```
+```text
 > circalog@0.0.0 build
 > tsc -b && vite build
 
@@ -85,8 +85,8 @@ Verification performed visually by Mahmoud against the running dev server at
 | Tab bar visible and fixed to the bottom | Pass |
 | Four tabs render: Log, Chart, History, Insights with icon + label | Pass |
 | Hamburger icon visible on the left of the bar | Pass |
-| Log tab styled with accent colour (active state) | Pass |
-| Other tabs styled with secondary text colour | Pass |
+| Log tab styled with accent color (active state) | Pass |
+| Other tabs styled with secondary text color | Pass |
 | No content hidden behind the tab bar (`pb-16` on main) | Pass |
 
 **Side drawer — open**
@@ -140,4 +140,4 @@ None.
   driven by the current route in a future batch (TODO comment in the component).
 - `tasks/playwright-verify-shell.cjs` was created as a verification aid during
   this session. It is not committed and can be removed after the Playwright
-  verification workflow is finalised in a future session.
+  verification workflow is finalized in a future session.
