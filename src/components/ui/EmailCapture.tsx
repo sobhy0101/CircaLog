@@ -34,6 +34,12 @@ export default function EmailCapture() {
     setInputError('')
     setState('loading')
 
+    // supabase is null when env vars are not configured — treat as server error.
+    if (!supabase) {
+      setState('error-other')
+      return
+    }
+
     const { error } = await supabase
       .from('waitlist')
       .insert({ email: email.trim() })
