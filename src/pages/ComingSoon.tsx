@@ -59,8 +59,8 @@ export default function ComingSoon() {
         <EmailCapture />
       </div>
 
-      {/* ── Footer links ───────────────────────────────────────────────── */}
-      <p className="mt-16 text-xs font-family-body text-circa-text-muted">
+      {/* ── Footer links — pinned to bottom, outside the centered stack ── */}
+      <footer className="absolute bottom-6 flex items-center gap-6 text-xs font-family-body">
         <a
           href="https://github.com/sobhy0101/CircaLog"
           target="_blank"
@@ -69,7 +69,6 @@ export default function ComingSoon() {
         >
           GitHub
         </a>
-        {' · Built by '}
         <a
           href="https://github.com/sobhy0101"
           target="_blank"
@@ -78,7 +77,7 @@ export default function ComingSoon() {
         >
           sobhy0101
         </a>
-      </p>
+      </footer>
 
     </div>
   )
