@@ -111,11 +111,9 @@
 
 ### 🌐 Landing Page (circalog.app root)
 
-- [ ] 🟢 Design and build coming soon page
-- [ ] 🟢 App name + tagline
-- [ ] 🟢 Brief description of what CircaLog is and who it's for
-- [ ] 🟢 "Get notified at launch" email capture (optional, simple)
-- [ ] 🟢 Link to `/log` for early access
+- [x] 🟢 Design and build coming soon page
+- [x] 🟢 App name + tagline
+- [x] 🟢 "Get notified at launch" email capture (optional, simple)
 
 ### 🏠 App Shell & Navigation
 
