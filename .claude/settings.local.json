@@ -1,6 +1,6 @@
 {
   "enabledMcpjsonServers": [
-    "supabase"
+    "supabase-circalog"
   ],
   "enableAllProjectMcpServers": true
 }
