@@ -117,11 +117,11 @@
 
 ### 🏠 App Shell & Navigation
 
-- [ ] 🟡 Build base app shell (bottom tab bar + side drawer layout)
-- [ ] 🟡 Build bottom tab bar: `[ Log ] [ Chart ] [ History ] [ Insights ]`
-- [ ] 🟡 Add bottom padding for Android/iOS system navigation bars
-- [ ] 🟡 Build side drawer (hamburger icon top-left)
-- [ ] 🟡 Populate drawer links: Settings, Reports, Export, About,
+- [x] 🟡 Build base app shell (bottom tab bar + side drawer layout)
+- [x] 🟡 Build bottom tab bar: `[ Log ] [ Chart ] [ History ] [ Insights ]`
+- [x] 🟡 Add bottom padding for Android/iOS system navigation bars
+- [x] 🟡 Build side drawer (hamburger icon top-left)
+- [x] 🟡 Populate drawer links: Settings, Reports, Export, About,
        Privacy Policy, Terms & Conditions, Dark Mode Toggle
        (move `ThemeToggle` here from its temporary placement in `AppShell.tsx`)
 
