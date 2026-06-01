@@ -23,14 +23,17 @@ export default function ComingSoon() {
         <div
 
         >
-          {/* Initials placeholder — swap for <img> or <svg> when logo exists */}
-          <span className="text-3xl font-bold tracking-widest text-circa-accent-light select-none">
-            <img
-              src="/images/brand/logo/circalog-dark-logo.svg"
-              alt="CircaLog Logo "
-              className="w-64 h-auto object-contain mb-8"
-            />
-          </span>
+          {/* Two logos rendered simultaneously; CSS hides the inactive one. */}
+          <img
+            src="/images/brand/logo/circalog-dark-logo.svg"
+            alt="CircaLog"
+            className="w-64 h-auto object-contain mb-8 hidden dark:block"
+          />
+          <img
+            src="/images/brand/logo/circalog-light-logo.svg"
+            alt="CircaLog"
+            className="w-64 h-auto object-contain mb-8 block dark:hidden"
+          />
         </div>
 
         {/* App name — styled as the wordmark until a proper logo is designed */}
@@ -57,7 +60,7 @@ export default function ComingSoon() {
       </div>
 
       {/* ── Footer links ───────────────────────────────────────────────── */}
-      <p className="mt-16 text-xs font-family-body">
+      <p className="mt-16 text-xs font-family-body text-circa-text-muted">
         <a
           href="https://github.com/sobhy0101/CircaLog"
           target="_blank"
