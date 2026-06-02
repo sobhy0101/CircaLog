@@ -56,8 +56,8 @@
 
 ### 🧪 Test Infrastructure
 
-- [ ] 🔴 Install and configure Vitest
-- [ ] 🔴 Build test fixtures in `src/lib/circadian/__fixtures__/`
+- [x] 🔴 Install and configure Vitest
+- [x] 🔴 Build test fixtures in `src/lib/circadian/__fixtures__/`
        - Sanitized historical sleep data from Mahmoud's own records
          (the strongest real-world test corpus available — supersedes any synthetic data)
        - Synthetic edge cases: timezone switches, DST transitions, long awake periods,

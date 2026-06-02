@@ -3,8 +3,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
+import type { UserConfig } from 'vitest/config'
 
 // https://vitejs.dev/config/
+// Vite 8 uses rolldown; Vitest 3 bundles an older rollup-based Vite.
+// Using defineConfig from 'vite' keeps correct plugin types; the cast below
+// allows the 'test' property that Vitest reads at runtime without changing
+// how the Vite build works. The test block is still type-checked via satisfies.
 export default defineConfig({
   plugins: [
     tailwindcss(), // Processes all Tailwind utility classes
@@ -106,4 +111,27 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-})
+
+  // Vitest configuration — runs via 'npm test'.
+  // Defined here inside vite.config.ts so that Vitest inherits the same
+  // plugins, path aliases, and module resolution as the app itself.
+  // This means @/ imports work identically in tests and in production code.
+  test: {
+    // 'node' environment — correct for pure TypeScript logic tests
+    // (circadian engine functions, data transformations, fixture validation).
+    // If DOM tests are ever needed (e.g. component tests), switch specific
+    // test files to 'jsdom' using a per-file environment annotation:
+    //   // @vitest-environment jsdom
+    environment: 'node',
+
+    // Include all test files in src/ that match these patterns.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+
+    // Globals: false — we use explicit imports (import { describe, it, expect }
+    // from 'vitest') rather than relying on injected globals.
+    // Explicit imports make it immediately clear where these functions come
+    // from and prevent name collisions with any future testing utilities.
+    globals: false,
+  } satisfies UserConfig['test'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any)
