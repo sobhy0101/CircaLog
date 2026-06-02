@@ -457,9 +457,9 @@ a V1 legacy field and must not be extended):
 | Store / Table | Purpose |
 |---|---|
 | `medication_definitions` | One-time-configured medication library per user. Each entry holds the drug name, scheduled times (HH:MM), acceptable window, food relationship, food gap, min gap before sleep, and missed-dose policy. |
-| `meal_definitions` | User-defined meal slots (e.g. “Breakfast”, “Lunch”). Picked from a list — not typed fresh each time. Optional typical clock-time hint (UI only; never used for compliance). |
+| `meal_definitions` | User-defined meal slots (e.g. "Breakfast", "Lunch"). Picked from a list — not typed fresh each time. Optional typical clock-time hint (UI only; never used for compliance). |
 | `dose_log_entries` | Daily dose record. A row is created automatically as `missed` for every scheduled dose; updated to `taken` or `skipped` when the user logs it. Produces a compliance record, not just a list of taken doses. |
-| `meal_log_entries` | Actual meal times. The engine uses these as the food anchor for dose-compliance checks (e.g. “Metformin requires food; last meal was 4 hours ago — window is valid”). |
+| `meal_log_entries` | Actual meal times. The engine uses these as the food anchor for dose-compliance checks (e.g. "Metformin requires food; last meal was 4 hours ago — window is valid"). |
 
 **On the logging screen:** the user taps a medication from a
 pre-populated list and enters only the actual time taken (or marks it
@@ -487,6 +487,97 @@ one-tap PDF alongside the actogram.
 - F) None — sleep data only
 
 Answer: E, but optional fields, not required in V1.
+
+---
+
+### ☕ Supplementary: Drinks Log
+
+*Decided 02 Jun 2026 — arose from recognising that caffeine timing,
+alcohol, and fluid intake are medically relevant context for a sleep
+specialist and are not captured elsewhere in the app.*
+
+**The case for logging drinks**
+
+Caffeine has a half-life of ~5–7 hours. A coffee at 3 PM still has half
+its stimulant effect at 8–10 PM. For a Non-24 patient already fighting
+delayed sleep timing, late caffeine is a compounding factor that a sleep
+specialist needs to see alongside the actogram. Alcohol disrupts sleep
+architecture even when it does not delay onset. Protein shakes affect
+satiety and indirectly sleep quality. Juice can carry sugar load and
+sometimes caffeine (green tea variants, etc.). Water intake is relevant
+for hydration and, for patients with conditions affecting nocturia (e.g.
+enlarged prostate), correlates with sleep fragmentation patterns.
+
+CircaLog is not just a sleep diary — it is a *sleep context* tracker.
+A sleep specialist reviewing a full CircaLog report should see everything
+contributing to the patient's sleep pattern, not just the sleep blocks
+themselves.
+
+**Data model — `DrinkLogEntry`**
+
+To be added to `src/lib/circadian/types.ts`:
+
+| Field | Type | Notes |
+|---|---|---|
+| `date` | `string` (DD/MM/YYYY) | Calendar date of the drink |
+| `timeUtc` | `string` (ISO 8601) | Actual time in UTC |
+| `ianaTimezone` | `string` | Entry's local timezone (matches SleepEntry convention) |
+| `drinkType` | `DrinkType` enum | See enum values below |
+| `caffeineEstimateMg` | `number \| null` | Auto-calculated from type+size; user-editable |
+| `sizeCategory` | `'small' \| 'regular' \| 'large' \| 'custom'` | — |
+| `customSizeOz` | `number \| null` | Populated when sizeCategory = 'custom' |
+| `customSizeMl` | `number \| null` | Populated when sizeCategory = 'custom' |
+| `notes` | `string \| null` | Optional free text |
+
+**`DrinkType` enum values:**
+`coffee`, `tea`, `energy_drink`, `protein_shake`, `juice`, `alcohol`, `water`, `other`
+
+**Caffeine reference table**
+
+Default mg estimates per type and size (user-editable in Settings):
+
+| Drink Type | Small | Regular | Large |
+|---|---|---|---|
+| Coffee (espresso-based) | 63 mg | 126 mg | 189 mg |
+| Coffee (filter/drip) | 95 mg | 140 mg | 200 mg |
+| Tea (black) | 25 mg | 47 mg | 70 mg |
+| Tea (green) | 15 mg | 28 mg | 45 mg |
+| Energy drink | 80 mg | 160 mg | 240 mg |
+| Protein shake | 0 mg | 0 mg | 0 mg |
+| Juice | 0 mg | 0 mg | 0 mg |
+| Alcohol | 0 mg | 0 mg | 0 mg |
+| Water | 0 mg | 0 mg | 0 mg |
+
+*Note: "Coffee" should be split into sub-types (espresso vs. filter) in
+the Settings caffeine table — the default UX uses a single "Coffee" option
+for logging speed, but the caffeine reference table can have two rows.*
+
+**Storage**
+
+- IndexedDB store: `drink_log_entries`
+- Supabase table: `drink_log_entries`
+- Both follow the same naming convention as the medication/meal stores.
+
+**UX notes**
+
+- Water logging is high-frequency — needs a one-tap shortcut (e.g. a
+  dedicated "Water +" button) to avoid friction death.
+- Caffeine estimate auto-fills from drink type + size; the user can tap
+  to override if they know the exact value (e.g. from a can label).
+- The caffeine curve overlay on the actogram/timeline view is optional —
+  the patient can toggle it off if it adds visual noise.
+
+**Insights — caffeine curve overlay**
+
+Calculated from logged drinks using the standard ~5–7 hour half-life
+model. Shown as an optional overlay on the actogram or timeline view.
+Helps the patient and their doctor see whether late caffeine correlates
+with delayed sleep onset across multiple cycles.
+
+**Doctor report integration (V2)**
+
+- Caffeine intake summary included in the one-tap PDF
+- Correlate drink timing with sleep onset latency where data permits
 
 ---
 

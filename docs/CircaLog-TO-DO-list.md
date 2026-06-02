@@ -257,6 +257,43 @@
 - [ ] Mood / energy upon waking (1–5 scale)
 - [ ] All fields optional, off by default, toggleable in Settings
 
+### ☕ Drinks Log
+
+> Caffeine timing is medically relevant to sleep onset — a coffee at 3 PM
+> still has half its stimulant effect at 8–10 PM due to caffeine's ~5–7 hour
+> half-life. For Non-24 patients fighting delayed sleep timing, and for any
+> patient whose doctor needs accurate context, this is signal, not noise.
+>
+> Alcohol affects sleep architecture. Protein shakes affect satiety and
+> indirectly sleep quality. Juice can carry sugar load and sometimes caffeine.
+> Water intake is relevant for hydration and, for patients with conditions
+> affecting nocturia (e.g. enlarged prostate), can correlate with sleep
+> fragmentation patterns.
+>
+> The goal is to give a sleep specialist a complete picture — not just the
+> sleep log, but the context surrounding it.
+
+- [ ] Drinks log — data model (`DrinkLogEntry` in `src/lib/circadian/types.ts`)
+       - Date (DD/MM/YYYY)
+       - Time (HH:MM)
+       - Drink type: Coffee / Tea / Energy Drink / Protein Shake / Juice /
+         Alcohol / Water / Other
+       - Caffeine estimate: auto-calculated from drink type; manual override
+         available
+       - Size: Small / Regular / Large / Custom (oz and ml input)
+- [ ] Settings — Caffeine reference table
+       (default mg values per drink type per size; user-editable)
+- [ ] IndexedDB store: `drink_log_entries`
+- [ ] Supabase table: `drink_log_entries`
+- [ ] Quick-entry UX for water (high logging frequency — needs low friction)
+- [ ] Insights — caffeine curve overlay
+       - Optional overlay on the actogram or timeline view
+       - Shows estimated active caffeine level across the day
+       - Calculated from logged drinks using standard ~5–7 hour half-life model
+- [ ] Doctor report integration (V2 reports task)
+       - Include caffeine intake summary in the one-tap PDF
+       - Correlate drink timing with sleep onset latency where data permits
+
 ### 💊 Medication & Meal Log
 
 > Designed around the Non-24 reality: clock-based medication schedules
@@ -282,7 +319,7 @@
        - Missed-dose policy: `skip` | `take_late` | `ask`
        - `isActive` toggle (retire without losing history)
 - [ ] Settings — Meal Library screen
-       - Add / edit / deactivate meal slots (e.g. “Breakfast”, “Lunch”, “Dinner”)
+       - Add / edit / deactivate meal slots (e.g. "Breakfast", "Lunch", "Dinner")
        - Optional typical clock-time hint per slot (UI hint only — never used
          for compliance calculations because Non-24 makes fixed meal times
          irrelevant)
@@ -296,7 +333,7 @@
          eat time; the engine uses this as the food anchor for dose
          compliance checks
 - [ ] Logging screen integration
-       - When waking, show a pre-populated list of today’s due/overdue doses
+       - When waking, show a pre-populated list of today's due/overdue doses
        - Tap a medication → enter actual time taken (or mark skipped)
        - Optional free-text note per dose
        - Meal log entry accessible from the same screen
@@ -369,3 +406,6 @@
 - [ ] Performance audit (Lighthouse PWA score target: 95+)
 - [ ] Keep dependencies updated
 - [ ] Update changelog with every meaningful release
+
+
+---
