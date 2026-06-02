@@ -724,3 +724,71 @@ Rejected — letterforms read as technical sci-fi rather than
 medical-adjacent, which conflicts with the trustworthy brief (Q26).
 
 > **Instructions:** Answer each question with the letter(s) that best match your vision. For any question, feel free to answer with multiple letters (e.g., "B + D") or write a custom answer. The more honest your answers, the better the dev plan we can build together.
+
+---
+
+## 🕐 Supplementary: Three-Date Sleep Session Model
+
+*Decided 02 Jun 2026 — arose from observing that a single sleep session
+can span multiple calendar dates, and that a single `Date` column is
+ambiguous for midnight-crossover sessions.*
+
+---
+
+**The problem**
+
+A sleep session that begins at 23:10 on May 31 (local), crosses midnight,
+and ends at 05:40 on June 1 (local) produces three meaningful calendar
+dates:
+
+| Date | Answers the question |
+|---|---|
+| **Bed date** (May 31) | "Which night was this?" — the human anchor; what you'd tell your doctor |
+| **Sleep start date** (June 1) | "When did sleep actually begin?" — used for onset calculations and actogram Y-axis |
+| **Wake date** (June 1) | "When did the day start after this session?" — used for medication and food timing |
+
+The spreadsheet collapsed all three into one `Date` column anchored to
+Sleep Start local time, which caused Cycles 4 and 5 in the real-data
+fixture to both show as `06/01` even though they were on different nights.
+
+For patients with Non-24 who may sleep for 12–48+ hours, or stay awake
+for 36–51+ hours, the three dates can be on entirely different calendar
+days. A single date field cannot represent this correctly.
+
+**Architectural decision**
+
+`bedTimeUtc?: string` was added to `SleepEntry` as an optional field:
+
+- **Optional** because back-filled historical entries may only have sleep
+  start and wake times, and the app must work correctly without it.
+- **The night anchor:** the local calendar date derived from `bedTimeUtc`
+  is the correct answer to "which night was this session?" — even when
+  sleep start and wake time fall on different calendar dates.
+- **Fallback:** when `bedTimeUtc` is absent, display layers fall back to
+  `localSleepStartDate` and note that the night anchor is approximate.
+
+`normalizeSleepSpan(entry)` returns all three local dates:
+
+```typescript
+interface NormalizedSleepSpan {
+  durationMs: number
+  sleepStartUtc: string
+  wakeUtc: string
+  localSleepStartDate: string   // YYYY-MM-DD in entry's ianaTimezone
+  localWakeDate: string         // YYYY-MM-DD in entry's ianaTimezone
+  localBedDate?: string         // YYYY-MM-DD — undefined when bedTimeUtc absent
+}
+```
+
+All downstream consumers (history view, actogram, doctor report) use
+`localBedDate` as the display date for "which night was this?" and fall
+back to `localSleepStartDate` only when `localBedDate` is undefined.
+
+**Future use**
+
+Once enough drift data is collected (14+ entries), `estimateFreeRunningPeriod()`
+can project sleep windows forward. The goal: tell the patient "based on
+your current cycle, your predicted sleep onset on June 22 is around 3 AM
+and you should be awake by 10 AM" — answering questions like "will I be
+awake when my wife lands?" This requires accurate bed-date anchoring to
+be meaningful.

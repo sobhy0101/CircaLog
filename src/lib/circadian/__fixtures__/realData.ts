@@ -4,6 +4,7 @@
  * Source: Mahmoud's actual sleep records, May 29 – Jun 2 2026.
  * Sanitized: notes shortened; medication and food logs omitted
  * (those fields are not part of SleepEntry).
+ * Updated: bedTimeUtc added to all entries (02 Jun 2026).
  *
  * Timezone: Africa/Cairo, UTC+3 during DST (EEST).
  * DST was active on all dates in this fixture (Apr–Oct).
@@ -36,6 +37,7 @@ export const realSleepEntries: SleepEntry[] = [
     // Cairo local: bed 03:10, sleep 04:00, wake 10:00 (all May 29)
     // UTC: sleep 01:00, wake 07:00
     id: 'real-cycle-1',
+    bedTimeUtc: '2026-05-29T00:10:00.000Z',
     sleepStartUtc: '2026-05-29T01:00:00.000Z',
     wakeUtc: '2026-05-29T07:00:00.000Z',
     ianaTimezone: 'Africa/Cairo',
@@ -54,6 +56,7 @@ export const realSleepEntries: SleepEntry[] = [
     // Cairo local: bed 05:28, sleep 06:03, wake 13:40 (all May 30)
     // UTC: sleep 03:03, wake 10:40
     id: 'real-cycle-2',
+    bedTimeUtc: '2026-05-30T02:28:00.000Z',
     sleepStartUtc: '2026-05-30T03:03:00.000Z',
     wakeUtc: '2026-05-30T10:40:00.000Z',
     ianaTimezone: 'Africa/Cairo',
@@ -72,6 +75,7 @@ export const realSleepEntries: SleepEntry[] = [
     // Cairo local: bed 06:25, sleep 07:06, wake 11:30 (all May 31)
     // UTC: sleep 04:06, wake 08:30
     id: 'real-cycle-3',
+    bedTimeUtc: '2026-05-31T03:25:00.000Z',
     sleepStartUtc: '2026-05-31T04:06:00.000Z',
     wakeUtc: '2026-05-31T08:30:00.000Z',
     ianaTimezone: 'Africa/Cairo',
@@ -98,6 +102,7 @@ export const realSleepEntries: SleepEntry[] = [
     // This is the primary midnight-crossover test case in the fixture set.
     // normalizeSleepSpan() and all duration calculations must handle it.
     id: 'real-cycle-4',
+    bedTimeUtc: '2026-05-31T20:10:00.000Z',
     sleepStartUtc: '2026-05-31T21:37:00.000Z',
     wakeUtc: '2026-06-01T02:40:00.000Z',
     ianaTimezone: 'Africa/Cairo',
@@ -123,6 +128,7 @@ export const realSleepEntries: SleepEntry[] = [
     //
     // Sleep onset latency: only 11 minutes (bed 21:37, sleep 21:48).
     id: 'real-cycle-5',
+    bedTimeUtc: '2026-06-01T18:37:00.000Z',
     sleepStartUtc: '2026-06-01T18:48:00.000Z',
     wakeUtc: '2026-06-02T02:20:00.000Z',
     ianaTimezone: 'Africa/Cairo',

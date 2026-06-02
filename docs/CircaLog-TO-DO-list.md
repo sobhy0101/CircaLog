@@ -65,18 +65,18 @@
 
 ### 🔧 Pure Utility Functions (all in `src/lib/circadian/`)
 
-- [ ] 🔴 `normalizeSleepSpan(entry)` — overnight + timezone + DST normalization
-- [ ] 🔴 `detectSessionType(durationMs, gapMs)` — returns `'main'` | `'nap'`
-- [ ] 🔴 `assignCycleNumber(entries)` — assigns/recomputes cycle numbers (idempotent; runs after every back-fill)
-- [ ] 🔴 `calculateDrift(entries)` — minutes-per-cycle drift rate
-- [ ] 🔴 `estimateFreeRunningPeriod(entries)` — linear regression on sleep onset times; returns `'pending'` until 14+ entries
-- [ ] 🔴 `groupEntriesByCycle(entries)` — grouping helper for chart and history rendering
-- [ ] 🔴 `detectFragmentation(entry)` — flags fragmented sleep sessions
-- [ ] 🔴 `calculateRollingAverages(entries, windowDays)` — rolling 7/30-day stats
+- [x] 🔴 `normalizeSleepSpan(entry)` — overnight + timezone + DST normalization
+- [x] 🔴 `detectSessionType(durationMs, gapMs)` — returns `'main'` | `'nap'`
+- [x] 🔴 `assignCycleNumber(entries)` — assigns/recomputes cycle numbers (idempotent; runs after every back-fill)
+- [x] 🔴 `calculateDrift(entries)` — minutes-per-cycle drift rate
+- [x] 🔴 `estimateFreeRunningPeriod(entries)` — linear regression on sleep onset times; returns `'pending'` until 14+ entries
+- [x] 🔴 `groupEntriesByCycle(entries)` — grouping helper for chart and history rendering
+- [x] 🔴 `detectFragmentation(entry)` — flags fragmented sleep sessions
+- [x] 🔴 `calculateRollingAverages(entries, windowDays)` — rolling 7/30-day stats
 
 ### ✅ Verification
 
-- [ ] 🔴 Vitest test suite passes against both fixture sets (real history + synthetic edge cases)
+- [x] 🔴 Vitest test suite passes against both fixture sets (real history + synthetic edge cases)
        with zero failures before Phase 0.5 is considered complete
 
 ---

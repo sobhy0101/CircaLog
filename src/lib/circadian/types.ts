@@ -115,6 +115,26 @@ export interface SleepEntry {
 
   // ── Timestamps ────────────────────────────────────────────────────────────
 
+  /**
+   * The time the user got into bed, stored as an ISO 8601 UTC string.
+   * Optional — not all entries will have this value (back-filled
+   * historical entries may only have sleep start and wake times).
+   *
+   * This is the "night anchor" date: the calendar date of bedTimeUtc
+   * in the user's local timezone is the correct answer to the question
+   * "which night was this sleep session?" — even when sleep start and
+   * wake time fall on different calendar dates (midnight crossover).
+   *
+   * Example: bed 23:10 May 31, sleep 00:37 Jun 1, wake 05:40 Jun 1.
+   * The night is May 31. sleepStartUtc alone gives Jun 1, which is wrong.
+   *
+   * Never entered manually by the user in the timer flow — set
+   * automatically when the user taps "Start Sleep". May be entered
+   * manually in back-fill mode when the user remembers when they
+   * went to bed.
+   */
+  bedTimeUtc?: string;
+
   /** Sleep start time, stored as an ISO 8601 UTC string. */
   sleepStartUtc: string;
 
@@ -287,6 +307,53 @@ export interface RollingAverages {
 
   /** Number of entries that fell within the window. */
   entryCount: number;
+}
+
+/**
+ * The result of normalizeSleepSpan().
+ *
+ * All UTC timestamps from the source entry are validated and preserved.
+ * The three local date strings are derived from those UTC timestamps
+ * using the entry's ianaTimezone — they exist so that display layers
+ * (history list, actogram, doctor report) do not have to re-derive them.
+ *
+ * "Local date" means an ISO 8601 date string (YYYY-MM-DD) in the
+ * entry's ianaTimezone — not a Date object, not a UTC date string.
+ *
+ * localBedDate is undefined when bedTimeUtc is absent from the entry.
+ */
+export interface NormalizedSleepSpan {
+  /** Duration from sleep start to wake, in milliseconds. Always > 0. */
+  durationMs: number;
+
+  /** Validated ISO 8601 UTC string — equal to entry.sleepStartUtc. */
+  sleepStartUtc: string;
+
+  /** Validated ISO 8601 UTC string — equal to entry.wakeUtc. */
+  wakeUtc: string;
+
+  /**
+   * Local calendar date (YYYY-MM-DD) of sleep start in the entry's
+   * ianaTimezone. This is the date the patient fell asleep.
+   */
+  localSleepStartDate: string;
+
+  /**
+   * Local calendar date (YYYY-MM-DD) of wake time in the entry's
+   * ianaTimezone. This is the date the patient woke up.
+   */
+  localWakeDate: string;
+
+  /**
+   * Local calendar date (YYYY-MM-DD) of bed time in the entry's
+   * ianaTimezone. This is the "night anchor" — the correct answer to
+   * "which night was this session?"
+   *
+   * Undefined when bedTimeUtc is absent from the source entry.
+   * When undefined, callers should fall back to localSleepStartDate
+   * for display, with a note that the night anchor is approximate.
+   */
+  localBedDate?: string;
 }
 
 // ---------------------------------------------------------------------------

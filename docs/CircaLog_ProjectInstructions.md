@@ -241,15 +241,15 @@ settings together determine the import rule:
 
 *Discovered during Phase 1 ThemeToggle task (May 2026).*
 
-### Vitest 3 + Vite 8 type conflict (`vite.config.ts`)
+### Vitest 4 + Vite 8 type conflict (`vite.config.ts`)
 
-Vite 8 uses `rolldown` internally; Vitest 3 bundles an older
+Vite 8 uses `rolldown` internally; Vitest 4 bundles an older
 `rollup`-based Vite. Their plugin types conflict at the TypeScript level
 when Vitest config is added to `vite.config.ts`.
 
 Two things follow from this:
 
-- **`UserConfig` is not exported from `vitest/config` in Vitest 3.**
+- **`UserConfig` is not exported from `vitest/config` in Vitest 4.**
   Do not write `import type { UserConfig } from 'vitest/config'` —
   it will cause a Vercel deployment failure even if the local build passes.
 - **`satisfies UserConfig['test']`** is therefore also unavailable and
@@ -272,6 +272,27 @@ export default defineConfig({
 ```
 
 *Discovered during Phase 0.5 Vitest installation (Jun 2026).*
+
+### `bedTimeUtc` and the three-date sleep session model
+
+A single sleep session can span multiple calendar dates. `SleepEntry`
+stores `bedTimeUtc?: string` (optional) alongside `sleepStartUtc` and
+`wakeUtc`. The three dates answer different questions:
+
+- `localBedDate`        — "which night was this?" (the human anchor; what the patient tells their doctor)
+- `localSleepStartDate` — "when did sleep begin?" (used for onset calculations, actogram Y-axis)
+- `localWakeDate`       — "when did the day start?" (used for medication and food timing)
+
+`normalizeSleepSpan(entry)` derives and returns all three as `YYYY-MM-DD`
+strings in the entry's `ianaTimezone`. All display layers (history view,
+actogram, doctor report) use `localBedDate` as the primary display date
+and fall back to `localSleepStartDate` only when `bedTimeUtc` is absent.
+
+`bedTimeUtc` is optional because back-filled historical entries may only
+have sleep start and wake times. Every engine function works correctly
+without it. Never treat its absence as an error.
+
+*Decided 02 Jun 2026, Phase 0.5 planning session.*
 
 ---
 

@@ -82,13 +82,27 @@ C:\Projects\CircaLog\
       ui/        — primitive building-block components
     hooks/       — custom React hooks
     lib/
-      db/        — IndexedDB service
+      circadian/ — circadian engine (Phase 0.5 — complete)
+        types.ts               — canonical domain model (SleepEntry, Cycle, etc.)
+        utils.ts               — internal helpers (utcToLocalDate, filterActive)
+        index.ts               — public API barrel export
+        normalizeSleepSpan.ts
+        detectSessionType.ts
+        assignCycleNumber.ts
+        calculateDrift.ts
+        estimateFreeRunningPeriod.ts
+        groupEntriesByCycle.ts
+        detectFragmentation.ts
+        calculateRollingAverages.ts
+        __fixtures__/          — test fixtures (realData.ts, edgeCases.ts)
+        __tests__/             — engine.test.ts (43 tests, all passing)
+      db/        — IndexedDB service (not yet built)
       supabase/  — Supabase client (V2)
     pages/       — page-level components
     types/       — TypeScript type definitions
     utils/       — pure helper functions
-  tasks/         — CC task files (untracked in git as of Phase 0)
-  public/        — static assets (favicon.svg placeholder)
+  tasks/         — CC task files (untracked in git)
+  public/        — static assets
 ```
 
 ## Key URLs
@@ -96,6 +110,11 @@ C:\Projects\CircaLog\
 - `circalog.app/log` — the PWA app (permanent URL)
 
 ## Roadmap Phase
+**Phase 0.5 (Circadian Engine) — Complete** (02 Jun 2026)
+- All eight engine functions implemented and tested (43 tests passing)
+- `bedTimeUtc` added to `SleepEntry`; three-date model established
+- See `src/lib/circadian/` for full implementation
+
 Currently building **V1 (Core MVP)**:
 - Sleep log with required + optional fields
 - Actogram drift chart with time range toggle

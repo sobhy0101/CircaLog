@@ -27,6 +27,10 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
   hunger, pain, other), medication taken (before/during/after sleep)
 - Automatic nap detection (sessions under 3 hours = nap)
 - Back-fill past entries going back weeks or months
+- Correct night-anchor dating: sessions that cross midnight (e.g. bed at
+  23:10 May 31, asleep at 00:37 June 1) are displayed under the night they
+  started, not the calendar date of sleep onset — because that is how
+  patients and doctors think about sleep
 
 ### 📊 Visualization
 - **Actogram** — the primary chart. A diagonal drift visualization showing

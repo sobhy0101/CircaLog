@@ -61,6 +61,7 @@ function makeEntry(
 export const dstSpringForward: SleepEntry[] = [
   makeEntry({
     id: 'dst-spring-forward-1',
+    bedTimeUtc: '2026-04-23T21:00:00.000Z',
     // Sleep start: 23 Apr 2026 23:30 Cairo (EET = UTC+2) → 21:30 UTC
     sleepStartUtc: '2026-04-23T21:30:00.000Z',
     // Wake: 24 Apr 2026 04:00 Cairo (EEST = UTC+3) → 01:00 UTC
@@ -90,6 +91,7 @@ export const dstSpringForward: SleepEntry[] = [
 export const dstFallBack: SleepEntry[] = [
   makeEntry({
     id: 'dst-fall-back-1',
+    bedTimeUtc: '2026-10-28T21:30:00.000Z',
     // Sleep start: 29 Oct 2026 01:00 Cairo (EEST = UTC+3) → 22:00 UTC 28 Oct
     sleepStartUtc: '2026-10-28T22:00:00.000Z',
     // Wake: 29 Oct 2026 04:00 Cairo (EET = UTC+2, after fall-back) → 02:00 UTC 29 Oct
