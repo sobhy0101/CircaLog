@@ -241,6 +241,38 @@ settings together determine the import rule:
 
 *Discovered during Phase 1 ThemeToggle task (May 2026).*
 
+### Vitest 3 + Vite 8 type conflict (`vite.config.ts`)
+
+Vite 8 uses `rolldown` internally; Vitest 3 bundles an older
+`rollup`-based Vite. Their plugin types conflict at the TypeScript level
+when Vitest config is added to `vite.config.ts`.
+
+Two things follow from this:
+
+- **`UserConfig` is not exported from `vitest/config` in Vitest 3.**
+  Do not write `import type { UserConfig } from 'vitest/config'` —
+  it will cause a Vercel deployment failure even if the local build passes.
+- **`satisfies UserConfig['test']`** is therefore also unavailable and
+  must not be used on the `test` block.
+- The correct workaround is an `as any` cast on the `defineConfig({...})`
+  call. This bypasses the plugin type conflict without affecting runtime
+  behaviour. The `test` block itself does not need a type annotation.
+
+The resulting pattern in `vite.config.ts`:
+
+```typescript
+export default defineConfig({
+  // ... plugins, resolve, etc.
+  test: {
+    environment: 'node',
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    globals: false,
+  },
+} as any)
+```
+
+*Discovered during Phase 0.5 Vitest installation (Jun 2026).*
+
 ---
 
 ## Developer Context
