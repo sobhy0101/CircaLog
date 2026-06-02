@@ -407,5 +407,4 @@
 - [ ] Keep dependencies updated
 - [ ] Update changelog with every meaningful release
 
-
 ---
