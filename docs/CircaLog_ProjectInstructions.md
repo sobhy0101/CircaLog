@@ -3,7 +3,7 @@
 **Project:** CircaLog — Sleep tracking PWA for Non-24-Hour Sleep-Wake Disorder
 **Stack:** React + Vite + TypeScript + TailwindCSS + Recharts + IndexedDB + Supabase + Vercel
 **Project root:** `C:\Projects\CircaLog\`
-**Domain:** `circalog.app` (purchasing June 1st, insha'Allah)
+**Domain:** `circalog.app` (purchasing TBD)
 **GitHub:** <https://github.com/sobhy0101/CircaLog>
 
 ---
