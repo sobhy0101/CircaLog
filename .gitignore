@@ -67,6 +67,10 @@ tasks/*.png
 # ─── TypeScript ───────────────────────────────────────────────
 *.tsbuildinfo
 
+# ─── MCP Configuration ────────────────────────────────────────
+# Contains personal access tokens — never commit
+.mcp.json
+
 # ─── Misc ─────────────────────────────────────────────────────
 .cache/
 .parcel-cache/
