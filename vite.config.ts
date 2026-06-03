@@ -102,6 +102,24 @@ export default defineConfig({
     }),
   ],
 
+  build: {
+    // Split vendor libs into a separate chunk so app-only deploys don't bust
+    // the cached vendor bundle (React, ReactDOM, Dexie).
+    rolldownOptions: {
+      output: {
+        // Rolldown requires manualChunks to be a function (not a plain object).
+        manualChunks: (id: string) => {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'vendor'
+          }
+          if (id.includes('node_modules/dexie')) {
+            return 'dexie'
+          }
+        },
+      },
+    },
+  },
+
   resolve: {
     alias: {
       // Allows clean imports like: import Foo from '@/components/Foo'
