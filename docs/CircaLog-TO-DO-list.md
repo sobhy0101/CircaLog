@@ -127,10 +127,10 @@
 
 ### 🛏️ Sleep Log — Core
 
-- [ ] 🔴 Design sleep log data model (IndexedDB schema)
+- [x] 🔴 Design sleep log data model (IndexedDB schema)
        (Derives from Phase 0.5 TypeScript interfaces — do not finalize
        until the Circadian Engine is stable)
-- [ ] 🔴 Build IndexedDB service with full CRUD (create, read, update, delete) from day 1
+- [x] 🔴 Build IndexedDB service with full CRUD (create, read, update, delete) from day 1
        (Edit/delete capability must exist before serious testing — junk test data
        accumulates otherwise. Consider Dexie.js once Phase 0.5 query patterns are
        clear; defer that decision until then.)
@@ -145,8 +145,8 @@
        - Dreams / Nightmares (yes/no + text)
        - Interruptions (count + type: bathroom/thirst/hunger/pain/other)
        - Medication taken (before/during/after, yes/no)
-- [ ] 🟡 Wire `detectSessionType` from Phase 0.5 into the save path (Main Sleep ≥3h vs. Nap <3h)
-- [ ] 🟡 Wire `assignCycleNumber` from Phase 0.5 into the save path
+- [x] 🟡 Wire `detectSessionType` from Phase 0.5 into the save path (Main Sleep ≥3h vs. Nap <3h)
+- [x] 🟡 Wire `assignCycleNumber` from Phase 0.5 into the save path
 - [ ] 🟡 Display both calendar date AND cycle number on each entry
 - [ ] 🟢 Back-fill past entries (date/time picker for historical input)
        (Re-runs `assignCycleNumber` across the affected range after insert)

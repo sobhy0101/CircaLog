@@ -294,6 +294,36 @@ without it. Never treat its absence as an error.
 
 *Decided 02 Jun 2026, Phase 0.5 planning session.*
 
+### Dexie 4.x — boolean fields cannot be used as index keys
+
+The IndexedDB spec rejects booleans as index key types. Dexie 3.x worked
+around this by coercing `false → 0` and `true → 1` before writing to the
+index, which made `.where('isDeleted').equals(0)` work. Dexie 4.x removed
+that coercion to stay spec-compliant.
+
+**Consequence:** even though `isDeleted` is declared in the Dexie schema
+index string (which is fine — Dexie ignores unqueryable fields there), it
+cannot be queried via `.where('isDeleted').equals(...)` in Dexie 4.x.
+Doing so silently returns zero results with no error.
+
+**The correct pattern for filtering on boolean fields in Dexie 4.x:**
+
+```typescript
+// WRONG — silently returns zero results in Dexie 4.x
+const active = await db.sleepEntries.where('isDeleted').equals(0).toArray()
+
+// CORRECT — fetch all, filter in JS
+const all = await db.sleepEntries.toArray()
+const active = all.filter(e => !e.isDeleted)
+```
+
+This applies to any boolean field in any Dexie table. For large stores where
+this becomes a performance concern in the future, the workaround is to store
+an integer flag (`isDeleted: 0 | 1`) instead of a boolean — but that is not
+needed at V1 scale and would require a schema migration.
+
+*Discovered during Phase 1 Batch A DB layer task (Jun 2026).*
+
 ---
 
 ## Developer Context
