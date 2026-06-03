@@ -3,7 +3,8 @@
 
 import { Routes, Route } from 'react-router-dom' // URL-to-component mapping
 import ComingSoon from '@/pages/ComingSoon'       // Route: /
-import AppShell   from '@/pages/AppShell'         // Route: /log
+import AppShell   from '@/pages/AppShell'         // Route: /log (shell wrapper)
+import LogPage    from '@/pages/log/LogPage'      // Route: /log (index child)
 
 export default function App() {
   return (
@@ -11,8 +12,10 @@ export default function App() {
       {/* / → coming soon landing page */}
       <Route path="/" element={<ComingSoon />} />
 
-      {/* /log → the main PWA application */}
-      <Route path="/log" element={<AppShell />} />
+      {/* /log → app shell; LogPage renders inside <Outlet /> */}
+      <Route path="/log" element={<AppShell />}>
+        <Route index element={<LogPage />} />
+      </Route>
     </Routes>
   )
 }

@@ -1,8 +1,8 @@
 // AppShell.tsx — the main PWA application shell (route: /log).
 // Holds drawer open/close state and composes BottomTabBar + SideDrawer.
-// <Outlet /> for React Router will be added in a future routing batch.
 
 import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import BottomTabBar from '@/components/layout/BottomTabBar';
 import SideDrawer   from '@/components/layout/SideDrawer';
 
@@ -18,12 +18,7 @@ export default function AppShell() {
 
       {/* Main scrollable content area — pb-16 clears the 64px tab bar */}
       <main className="flex-1 overflow-y-auto pb-16">
-        {/* Page content will be rendered here via React Router <Outlet> in a future batch. */}
-        <div className="flex items-center justify-center h-full min-h-[calc(100vh-4rem)]">
-          <p className="text-circa-accent text-sm tracking-wide">
-            CircaLog — app shell ✓
-          </p>
-        </div>
+        <Outlet />
       </main>
 
       {/* Bottom tab bar (fixed to bottom) */}

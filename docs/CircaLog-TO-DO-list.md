@@ -134,13 +134,13 @@
        (Edit/delete capability must exist before serious testing — junk test data
        accumulates otherwise. Consider Dexie.js once Phase 0.5 query patterns are
        clear; defer that decision until then.)
-- [ ] 🔴 Build manual time entry form (both start and wake)
+- [x] 🔴 Build manual time entry form (both start and wake)
        (Manual entry first — it stress-tests the data model faster than the timer
        flow and unblocks back-fill of historical data)
-- [ ] 🔴 Build "Start Sleep" one-tap timer screen
-- [ ] 🔴 Build "Wake Up" completion screen
-- [ ] 🟡 Required fields: sleep start, wake time, quality rating (1–5)
-- [ ] 🟡 Optional fields toggle:
+- [x] 🔴 Build "Start Sleep" one-tap timer screen
+- [x] 🔴 Build "Wake Up" completion screen
+- [x] 🟡 Required fields: sleep start, wake time, quality rating (1–5)
+- [x] 🟡 Optional fields toggle:
        - Notes (free text)
        - Dreams / Nightmares (yes/no + text)
        - Interruptions (count + type: bathroom/thirst/hunger/pain/other)
