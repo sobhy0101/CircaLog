@@ -18,7 +18,7 @@ export default function QualityPicker({ value, onChange, label }: QualityPickerP
       {label && (
         <p className="text-sm font-medium text-circa-text-primary mb-2">{label}</p>
       )}
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-3 w-full px-4">
         {[1, 2, 3, 4, 5].map(n => {
           const selected = value === n;
           return (
@@ -29,8 +29,8 @@ export default function QualityPicker({ value, onChange, label }: QualityPickerP
               aria-pressed={selected}
               aria-label={`Rate sleep quality ${n} out of 5`}
               className={[
-                'w-10 h-10 rounded-full border-2 flex items-center justify-center',
-                'min-w-[44px] min-h-[44px] transition-colors',
+                'rounded-full border-2 flex items-center justify-center',
+                'aspect-square flex-1 min-w-11 max-w-18 transition-colors',
                 selected
                   ? 'bg-circa-accent border-circa-accent'
                   : 'bg-circa-surface border-circa-border',

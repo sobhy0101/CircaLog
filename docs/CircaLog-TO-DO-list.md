@@ -148,7 +148,7 @@
 - [x] 🟡 Wire `detectSessionType` from Phase 0.5 into the save path (Main Sleep ≥3h vs. Nap <3h)
 - [x] 🟡 Wire `assignCycleNumber` from Phase 0.5 into the save path
 - [ ] 🟡 Display both calendar date AND cycle number on each entry
-- [ ] 🟢 Back-fill past entries (date/time picker for historical input)
+- [x] 🟢 Back-fill past entries (date/time picker for historical input)
        (Re-runs `assignCycleNumber` across the affected range after insert)
 - [ ] 🟢 Edit existing sleep entries — user-facing form (CRUD layer already exists from above)
 - [ ] 🟢 Delete sleep entries — confirmation dialog UX (CRUD layer already exists from above)

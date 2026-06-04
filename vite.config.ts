@@ -120,6 +120,13 @@ export default defineConfig({
     },
   },
 
+  server: {
+    // Bind to 0.0.0.0 instead of 127.0.0.1 (loopback only).
+    // This makes the dev server reachable from other devices on the same LAN (e.g. a phone at 10.0.0.140:5173).
+    // WAN access still requires a separate port-forwarding rule on the router.
+    host: true,
+  },
+
   resolve: {
     alias: {
       // Allows clean imports like: import Foo from '@/components/Foo'

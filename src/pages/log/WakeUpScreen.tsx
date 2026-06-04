@@ -33,12 +33,10 @@ function nowTimeLocal(): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-// Formats elapsed milliseconds as "Xh Ym"
-function formatElapsed(ms: number): string {
+// Returns hours and minutes as separate numbers for split rendering
+function parseElapsed(ms: number): { h: number; m: number } {
   const totalMin = Math.floor(ms / 60000);
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  return `${h}h ${m}m`;
+  return { h: Math.floor(totalMin / 60), m: totalMin % 60 };
 }
 
 const INTERRUPTION_TYPES: { value: InterruptionType; label: string }[] = [
@@ -63,16 +61,28 @@ export default function WakeUpScreen({
   isLoading,
 }: WakeUpScreenProps) {
   const [elapsed, setElapsed] = useState(() =>
-    formatElapsed(Date.now() - new Date(inProgress.startedAt).getTime())
+    parseElapsed(Date.now() - new Date(inProgress.startedAt).getTime())
   );
+  const [colonVisible, setColonVisible] = useState(true);
 
-  // Update elapsed every second
+  // Update elapsed every second and blink the colon separator
   useEffect(() => {
     const id = setInterval(() => {
-      setElapsed(formatElapsed(Date.now() - new Date(inProgress.startedAt).getTime()));
+      setElapsed(parseElapsed(Date.now() - new Date(inProgress.startedAt).getTime()));
+      setColonVisible(v => !v);
     }, 1000);
     return () => clearInterval(id);
   }, [inProgress.startedAt]);
+
+  // Sleep start — pre-filled from inProgress.bedTimeUtc, editable
+  const [sleepDate, setSleepDate] = useState(() => {
+    const d = new Date(inProgress.bedTimeUtc);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
+  const [sleepTime, setSleepTime] = useState(() => {
+    const d = new Date(inProgress.bedTimeUtc);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  });
 
   // Wake time fields — pre-filled with current time
   const [wakeDate, setWakeDate] = useState(todayLocal);
@@ -90,6 +100,7 @@ export default function WakeUpScreen({
   const [medicationTiming,    setMedicationTiming]    = useState<MedicationTiming | null>(null);
 
   // Inline errors
+  const [sleepError,   setSleepError]   = useState('');
   const [wakeError,    setWakeError]    = useState('');
   const [qualityError, setQualityError] = useState('');
 
@@ -104,6 +115,13 @@ export default function WakeUpScreen({
 
   async function handleComplete() {
     let valid = true;
+
+    if (!sleepDate || !sleepTime) {
+      setSleepError('Sleep start time is required.');
+      valid = false;
+    } else {
+      setSleepError('');
+    }
 
     if (!wakeDate || !wakeTime) {
       setWakeError('Wake time is required.');
@@ -132,8 +150,8 @@ export default function WakeUpScreen({
     await createEntry({
       // bedTimeUtc is the moment "Start Sleep" was tapped
       bedTimeUtc:    inProgress.bedTimeUtc,
-      // sleepStartUtc = bedTimeUtc because no separate "fell asleep" moment was recorded
-      sleepStartUtc: inProgress.bedTimeUtc,
+      // sleepStartUtc comes from the editable "Fell Asleep" field
+      sleepStartUtc: toUtcIso(sleepDate, sleepTime)!,
       wakeUtc,
       ianaTimezone,
       quality: quality as 1 | 2 | 3 | 4 | 5,
@@ -159,15 +177,50 @@ export default function WakeUpScreen({
   return (
     <div className="px-4 py-6 space-y-6 max-w-lg mx-auto">
 
-      {/* Elapsed timer */}
+      {/* Elapsed timer — digits blink a colon separator every second to
+          confirm the timer is live. colonVisible toggles each interval tick. */}
       <div className="text-center">
         <p className="text-circa-text-secondary text-sm mb-1">Sleep duration so far</p>
-        <p className="text-circa-text-primary font-display text-4xl font-semibold tracking-tight">
-          {elapsed}
+        <p className="text-circa-text-primary font-display text-4xl font-semibold tracking-tight tabular-nums">
+          {elapsed.h}
+          <span
+            className="transition-opacity duration-100"
+            style={{ opacity: colonVisible ? 1 : 0 }}
+          >
+            :
+          </span>
+          {String(elapsed.m).padStart(2, '0')}
         </p>
       </div>
 
-      {/* Wake time */}
+      {/* Fell Asleep — pre-filled from bed time, editable */}
+      <div>
+        <label className="block text-sm font-medium text-circa-text-primary mb-1">
+          Fell Asleep
+          <span className="text-circa-text-muted font-normal text-xs ml-1">
+            (adjust if you lay awake)
+          </span>
+        </label>
+        <div className="flex gap-2">
+          <input
+            id="sleepDate"
+            type="date"
+            value={sleepDate}
+            onChange={e => setSleepDate(e.target.value)}
+            className={`${inputClass} flex-1`}
+          />
+          <input
+            id="sleepTime"
+            type="time"
+            value={sleepTime}
+            onChange={e => setSleepTime(e.target.value)}
+            className={`${inputClass} w-32`}
+          />
+        </div>
+        {sleepError && <p className="text-red-400 text-xs mt-1">{sleepError}</p>}
+      </div>
+
+      {/* Wake Time */}
       <div>
         <label className="block text-sm font-medium text-circa-text-primary mb-1">
           Wake Time
