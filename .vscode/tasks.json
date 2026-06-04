@@ -1,0 +1,40 @@
+{
+  // Text-to-Speech tasks using Windows SAPI5 (System.Speech).
+  // Natural/neural voices (e.g. Microsoft Guy Natural) are NOT accessible
+  // this way — they require WinRT. SAPI5 voices found on this machine:
+  //   Microsoft David Desktop  ← best quality, current choice
+  //   Microsoft Zira Desktop
+  //   Microsoft David / Mark / Zira  (older, more robotic)
+  //
+  // KEYBOARD SHORTCUTS (set in keybindings.json):
+  //   Ctrl+Alt+R  →  Speak File    (reads the entire open file)
+  //   Ctrl+Alt+S  →  Speak Selection  (reads whatever is on the clipboard)
+  //                  Workflow: select text → Ctrl+C → Ctrl+Alt+S
+  //
+  // To change voice: replace 'Microsoft David Desktop' in both tasks below.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Speak File",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.SelectVoice('Microsoft David Desktop'); $s.Speak((Get-Content '${file}' -Raw))"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Speak Selection",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.SelectVoice('Microsoft David Desktop'); $s.Speak((Get-Clipboard))"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
