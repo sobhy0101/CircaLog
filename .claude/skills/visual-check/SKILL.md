@@ -5,6 +5,24 @@ in a browser. Start the dev server first — see `.claude/skills/run/SKILL.md`.
 
 ---
 
+## ⚠️ Scope limit — read this first
+
+Playwright is for **static rendering checks only**: theme tokens, CSS variable
+values, and screenshots of the initial page state.
+
+Playwright is **not** for:
+- Simulating user interactions (clicks, form fills, filter toggles)
+- Seeding or reading IndexedDB data
+- Verifying dynamic UI behaviour (state changes, filtered lists, animations)
+
+If a visual check item requires interaction or live data, mark it as
+**"manual check"** in the session report and move on. Do NOT attempt to
+work around this by writing custom Playwright interaction scripts — that
+path burns tokens without reliable results. One failed Playwright
+interaction attempt = stop, mark manual, continue.
+
+---
+
 ## Standard theme verification scenarios
 
 Every task that touches `index.css`, `index.html`, or any component using
