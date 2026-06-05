@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import type { createEntry } from '@/lib/db';
-import type { InterruptionType, MedicationTiming } from '@/lib/circadian';
+import type { InterruptionType, MedicationTiming, SleepEntry } from '@/lib/circadian';
 import QualityPicker from '@/components/ui/QualityPicker';
 
 interface ManualEntryFormProps {
   onSaved: () => void;
   onCancel: () => void;
-  createEntry: (draft: Parameters<typeof createEntry>[0]) => Promise<void>;
+  // Create mode — provide createEntry; omit when editing
+  createEntry?: (draft: Parameters<typeof createEntry>[0]) => Promise<void>;
+  // Edit mode — provide both; omit when creating
+  updateEntry?: (
+    id: string,
+    changes: Partial<Omit<SleepEntry, 'id' | 'cycleNumber' | 'sessionType' | 'createdAt' | 'isDeleted'>>
+  ) => Promise<void>;
+  editEntry?: SleepEntry;
   error: string | null;
   isLoading: boolean;
-  initialSleepStart?: string;
-  initialWake?: string;
 }
 
 /**
@@ -21,6 +26,26 @@ interface ManualEntryFormProps {
 function toUtcIso(date: string, time: string): string | null {
   if (!date || !time) return null;
   return new Date(`${date}T${time}`).toISOString();
+}
+
+// Converts a UTC ISO string to local date and time inputs using the given IANA timezone.
+// Produces YYYY-MM-DD and HH:MM strings suitable for <input type="date"> / <input type="time">.
+function utcToLocalInputs(utcIso: string, tz: string): { date: string; time: string } {
+  const d = new Date(utcIso);
+  const dateParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(d);
+  const timeParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(d);
+  const get = (parts: Intl.DateTimeFormatPart[], type: string) =>
+    parts.find(p => p.type === type)?.value ?? '';
+  const rawHour = get(timeParts, 'hour');
+  return {
+    date: `${get(dateParts, 'year')}-${get(dateParts, 'month')}-${get(dateParts, 'day')}`,
+    // Some engines return '24' for midnight with hour12:false — normalise to '00'
+    time: `${rawHour === '24' ? '00' : rawHour}:${get(timeParts, 'minute')}`,
+  };
 }
 
 function todayLocal(): string {
@@ -44,31 +69,74 @@ export default function ManualEntryForm({
   onSaved,
   onCancel,
   createEntry,
+  updateEntry,
+  editEntry,
   error,
   isLoading,
 }: ManualEntryFormProps) {
   const today = todayLocal();
+  const isEdit = !!editEntry;
 
-  // Required fields
-  const [sleepDate, setSleepDate] = useState(today);
-  const [sleepTime, setSleepTime] = useState('');
-  const [wakeDate,  setWakeDate]  = useState(today);
-  const [wakeTime,  setWakeTime]  = useState('');
-  const [quality,   setQuality]   = useState<number | null>(null);
+  // Required fields — pre-filled from editEntry when editing
+  const [sleepDate, setSleepDate] = useState(() =>
+    editEntry ? utcToLocalInputs(editEntry.sleepStartUtc, editEntry.ianaTimezone).date : today
+  );
+  const [sleepTime, setSleepTime] = useState(() =>
+    editEntry ? utcToLocalInputs(editEntry.sleepStartUtc, editEntry.ianaTimezone).time : ''
+  );
+  const [wakeDate, setWakeDate] = useState(() =>
+    editEntry ? utcToLocalInputs(editEntry.wakeUtc, editEntry.ianaTimezone).date : today
+  );
+  const [wakeTime, setWakeTime] = useState(() =>
+    editEntry ? utcToLocalInputs(editEntry.wakeUtc, editEntry.ianaTimezone).time : ''
+  );
+  const [quality, setQuality] = useState<number | null>(() =>
+    editEntry ? editEntry.quality : null
+  );
 
   // Optional — always visible
-  const [bedDate, setBedDate]   = useState(today);
-  const [bedTime, setBedTime]   = useState('');
-  const [notes,   setNotes]     = useState('');
+  const [bedDate, setBedDate] = useState(() =>
+    editEntry?.bedTimeUtc
+      ? utcToLocalInputs(editEntry.bedTimeUtc, editEntry.ianaTimezone).date
+      : today
+  );
+  const [bedTime, setBedTime] = useState(() =>
+    editEntry?.bedTimeUtc
+      ? utcToLocalInputs(editEntry.bedTimeUtc, editEntry.ianaTimezone).time
+      : ''
+  );
+  const [notes, setNotes] = useState(() => editEntry?.notes ?? '');
 
-  // Optional — collapsible
-  const [showOptional,       setShowOptional]       = useState(false);
-  const [hadDreams,          setHadDreams]          = useState<boolean | null>(null);
-  const [dreamNotes,         setDreamNotes]         = useState('');
-  const [activeInterruptions, setActiveInterruptions] = useState<Set<InterruptionType>>(new Set());
-  const [interruptionNotes,  setInterruptionNotes]  = useState<Partial<Record<InterruptionType, string>>>({});
-  const [medicationTaken,    setMedicationTaken]    = useState<boolean | null>(null);
-  const [medicationTiming,   setMedicationTiming]   = useState<MedicationTiming | null>(null);
+  // Optional — collapsible; auto-expanded when editing an entry that has optional data
+  const [showOptional, setShowOptional] = useState(() => {
+    if (!editEntry) return false;
+    return !!(
+      editEntry.hadDreams !== undefined ||
+      editEntry.interruptions?.length ||
+      editEntry.medications?.length
+    );
+  });
+  const [hadDreams, setHadDreams] = useState<boolean | null>(() =>
+    editEntry?.hadDreams ?? null
+  );
+  const [dreamNotes, setDreamNotes] = useState(() => editEntry?.dreamNotes ?? '');
+  const [activeInterruptions, setActiveInterruptions] = useState<Set<InterruptionType>>(() => {
+    if (!editEntry?.interruptions) return new Set();
+    return new Set(editEntry.interruptions.map(i => i.type));
+  });
+  const [interruptionNotes, setInterruptionNotes] = useState<Partial<Record<InterruptionType, string>>>(() => {
+    if (!editEntry?.interruptions) return {};
+    return Object.fromEntries(
+      editEntry.interruptions.filter(i => i.note).map(i => [i.type, i.note!])
+    );
+  });
+  const [medicationTaken, setMedicationTaken] = useState<boolean | null>(() => {
+    if (!editEntry) return null;
+    return editEntry.medications ? editEntry.medications.length > 0 : null;
+  });
+  const [medicationTiming, setMedicationTiming] = useState<MedicationTiming | null>(() =>
+    editEntry?.medications?.[0]?.timing ?? null
+  );
 
   // Inline validation errors
   const [sleepError,   setSleepError]   = useState('');
@@ -120,7 +188,7 @@ export default function ManualEntryForm({
       note: interruptionNotes[type] || undefined,
     }));
 
-    await createEntry({
+    const entryData = {
       sleepStartUtc,
       wakeUtc,
       bedTimeUtc,
@@ -134,7 +202,13 @@ export default function ManualEntryForm({
         medicationTaken && medicationTiming
           ? [{ name: 'Yes', timing: medicationTiming }]
           : undefined,
-    });
+    };
+
+    if (isEdit && editEntry && updateEntry) {
+      await updateEntry(editEntry.id, entryData);
+    } else if (createEntry) {
+      await createEntry(entryData);
+    }
 
     onSaved();
   }
@@ -398,7 +472,7 @@ export default function ManualEntryForm({
         className="w-full bg-circa-accent text-white font-semibold py-3 rounded-xl
                    disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isLoading ? 'Saving…' : 'Save Sleep Session'}
+        {isLoading ? 'Saving…' : isEdit ? 'Update Session' : 'Save Sleep Session'}
       </button>
 
       {/* Cancel */}

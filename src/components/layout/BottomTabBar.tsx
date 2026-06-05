@@ -1,12 +1,27 @@
 // BottomTabBar.tsx — persistent bottom navigation bar with four tabs and hamburger trigger.
-// Hamburger is on the left (drawer opens from left → trigger on left is standard UX).
-// TODO: Active tab is hardcoded to "Log" for V1; drive from current route in a future batch.
+// Active tab is driven from the current route via useLocation.
+
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface BottomTabBarProps {
   onOpenDrawer: () => void;
 }
 
 export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  // Determine active tab from current path
+  const isLog     = pathname === '/log';
+  const isHistory = pathname === '/log/history';
+
+  function tabClass(active: boolean) {
+    return (
+      'flex flex-col items-center justify-center gap-1 flex-1 transition-colors ' +
+      (active ? 'text-circa-accent' : 'text-circa-text-secondary hover:text-circa-accent')
+    );
+  }
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 h-16 bg-circa-surface border-t border-circa-border flex items-stretch z-30"
@@ -17,7 +32,7 @@ export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
       <button
         onClick={onOpenDrawer}
         aria-label="Open menu"
-        className="flex items-center justify-center min-w-[44px] min-h-[44px] px-3 text-circa-text-secondary hover:text-circa-accent transition-colors"
+        className="flex items-center justify-center min-w-11 min-h-11 px-3 text-circa-text-secondary hover:text-circa-accent transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -39,8 +54,13 @@ export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
 
       {/* Tab area — equal-width flex children */}
       <div className="flex flex-1">
-        {/* Log tab — active (hardcoded for V1) */}
-        <button className="flex flex-col items-center justify-center gap-1 flex-1 text-circa-accent">
+        {/* Log tab */}
+        <button
+          onClick={() => navigate('/log')}
+          aria-label="Log"
+          aria-current={isLog ? 'page' : undefined}
+          className={tabClass(isLog)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -60,8 +80,11 @@ export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
           <span className="text-xs">Log</span>
         </button>
 
-        {/* Chart tab */}
-        <button className="flex flex-col items-center justify-center gap-1 flex-1 text-circa-text-secondary hover:text-circa-accent transition-colors">
+        {/* Chart tab — not yet implemented */}
+        <button
+          aria-label="Chart"
+          className={tabClass(false)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -83,7 +106,12 @@ export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
         </button>
 
         {/* History tab */}
-        <button className="flex flex-col items-center justify-center gap-1 flex-1 text-circa-text-secondary hover:text-circa-accent transition-colors">
+        <button
+          onClick={() => navigate('/log/history')}
+          aria-label="History"
+          aria-current={isHistory ? 'page' : undefined}
+          className={tabClass(isHistory)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -103,8 +131,11 @@ export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
           <span className="text-xs">History</span>
         </button>
 
-        {/* Insights tab */}
-        <button className="flex flex-col items-center justify-center gap-1 flex-1 text-circa-text-secondary hover:text-circa-accent transition-colors">
+        {/* Insights tab — not yet implemented */}
+        <button
+          aria-label="Insights"
+          className={tabClass(false)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"

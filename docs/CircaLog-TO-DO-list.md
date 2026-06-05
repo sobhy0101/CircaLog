@@ -147,20 +147,27 @@
        - Medication taken (before/during/after, yes/no)
 - [x] 🟡 Wire `detectSessionType` from Phase 0.5 into the save path (Main Sleep ≥3h vs. Nap <3h)
 - [x] 🟡 Wire `assignCycleNumber` from Phase 0.5 into the save path
-- [ ] 🟡 Display both calendar date AND cycle number on each entry
+- [x] 🟡 Display both calendar date AND cycle number on each entry
+       (Shown on every History View entry card: cycle badge + local date + local times)
 - [x] 🟢 Back-fill past entries (date/time picker for historical input)
        (Re-runs `assignCycleNumber` across the affected range after insert)
-- [ ] 🟢 Edit existing sleep entries — user-facing form (CRUD layer already exists from above)
-- [ ] 🟢 Delete sleep entries — confirmation dialog UX (CRUD layer already exists from above)
+- [x] 🟢 Edit existing sleep entries — user-facing form (CRUD layer already exists from above)
+       (ManualEntryForm in edit mode, pre-fills all fields from existing SleepEntry)
+- [x] 🟢 Delete sleep entries — confirmation dialog UX (CRUD layer already exists from above)
+       (Soft delete via DeleteConfirmDialog; cycle numbers renumber automatically)
 
 ### 📋 History View
 
 > Built **before** the actogram — it is the debugging console for the
 > sleep log data. Chart bugs become tractable when the raw entries are
 > visible in a sortable, filterable list.
+>
+> *Note: the first two items below were completed as part of Batch C
+> (Sleep Log Core), not a separate Batch D session. CC built the History
+> View alongside Edit/Delete rather than deferring it.*
 
-- [ ] 🔴 List view of all past sleep entries
-- [ ] 🔴 Show: cycle number, calendar date, start time, wake time,
+- [x] 🔴 List view of all past sleep entries
+- [x] 🔴 Show: cycle number, calendar date, start time, wake time,
        duration, quality rating, session type (sleep/nap)
 - [ ] 🟡 Filter by: date range, session type, quality rating
 - [ ] 🟢 Sort by: most recent first (default) / oldest first

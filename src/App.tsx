@@ -1,10 +1,11 @@
 // App.tsx — root component of CircaLog.
 // Defines which page component renders for each URL path.
 
-import { Routes, Route } from 'react-router-dom' // URL-to-component mapping
-import ComingSoon from '@/pages/ComingSoon'       // Route: /
-import AppShell   from '@/pages/AppShell'         // Route: /log (shell wrapper)
-import LogPage    from '@/pages/log/LogPage'      // Route: /log (index child)
+import { Routes, Route } from 'react-router-dom'   // URL-to-component mapping
+import ComingSoon  from '@/pages/ComingSoon'         // Route: /
+import AppShell    from '@/pages/AppShell'           // Route: /log (shell wrapper)
+import LogPage     from '@/pages/log/LogPage'        // Route: /log (index child)
+import HistoryPage from '@/pages/history/HistoryPage' // Route: /log/history
 
 export default function App() {
   return (
@@ -12,9 +13,10 @@ export default function App() {
       {/* / → coming soon landing page */}
       <Route path="/" element={<ComingSoon />} />
 
-      {/* /log → app shell; LogPage renders inside <Outlet /> */}
+      {/* /log → app shell; child pages render inside <Outlet /> */}
       <Route path="/log" element={<AppShell />}>
         <Route index element={<LogPage />} />
+        <Route path="history" element={<HistoryPage />} />
       </Route>
     </Routes>
   )
