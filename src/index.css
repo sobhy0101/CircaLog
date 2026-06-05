@@ -51,8 +51,8 @@
 
   /* Text */
   --circa-text-primary:   #F0F0FA; /* Headings, body copy */
-  --circa-text-secondary: #A0A0C0; /* Labels, captions */
-  --circa-text-muted:     #5A5A7A; /* Placeholder, disabled */
+  --circa-text-secondary: #B8B8D8; /* Labels, captions — lifted for WCAG AA contrast */
+  --circa-text-muted:     #7878A0; /* Placeholders, disabled, truly secondary UI */
 }
 
 /* ── Tailwind v4 theme mapping ──────────────────────────────────────────
