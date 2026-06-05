@@ -169,8 +169,12 @@
 - [x] 🔴 List view of all past sleep entries
 - [x] 🔴 Show: cycle number, calendar date, start time, wake time,
        duration, quality rating, session type (sleep/nap)
-- [ ] 🟡 Filter by: date range, session type, quality rating
-- [ ] 🟢 Sort by: most recent first (default) / oldest first
+- [x] 🟡 Filter by: session type (All / Main Sleep / Nap) and quality rating (All / ★–★★★★★)
+       (Collapsible filter panel opened via header icon button; dot indicator when
+       active; "N of M sessions" subtitle; "Clear" button resets filters.
+       Note: date range filter deferred — not included in V1 build.)
+- [x] 🟢 Sort by: Newest (default) / Oldest / Rating ↑ / Rating ↓
+       (Compact button row always visible above the entry list)
 
 ### 📊 Visualization — Actogram
 
