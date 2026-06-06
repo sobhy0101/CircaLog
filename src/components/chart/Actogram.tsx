@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   ComposedChart,
   XAxis,
@@ -41,15 +41,17 @@ function useChartHeight(): number {
   const calculate = () =>
     Math.max(window.innerHeight - CHROME, MIN_CHART_HEIGHT);
 
+  // useState(calculate) runs calculate() once at mount as the initial value —
+  // no useEffect needed for the initial measurement.
   const [height, setHeight] = useState(calculate);
 
   useEffect(() => {
+    // Only update on subsequent window resize events.
+    // The initial value is already correct from useState(calculate) above.
     const handler = () => setHeight(calculate());
     window.addEventListener('resize', handler);
-    // Re-run once after mount in case innerHeight changed between SSR and hydration
-    setHeight(calculate());
     return () => window.removeEventListener('resize', handler);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return height;
 }
@@ -87,34 +89,43 @@ function formatDuration(startUtc: string, endUtc: string): string {
   return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 }
 
-// ── Custom X axis tick ────────────────────────────────────────────────────────
+// ── Custom X axis tick (built as a closure inside Actogram) ──────────────────
+//
+// cyclesLookup is NOT passed as a prop — doing so produces a TS error because
+// Recharts' TickProp<XAxisTickContentProps> doesn't include cyclesLookup, and
+// TypeScript's contravariant function-parameter check rejects a required extra
+// field.  Instead, makeXTick returns a closure that captures the lookup map,
+// giving the returned function a prop type compatible with Recharts.
 
-interface XTickProps {
-  x?: number;
-  y?: number;
-  payload?: { value: number };
-  cyclesLookup: Map<number, ActogramCycle>;
-}
+function makeXTick(lookup: Map<number, ActogramCycle>) {
+  return function XAxisTick({
+    x = 0,
+    y = 0,
+    payload,
+  }: {
+    x?: string | number;
+    y?: string | number;
+    payload?: { value: number };
+  }) {
+    if (!payload) return null;
+    const cycle   = lookup.get(payload.value);
+    const dateStr = cycle ? formatCalendarDate(cycle.calendarDate) : '';
 
-function XAxisTick({ x = 0, y = 0, payload, cyclesLookup }: XTickProps) {
-  if (!payload) return null;
-  const cycle   = cyclesLookup.get(payload.value);
-  const dateStr = cycle ? formatCalendarDate(cycle.calendarDate) : '';
-
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={14} fill="var(--circa-text-secondary)"
-        textAnchor="middle" style={{ fontSize: 11 }}>
-        {payload.value}
-      </text>
-      {dateStr && (
-        <text x={0} y={0} dy={27} fill="var(--circa-text-muted)"
-          textAnchor="middle" style={{ fontSize: 10 }}>
-          {dateStr}
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={14} fill="var(--circa-text-secondary)"
+          textAnchor="middle" style={{ fontSize: 11 }}>
+          {payload.value}
         </text>
-      )}
-    </g>
-  );
+        {dateStr && (
+          <text x={0} y={0} dy={27} fill="var(--circa-text-muted)"
+            textAnchor="middle" style={{ fontSize: 10 }}>
+            {dateStr}
+          </text>
+        )}
+      </g>
+    );
+  };
 }
 
 // ── Quality dots ──────────────────────────────────────────────────────────────
@@ -203,7 +214,6 @@ export default function Actogram({ data, selectedRange, onRangeChange }: Actogra
     const observer = new ResizeObserver(entries => {
       for (const entry of entries) {
         setContainerWidth(entry.contentRect.width);
-        // Height is NOT read from ResizeObserver — see useChartHeight.
       }
     });
     observer.observe(el);
@@ -211,13 +221,15 @@ export default function Actogram({ data, selectedRange, onRangeChange }: Actogra
   }, []);
 
   const { cycles, yMax } = data;
+
+  // cyclesLookup for the tooltip overlay — built once per render from cycles.
   const cyclesLookup = new Map(cycles.map(c => [c.cycleNumber, c]));
 
+  // renderXTick is recreated when cycles changes so the closure always has the
+  // current cyclesLookup. makeXTick returns a function whose prop type contains
+  // no extra fields, so it satisfies Recharts' TickProp<XAxisTickContentProps>.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const renderXTick = useCallback(
-    (props: any) => <XAxisTick {...props} cyclesLookup={cyclesLookup} />,
-    [cycles]
-  );
+  const renderXTick = useMemo(() => makeXTick(cyclesLookup), [cycles]);
 
   // ── No data in range ───────────────────────────────────────────────────────
 
@@ -238,8 +250,8 @@ export default function Actogram({ data, selectedRange, onRangeChange }: Actogra
 
   // ── Chart sizing ───────────────────────────────────────────────────────────
 
-  const minCycle  = cycles[0].cycleNumber;
-  const maxCycle  = cycles[cycles.length - 1].cycleNumber;
+  const minCycle   = cycles[0].cycleNumber;
+  const maxCycle   = cycles[cycles.length - 1].cycleNumber;
   const chartWidth = Math.max(cycles.length * COL_WIDTH, containerWidth);
 
   const yTicks: number[] = [];
@@ -251,7 +263,7 @@ export default function Actogram({ data, selectedRange, onRangeChange }: Actogra
     <div>
       <RangeButtons selected={selectedRange} onChange={onRangeChange} />
 
-      {/* containerRef is on the width-tracking div only — not the chart SVG wrapper */}
+      {/* containerRef tracks width for horizontal scroll sizing */}
       <div ref={containerRef} style={{ overflowX: 'auto' }}>
         <ComposedChart
           width={chartWidth}
@@ -304,7 +316,9 @@ export default function Actogram({ data, selectedRange, onRangeChange }: Actogra
               stroke={block.sessionType === 'nap' ? 'var(--circa-accent)' : 'none'}
               strokeDasharray={block.sessionType === 'nap' ? '4 2' : undefined}
               style={{ cursor: 'pointer' }}
-              onClick={(_: any) => setSelectedBlock(block)}
+              // The click event from ReferenceArea carries Recharts internal
+              // data we don't need — we capture the block directly from closure.
+              onClick={() => setSelectedBlock(block)}
             />
           ))}
         </ComposedChart>
