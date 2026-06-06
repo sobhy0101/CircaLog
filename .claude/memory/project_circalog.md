@@ -1,6 +1,6 @@
 ---
 name: project-circalog
-description: "Core facts about the CircaLog project — purpose, stack, architecture, and roadmap phase"
+description: "Core facts about the CircaLog project — purpose, stack, architecture, and current V1 build status"
 metadata: 
   node_type: memory
   type: project
@@ -14,9 +14,9 @@ CircaLog is an open-source, offline-first Progressive Web App (PWA) for people l
 **How to apply:** Frame all design and feature decisions around the core user: someone whose sleep cycle drifts around the clock continuously. Prioritize the Actogram visualization and drift-aware data modeling over conventional "sleep score" or bedtime-based UX.
 
 ## Tech Stack
-- Framework: React 19 + Vite 8
-- Styling: TailwindCSS v4 (Vite plugin — no PostCSS, no tailwind.config.js)
-- Charts: Recharts v3
+- Framework: React + Vite
+- Styling: TailwindCSS
+- Charts: Recharts
 - Local Storage: IndexedDB
 - Cloud DB: Supabase (PostgreSQL)
 - Auth: Google Sign-In (optional)
@@ -24,107 +24,32 @@ CircaLog is an open-source, offline-first Progressive Web App (PWA) for people l
 - Serverless: Vercel Functions (V1) → Cloudflare Workers (V2+)
 - Updates: PWA Service Worker (silent auto-update)
 
-## Installed Versions (Phase 0 — 2026-05-25, commit 7653772)
-- Vite: ^8.0.12 (@vitejs/plugin-react ^6.0.1)
-- React: ^19.2.6 / React DOM: ^19.2.6
-- TypeScript: ~6.0.2
-- TailwindCSS: ^4.3.0 / @tailwindcss/vite: ^4.3.0
-- Recharts: ^3.8.1
-- ESLint: ^10.3.0
-- eslint-plugin-react-hooks: ^7.1.1
-- eslint-plugin-react-refresh: ^0.5.2
-- typescript-eslint: ^8.59.2
-- prettier: ^3.8.3 / eslint-config-prettier: ^10.1.8
-- @types/node: ^24.12.3 (included in template — not separately installed)
-
-## Critical API Notes for Future Tasks
-These versions differ from what common tutorials show — use these patterns:
-
-**TypeScript 6:** `baseUrl` is deprecated and will error. Use `paths` alone:
-
-```json
-"paths": { "@/*": ["./src/*"] }
-```
-
-`./src/*` must be an explicit relative path (not `src/*`) when `baseUrl` is absent.
-
-**ESLint 10 + react-hooks v7:** Plugin API changed. Use flat config style:
-
-```js
-reactHooks.configs.flat.recommended  // NOT reactHooks.configs.recommended.rules
-reactRefresh.configs.vite            // NOT manual plugins + rules setup
-```
-
-**Vite 9 template:** Does NOT generate `src/vite-env.d.ts`. Vite client types
-are declared via `"types": ["vite/client"]` in `tsconfig.app.json` instead.
-
-**React import rule (`"jsx": "react-jsx"` + `"noUnusedLocals": true`):**
-
-- `.tsx` files — do NOT add `import React from 'react'`. The JSX transform
-  injects it automatically; the unused-locals rule will produce `TS6133` if
-  the import is present.
-- `.ts` files that call React APIs directly — use named imports:
-  `import { useState } from 'react'` (preferred) or `import React from 'react'`
-  with `React.useState`. Either compiles; named imports are consistent with the
-  rest of the codebase.
-
 ## Architecture
 Local-first: fully functional offline (IndexedDB), optional Google Sign-In to sync to Supabase cloud. Data lives on device first.
-
-## Project Structure
-
-```
-C:\Projects\CircaLog\
-  docs/          — project documentation (TO-DO list, DevPlan Q&A, etc.)
-  src/
-    assets/      — images, icons, fonts
-    components/
-      ui/        — primitive building-block components
-    hooks/       — custom React hooks
-    lib/
-      circadian/ — circadian engine (Phase 0.5 — complete)
-        types.ts               — canonical domain model (SleepEntry, Cycle, etc.)
-        utils.ts               — internal helpers (utcToLocalDate, filterActive)
-        index.ts               — public API barrel export
-        normalizeSleepSpan.ts
-        detectSessionType.ts
-        assignCycleNumber.ts
-        calculateDrift.ts
-        estimateFreeRunningPeriod.ts
-        groupEntriesByCycle.ts
-        detectFragmentation.ts
-        calculateRollingAverages.ts
-        __fixtures__/          — test fixtures (realData.ts, edgeCases.ts)
-        __tests__/             — engine.test.ts (43 tests, all passing)
-      db/        — IndexedDB service (not yet built)
-      supabase/  — Supabase client (V2)
-    pages/       — page-level components
-    types/       — TypeScript type definitions
-    utils/       — pure helper functions
-  tasks/         — CC task files (untracked in git)
-  public/        — static assets
-```
 
 ## Key URLs
 - `circalog.app` — landing page (V1 coming soon, V2+ marketing)
 - `circalog.app/log` — the PWA app (permanent URL)
 
-## Roadmap Phase
-**Phase 0.5 (Circadian Engine) — Complete** (02 Jun 2026)
-- All eight engine functions implemented and tested (43 tests passing)
-- `bedTimeUtc` added to `SleepEntry`; three-date model established
-- See `src/lib/circadian/` for full implementation
+## V1 Build Status (as of 06 Jun 2026)
 
-Currently building **V1 (Core MVP)**:
-- Sleep log with required + optional fields
-- Actogram drift chart with time range toggle
-- Nap auto-detection
-- PWA manifest + service worker
-- Local IndexedDB storage
-- Continuous Vercel deployment from GitHub
+**Completed:**
+- Phase 0 — Project setup, Vercel/Supabase/PWA config
+- Phase 0.5 — Full circadian engine (normalizeSleepSpan, detectSessionType, assignCycleNumber, calculateDrift, estimateFreeRunningPeriod, groupEntriesByCycle, detectFragmentation, calculateRollingAverages) + Vitest suite
+- Sleep log UI — timer flow, manual entry, back-fill, edit, soft-delete
+- History view — sortable, filterable entry list
+- **Actogram chart** — Recharts ComposedChart with inverted Y axis (00:00 at top), one ReferenceArea per sleep block, dynamic yMax, time range toggle (1W / 2W / 1M / 3M / 6M / 1Y / All), custom tooltip overlay, horizontal scroll, dark/light theme support
+
+**Remaining in V1:**
+- Insights view (drift rate, rolling averages, free-running period estimate)
+- PWA icon/manifest verification + Android splash screen
+- Data resilience: JSON export/import
 
 **V2** adds: Google Sign-In, Supabase cloud sync, push notifications, PDF/CSV reports, doctor report, medication log, Android widget.
 **V3** adds: multi-user, full marketing site, public open-source release.
 
 ## Design Language
 Dark mode default, light/dark toggle. "Clinical + cosmic" aesthetic — dark charcoal with purple/violet accents, subtle night sky elements. Bottom tab bar: Log / Chart / History / Insights. Hamburger drawer for secondary features.
+
+## Recharts gotcha (actogram)
+Custom XAxis ticks that need extra props (e.g. a lookup map) must use a factory function pattern — `makeXTick(lookup)` returns a closure whose prop type contains only Recharts-native fields. Passing extra required props directly on the tick component type causes a TS contravariance error against `TickProp<XAxisTickContentProps>`.
