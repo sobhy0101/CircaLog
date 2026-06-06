@@ -178,20 +178,20 @@
 
 ### 📊 Visualization — Actogram
 
-- [ ] 🔴 Build actogram component using Recharts
+- [x] 🔴 Build actogram component using Recharts
        - Y axis: time of day (00:00 – 23:59, or extended for >24h sessions)
        - X axis: cycle number (primary) + calendar date (secondary)
        - Sleep blocks rendered as vertical bars/bands
        - Nap blocks visually distinct from main sleep (opacity or color)
-- [ ] 🔴 Build time range toggle: `[ 1W ] [ 1M ] [ 3M ] [ 6M ] [ 1Y ] [ All ]`
+- [x] 🔴 Build time range toggle: `[ 1W ] [ 1M ] [ 3M ] [ 6M ] [ 1Y ] [ All ]`
        - Default: 1W
        - Toggling changes visible range only — no data is hidden
-- [ ] 🟡 Tooltip on hover/tap showing session details
+- [x] 🟡 Tooltip on hover/tap showing session details
        (Part of the core build — the chart is unreadable on mobile without it)
-- [ ] 🟡 Basic touch navigation: horizontal pan/swipe
+- [x] 🟡 Basic touch navigation: horizontal pan/swipe
        (Part of the core build — required for mobile readability)
-- [ ] 🟡 Render actogram in dark and light themes correctly
-- [ ] 🟡 Handle empty state (no data yet — prompt to log first sleep)
+- [x] 🟡 Render actogram in dark and light themes correctly
+- [x] 🟡 Handle empty state (no data yet — prompt to log first sleep)
 - [ ] 🟢 Pinch-to-zoom (V2 candidate; basic pan is sufficient for V1)
 
 ### 💡 Insights View

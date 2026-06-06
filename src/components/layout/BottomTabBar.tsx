@@ -13,6 +13,7 @@ export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
 
   // Determine active tab from current path
   const isLog     = pathname === '/log';
+  const isChart   = pathname === '/log/chart';
   const isHistory = pathname === '/log/history';
 
   function tabClass(active: boolean) {
@@ -80,10 +81,12 @@ export default function BottomTabBar({ onOpenDrawer }: BottomTabBarProps) {
           <span className="text-xs">Log</span>
         </button>
 
-        {/* Chart tab — not yet implemented */}
+        {/* Chart tab */}
         <button
+          onClick={() => navigate('/log/chart')}
           aria-label="Chart"
-          className={tabClass(false)}
+          aria-current={isChart ? 'page' : undefined}
+          className={tabClass(isChart)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
