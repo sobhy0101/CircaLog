@@ -3,7 +3,7 @@ import { useSleepLog } from '@/hooks/useSleepLog';
 import { groupEntriesByCycle } from '@/lib/circadian';
 import type { SleepEntry } from '@/lib/circadian';
 
-export type TimeRange = '1W' | '1M' | '3M' | '6M' | '1Y' | 'All';
+export type TimeRange = '1W' | '2W' | '1M' | '3M' | '6M' | '1Y' | 'All';
 
 export interface SleepBlock {
   entryId: string;
@@ -53,6 +53,7 @@ function getCutoffDate(range: TimeRange): string | null {
   if (range === 'All') return null;
   const daysMap: Record<Exclude<TimeRange, 'All'>, number> = {
     '1W': 7,
+    '2W': 14,
     '1M': 30,
     '3M': 90,
     '6M': 180,

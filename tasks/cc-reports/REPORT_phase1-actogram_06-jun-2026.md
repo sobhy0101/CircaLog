@@ -173,4 +173,19 @@ npx vite build      → ✓ built in 853ms
 
 ## Issues encountered
 
-None. All steps completed cleanly on the first attempt.
+### Post-commit TypeScript error — Recharts `TickProp` contravariance
+
+After the initial commit, a TypeScript error was reported on the `tick` prop of `XAxis`:
+
+```text
+Type '(props: XTickProps) => JSX.Element' is not assignable to type
+'TickProp<XAxisTickContentProps> | undefined'.
+  Property 'cyclesLookup' is missing in type 'XAxisTickContentProps'
+  but required in type 'XTickProps'.
+```
+
+**Root cause:** The original `XAxisTick` component had `cyclesLookup` as a *required* prop. TypeScript's contravariant function-parameter checking means a function that requires more fields than Recharts ever passes cannot satisfy `TickProp<XAxisTickContentProps>`.
+
+**Fix:** Replaced the `XAxisTick` component + `XTickProps` interface with a `makeXTick(lookup)` factory function. The factory returns a closure that captures `cyclesLookup` from its outer scope, so the returned function's prop type is `{ x?: string | number; y?: string | number; payload?: { value: number } }` — a type that Recharts' `XAxisTickContentProps` satisfies. The `useMemo` call rebuilds the closure whenever `cycles` changes, keeping the lookup current.
+
+`tsc --noEmit` confirmed zero errors after the fix.

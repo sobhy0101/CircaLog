@@ -11,7 +11,7 @@ import type { ActogramData, ActogramCycle, SleepBlock, TimeRange } from '@/hooks
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const RANGES: TimeRange[] = ['1W', '1M', '3M', '6M', '1Y', 'All'];
+const RANGES: TimeRange[] = ['1W', '2W', '1M', '3M', '6M', '1Y', 'All'];
 
 const CHART_MARGIN = { top: 8, right: 16, bottom: 8, left: 56 };
 const COL_WIDTH = 56; // pixels per cycle column
