@@ -194,6 +194,35 @@
 - [x] 🟡 Handle empty state (no data yet — prompt to log first sleep)
 - [ ] 🟢 Pinch-to-zoom (V2 candidate; basic pan is sufficient for V1)
 
+### 🔐 Auth & Cloud Sync
+
+> Moved into V1 so that real patient data can be imported and used safely.
+> IndexedDB alone is not sufficient — it can be evicted by the browser at
+> any time, and the patient's PC is unstable. Data must land in Supabase
+> immediately on import. Nothing in this section should be built after the
+> CSV import below.
+
+- [ ] 🔴 Implement optional Google Sign-In (Required for data resilience)
+- [ ] 🔴 Connect Supabase auth to Google OAuth
+- [ ] 🔴 Build sync service: IndexedDB → Supabase on connect
+- [ ] 🟡 Handle sync conflicts (local wins by default)
+- [ ] 🟡 Show sync status indicator in UI
+- [ ] 🟢 Allow sign-out (data remains local)
+
+### 📥 Data Import
+
+- [ ] 🟡 Import sleep log from CSV
+       - Accepts CSV exported from the CircaLog Daily Tracker spreadsheet
+         (`C:\Users\sobhy\OneDrive\CircaLog-Daily-Tracker.xlsx`)
+       - Column mapping: Date, Bed Time, Sleep Start, Wake Time, Quality,
+         Notes, Had Dreams, Interruptions
+       - Preview table before confirming import
+       - Skips duplicate entries (matched by sleepStartUtc)
+       - Requires active Google Sign-In and Supabase sync before import
+         is permitted — data must land in Supabase immediately, not only
+         in local IndexedDB
+       - Runs `assignCycleNumber` across all entries after import completes
+
 ### 💡 Insights View
 
 - [ ] 🟡 Average sleep duration (rolling 7-day and 30-day)
@@ -232,15 +261,6 @@
 ---
 
 ## 🔧 V2 — Enhanced Features
-
-### 🔐 Auth & Cloud Sync
-
-- [ ] Implement optional Google Sign-In
-- [ ] Connect Supabase auth to Google OAuth
-- [ ] Build sync service: IndexedDB → Supabase on connect
-- [ ] Handle sync conflicts (local wins by default)
-- [ ] Show sync status indicator in UI
-- [ ] Allow sign-out (data remains local)
 
 ### 🔔 Notifications
 
