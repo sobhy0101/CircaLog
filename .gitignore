@@ -46,6 +46,9 @@ Desktop.ini
 # ─── Microsoft Office lock files ──────────────────────────────
 ~$*
 
+# ─── Google OAuth Client Secrets ─────────────────────────────
+client_secret_*.json
+
 # ─── VS Code ──────────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json

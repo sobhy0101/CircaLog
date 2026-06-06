@@ -10,7 +10,10 @@
 // All nav links are placeholder <button> elements — routes don't exist yet in V1.
 // TODO: replace all <button> nav items with <Link> once routes are wired in a future batch.
 
-import ThemeToggle from '@/components/ui/ThemeToggle';
+import ThemeToggle        from '@/components/ui/ThemeToggle';
+import GoogleSignInButton  from '@/components/ui/GoogleSignInButton';
+import UserAvatar          from '@/components/ui/UserAvatar';
+import { useAuth }         from '@/hooks/useAuth';
 
 interface SideDrawerProps {
   isOpen: boolean;
@@ -18,6 +21,8 @@ interface SideDrawerProps {
 }
 
 export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
+  const { user, isLoading } = useAuth();
+
   return (
     <>
       {/* Backdrop — closes drawer on tap, rendered below the panel (z-40 < z-50) */}
@@ -76,6 +81,17 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             </svg>
           </button>
         </div>
+
+        {/* ── Auth zone ── */}
+        {!isLoading && (
+          <div className="border-b border-circa-border">
+            {user ? <UserAvatar /> : (
+              <div className="px-4 py-3">
+                <GoogleSignInButton />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── Scrollable nav area ── */}
         <nav className="flex-1 overflow-y-auto" aria-label="Drawer navigation">
