@@ -53,6 +53,16 @@ function todayLocal(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+/**
+ * Formats a YYYY-MM-DD string as DD/MM/YYYY for display.
+ * Returns an empty string when the input is blank (field not yet filled).
+ */
+function formatDisplayDate(ymd: string): string {
+  if (!ymd) return '';
+  const [y, m, d] = ymd.split('-');
+  return `${d}/${m}/${y}`;
+}
+
 const INTERRUPTION_TYPES: { value: InterruptionType; label: string }[] = [
   { value: 'bathroom', label: 'Bathroom' },
   { value: 'thirst',   label: 'Thirst'   },
@@ -223,13 +233,20 @@ export default function ManualEntryForm({
           <span className="text-circa-text-muted font-normal">(optional)</span>
         </label>
         <div className="flex gap-2">
-          <input
-            id="bedDate"
-            type="date"
-            value={bedDate}
-            onChange={e => setBedDate(e.target.value)}
-            className={`${inputClass} flex-1`}
-          />
+          <div className="flex-1">
+            <input
+              id="bedDate"
+              type="date"
+              value={bedDate}
+              onChange={e => setBedDate(e.target.value)}
+              className={inputClass}
+            />
+            {bedDate && (
+              <p className="text-circa-text-muted text-xs mt-0.5 pl-1">
+                {formatDisplayDate(bedDate)}
+              </p>
+            )}
+          </div>
           <input
             id="bedTime"
             type="time"
@@ -249,13 +266,20 @@ export default function ManualEntryForm({
           Fell Asleep
         </label>
         <div className="flex gap-2">
-          <input
-            id="sleepDate"
-            type="date"
-            value={sleepDate}
-            onChange={e => setSleepDate(e.target.value)}
-            className={`${inputClass} flex-1`}
-          />
+          <div className="flex-1">
+            <input
+              id="sleepDate"
+              type="date"
+              value={sleepDate}
+              onChange={e => setSleepDate(e.target.value)}
+              className={inputClass}
+            />
+            {sleepDate && (
+              <p className="text-circa-text-muted text-xs mt-0.5 pl-1">
+                {formatDisplayDate(sleepDate)}
+              </p>
+            )}
+          </div>
           <input
             id="sleepTime"
             type="time"
@@ -273,13 +297,20 @@ export default function ManualEntryForm({
           Woke Up
         </label>
         <div className="flex gap-2">
-          <input
-            id="wakeDate"
-            type="date"
-            value={wakeDate}
-            onChange={e => setWakeDate(e.target.value)}
-            className={`${inputClass} flex-1`}
-          />
+          <div className="flex-1">
+            <input
+              id="wakeDate"
+              type="date"
+              value={wakeDate}
+              onChange={e => setWakeDate(e.target.value)}
+              className={inputClass}
+            />
+            {wakeDate && (
+              <p className="text-circa-text-muted text-xs mt-0.5 pl-1">
+                {formatDisplayDate(wakeDate)}
+              </p>
+            )}
+          </div>
           <input
             id="wakeTime"
             type="time"

@@ -141,6 +141,10 @@ async function dequeue(id: string): Promise<void> {
  */
 async function pushEntry(entry: SleepEntry, userId: string): Promise<void> {
   if (!supabase) return
+  // Do not attempt a network push while offline. The entry is already
+  // in the sync queue (or will be added by the caller) — it will be
+  // retried when connectivity is restored.
+  if (!navigator.onLine) return
 
   const row = toSupabaseRow(entry, userId)
 
@@ -278,6 +282,9 @@ export async function flushQueue(user: User): Promise<void> {
 
   const queued = await db.syncQueue.toArray()
   if (queued.length === 0) return
+  // Nothing to do while offline — the online event handler in useAuth.ts
+  // calls flushQueue again when connectivity is restored.
+  if (!navigator.onLine) return
 
   _isSyncing = true
   try {

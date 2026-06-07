@@ -1,5 +1,5 @@
 // useSyncStatus.ts — exposes the current sync state so the UI can show
-// an accurate status pill (synced / syncing / pending / error / signed-out).
+// an accurate status tab (synced / syncing / pending / error / offline / signed-out).
 
 import { useState, useEffect } from 'react'
 import { db } from '@/lib/db/db'
@@ -7,7 +7,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { isSyncing, errorCount } from '@/lib/supabase/syncService'
 
 export type SyncStatus =
-  | 'signed-out'  // user is not signed in — pill hidden
+  | 'signed-out'  // user is not signed in — tab hidden
+  | 'offline'     // navigator.onLine is false — data saved locally only
   | 'syncing'     // a sync operation is currently in progress
   | 'error'       // one or more entries have failed 3+ times
   | 'pending'     // entries are queued but no error yet
@@ -18,6 +19,20 @@ export function useSyncStatus() {
   const [pendingCount, setPendingCount] = useState(0)
   const [isActivelySyncing, setIsActivelySyncing] = useState(false)
   const [hasError, setHasError] = useState(false)
+  // Initialised from navigator.onLine so the very first render is correct.
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine)
+
+  // Track browser online/offline events independently of the polling interval.
+  useEffect(() => {
+    function handleOnline()  { setIsOnline(true)  }
+    function handleOffline() { setIsOnline(false) }
+    window.addEventListener('online',  handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online',  handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   useEffect(() => {
     if (!user) {
@@ -44,16 +59,18 @@ export function useSyncStatus() {
     return () => clearInterval(interval)
   }, [user])
 
-  // Priority order: signed-out → syncing → error → pending → synced
+  // Priority order: signed-out → offline → syncing → error → pending → synced
   const status: SyncStatus = !user
     ? 'signed-out'
-    : isActivelySyncing
-      ? 'syncing'
-      : hasError
-        ? 'error'
-        : pendingCount > 0
-          ? 'pending'
-          : 'synced'
+    : !isOnline
+      ? 'offline'
+      : isActivelySyncing
+        ? 'syncing'
+        : hasError
+          ? 'error'
+          : pendingCount > 0
+            ? 'pending'
+            : 'synced'
 
   return { status, pendingCount }
 }

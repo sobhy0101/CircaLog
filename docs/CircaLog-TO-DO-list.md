@@ -136,7 +136,12 @@
        clear; defer that decision until then.)
 - [x] 🔴 Build manual time entry form (both start and wake)
        (Manual entry first — it stress-tests the data model faster than the timer
-       flow and unblocks back-fill of historical data)
+        flow and unblocks back-fill of historical data)
+- [x] 🟢 Fix date format in manual entry form — display DD/MM/YYYY
+       (`<input type="date">` displays in the OS locale format, which shows MM/DD/YYYY
+        on en-US devices. Add a visible DD/MM/YYYY label above the date field showing
+        the currently selected value, so the correct date is always unambiguous,
+        regardless of the browser's native picker format.)
 - [x] 🔴 Build "Start Sleep" one-tap timer screen
 - [x] 🔴 Build "Wake Up" completion screen
 - [x] 🟡 Required fields: sleep start, wake time, quality rating (1–5)
@@ -210,6 +215,11 @@
 - [x] 🔴 Build sync service: IndexedDB → Supabase on connect
 - [x] 🟡 Handle sync conflicts (local wins by default)
 - [x] 🟡 Show sync status indicator in UI
+- [x] 🟢 Fix sync pill — add distinct offline state
+       (Currently shows "Synced" while offline because the flush cycle completes
+        before re-enqueue. Pill must detect `navigator.onLine === false` and show
+        a neutral "Saved — Offline" state instead. Separate from "Pending sync" —
+        offline is expected; pending while online is not.)
 - [x] 🟢 Allow sign-out (data remains local)
 
 ### 📥 Data Import
@@ -260,6 +270,9 @@
 - [ ] 🔴 Export all data as JSON (manual backup)
 - [ ] 🔴 Import JSON backup (manual restore, with merge-vs-replace prompt)
 - [ ] 🟡 Schema migration handler (for when the engine model evolves)
+- [ ] 🟢 Populate `profiles` table in Supabase on first sign-in
+       (Currently empty — no trigger fires on Google OAuth sign-in.
+        Needed for Doctor Report PDF (display name, email). Defer until that task.)
 
 ---
 

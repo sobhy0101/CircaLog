@@ -79,12 +79,13 @@ export default function Toast({
       role={variant === 'error' ? 'alert' : 'status'}
       aria-live={variant === 'error' ? 'assertive' : 'polite'}
       className={`
-        fixed top-4 left-1/2 -translate-x-1/2 z-[60]
+        fixed bottom-20 left-1/2 -translate-x-1/2 z-60
+        w-[90%] max-w-sm
         flex items-center gap-3
         px-4 py-3 rounded-lg shadow-lg
         border
         text-sm font-medium
-        animate-fade-in
+        animate-slide-up
         ${variantStyles[variant]}
       `}
     >

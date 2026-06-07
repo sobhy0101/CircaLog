@@ -1,180 +1,92 @@
-# Handoff — CircaLog Session, 07 Jun 2026
+# Handoff — 07 Jun 2026
 
-**Written by:** Claude.ai (end of session)
-**For:** Next Claude.ai planning session
-**Read this before doing anything else.**
+## What was completed this session
 
----
+### Bidirectional Sync Service (Phase 1)
+Full IndexedDB ↔ Supabase sync implemented and verified working across two
+devices (PC + phone). 4 entries synced correctly on first test.
 
-## What happened this session
+Two post-migration database fixes were required manually via Supabase SQL Editor:
 
-### Google Sign-In — external setup (complete)
+1. **Missing grants** — `anon` and `authenticated` roles were missing
+   SELECT/INSERT/UPDATE/DELETE on `sleep_entries` after the table rename.
+   Fixed with: `GRANT SELECT, INSERT, UPDATE, DELETE ON public.sleep_entries TO anon, authenticated;`
 
-All external dashboard configuration is done:
+2. **Stale CHECK constraint** — `sleep_sessions_session_type_check` only
+   allowed `session_type = 'sleep'`. App uses `'main'` | `'nap'`.
+   Fixed by dropping the old constraint and adding a correct one.
 
-- New Google account created: `circalog.app@gmail.com`
-- Google Cloud Console project: `CircaLog`
-- OAuth client created: `CircaLog Web` (Web application)
-- Authorized redirect URIs in Google Cloud Console:
-  - `https://iarozmvqcsrkdgytqzws.supabase.co/auth/v1/callback`
-  - `https://circalog.vercel.app/log`
-- Test user added: `sobhy0101@gmail.com`
-- Publishing status: Testing (100 user cap — fine for now)
-- Supabase: Google provider enabled with Client ID and Secret
-- Credentials JSON saved to:
-  `C:\Users\sobhy\OneDrive\Personal Vault\CircaLog-Credentials\`
-  (gitignored, not in the repo)
+Files created/modified:
+- `src/lib/supabase/syncService.ts` (new)
+- `src/hooks/useSyncStatus.ts` (new)
+- `src/lib/db/db.ts` — Dexie v2, syncQueue table
+- `src/lib/circadian/types.ts` — SyncQueueEntry added
+- `src/lib/db/sleepEntryService.ts` — user param, sync after mutations
+- `src/hooks/useAuth.ts` — migrated to client.ts, syncOnConnect wired
+- `src/hooks/useSleepLog.ts` — passes user to all mutations
+- `src/pages/AppShell.tsx` — sync status pill
 
-### Google Sign-In — code (complete, pushed)
+### Sync Status Pill UI fixes (Phase 1)
+- Moved pill from top-right to top-center (no more content overlap)
+- Pending dot color changed from purple to red (visible)
+- Added `syncing` state (amber, rotating arrows SVG)
+- Added `error` state (red, after 3 failed push attempts)
+- Added `circa-success`, `circa-warning`, `circa-error` semantic tokens
+  to `index.css` (light + dark) and `@theme inline`
 
-CC built and pushed all code. Commit message:
-`feat: add optional Google Sign-In via Supabase OAuth`
-
-Files created:
-- `src/lib/supabase.ts` — Supabase client singleton
-- `src/hooks/useAuth.ts` — auth state hook
-- `src/components/ui/GoogleSignInButton.tsx` — Sign-in button
-- `src/components/ui/UserAvatar.tsx` — signed-in user display
-
-Files modified:
-- `src/components/layout/SideDrawer.tsx` — auth zone added above nav
-- `.env.example` — explanatory comment added
-- `.env.local` — `VITE_APP_URL=http://localhost:5173` added
-
-Vercel environment variable set:
-`VITE_APP_URL=https://circalog.vercel.app` (Production + Preview)
-
-### TO-DO list — needs updating
-
-The following two items in `docs/CircaLog-TO-DO-list.md` were completed
-this session but are still showing as unchecked. Mark them done:
-
-```
-- [ ] 🔴 Implement optional Google Sign-In (Required for data resilience)
-- [ ] 🔴 Connect Supabase auth to Google OAuth
-```
-
-Should become:
-
-```
-- [x] 🔴 Implement optional Google Sign-In (Required for data resilience)
-- [x] 🔴 Connect Supabase auth to Google OAuth
-```
+Commit: `fbbb337` — live at https://circalog.vercel.app/log
 
 ---
 
-## Open issue — OAuth redirect not working correctly
+## Open bugs — added to TO-DO list, need CC task in next session
 
-Mahmoud noticed something about the redirect behavior during testing but
-the session ended before he could describe it. He tested on:
-- `https://circalog.vercel.app/log` (installed PWA on Android)
-- `https://circalog.vercel.app/log` (browser on PC)
+### 1. Sync pill — offline state (🟢 independent)
+**Location in TO-DO:** Auth & Cloud Sync section
+**Problem:** When airplane mode is on, the pill briefly shows "Syncing…"
+then "Synced" instead of a distinct "Saved — Offline" state. Root cause:
+`flushQueue` runs, push fails, re-enqueues — but `_isSyncing` resets to
+`false` and a polling tick catches the brief window where the queue appears
+empty. Fix: check `navigator.onLine` before attempting any push, and show
+a dedicated offline state in the pill when `!navigator.onLine`.
 
-After sign-in, the redirect was not landing correctly. The suspected cause:
-`useAuth.ts` uses `import.meta.env.VITE_APP_URL + '/log'` as `redirectTo`.
-The Vercel env var is set. The Google Cloud Console redirect URI is registered.
+### 2. Date format in manual entry form (🟢 independent)
+**Location in TO-DO:** Sleep Log Core section
+**Problem:** `<input type="date">` shows MM/DD/YYYY on en-US devices.
+Patient is Egyptian, uses DD/MM/YYYY. The internal value is always
+YYYY-MM-DD (correct), but the display is confusing.
+Fix: add a visible DD/MM/YYYY formatted label above each date field
+showing the currently selected value.
 
-**First thing to do in the new session:** ask Mahmoud what he noticed,
-then read `src/hooks/useAuth.ts` and `src/lib/supabase.ts` before
-advising anything.
-
----
-
-## Current codebase state
-
-### What exists and works
-
-- Full circadian engine (`src/lib/circadian/`) — tested
-- IndexedDB layer (`src/lib/db/`) — tested
-- `useSleepLog` hook — working
-- Sleep Log UI — LogPage, ManualEntryForm, StartSleepScreen, WakeUpScreen
-- History View — list with filters and sort
-- Actogram (ChartPage) — built with Recharts
-- App shell — AppShell, BottomTabBar, SideDrawer
-- `useAuth` hook and auth UI components — built, pushed, not fully smoke-tested
-- Coming soon landing page (`/`)
-- Dark/light mode toggle
-
-### Key file paths
-
-```
-src/
-  hooks/
-    useSleepLog.ts
-    useAuth.ts          ← new this session
-  lib/
-    supabase.ts         ← new this session
-    circadian/
-      types.ts
-    db/
-      sleepEntryService.ts
-      index.ts
-  pages/
-    AppShell.tsx
-    log/
-      LogPage.tsx
-      ManualEntryForm.tsx
-      StartSleepScreen.tsx
-      WakeUpScreen.tsx
-    history/
-      HistoryPage.tsx
-    chart/
-      ChartPage.tsx
-  components/
-    ui/
-      QualityPicker.tsx
-      GoogleSignInButton.tsx   ← new this session
-      UserAvatar.tsx           ← new this session
-    layout/
-      BottomTabBar.tsx
-      SideDrawer.tsx           ← modified this session
-docs/
-  CircaLog-TO-DO-list.md
-  CircaLog_DevPlan_QA.md
-  CircaLog_ProjectInstructions.md
-tasks/
-  CC_TASK_Phase1_Auth_GoogleSignIn.md   ← written this session
-```
+### 3. Profiles table empty (🟢 deferred)
+**Location in TO-DO:** Data Resilience section
+**Problem:** `profiles` table in Supabase is empty — no trigger fires on
+Google OAuth sign-in. Not blocking anything now.
+**Deferred to:** Doctor Report PDF task (V2).
 
 ---
 
-## Next open TO-DO items (after marking auth done)
+## Next logical task in TO-DO
 
-From `docs/CircaLog-TO-DO-list.md`, in dependency order:
+**CSV Import** — `src/pages/` (new import screen)
+- Accepts CSV exported from `CircaLog-Daily-Tracker.xlsx`
+- Column mapping: Date, Bed Time, Sleep Start, Wake Time, Quality, Notes,
+  Had Dreams, Interruptions
+- Preview table before confirming
+- Skips duplicates by `sleepStartUtc`
+- Requires active Google Sign-In (already complete)
+- Runs `assignCycleNumber` after import
 
-1. **Resolve the OAuth redirect issue** (see Open issue above)
-2. `[ ] 🔴 Build sync service: IndexedDB → Supabase on connect`
-3. `[ ] 🟡 Handle sync conflicts (local wins by default)`
-4. `[ ] 🟡 Show sync status indicator in UI`
-5. `[ ] 🟢 Allow sign-out (data remains local)`
-6. `[ ] 🟡 Import sleep log from CSV` (blocked until sync service exists)
-
-After sync, the CSV import unblocks — and that gets real historical data
-from `C:\Users\sobhy\OneDrive\CircaLog-Daily-Tracker.xlsx` into Supabase.
-
----
-
-## Cosmetic issue to track (not a blocker)
-
-The Google OAuth consent screen shows `iarozmvqcsrkdgytqzws.supabase.co`
-as the requesting domain instead of `circalog.app`. This is expected until
-the real domain is purchased and added as an authorized domain in Google
-Cloud Console → Branding. No action needed now.
+The two open bugs above (offline state, date format) are independent and
+can be bundled into one small CC task before or after CSV import —
+Mahmoud's call.
 
 ---
 
-## Key facts to not re-derive
+## Supabase project ref
+`iarozmvqcsrkdgytqzws` (permanent)
 
-- Supabase project ref: `iarozmvqcsrkdgytqzws` (do not rename — permanent)
-- Google Cloud Console project: `CircaLog`
-- OAuth client name: `CircaLog Web`
-- Test user for OAuth: `sobhy0101@gmail.com`
-- App URL (production): `https://circalog.vercel.app`
-- App URL (local dev): `http://localhost:5173`
-- `.env.local` has: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
-  `VITE_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-  `GITHUB_PERSONAL_ACCESS_TOKEN`, `VITE_APP_URL`
-- Google client credentials are NOT in `.env.local` — they live in
-  Supabase dashboard only
-- Stack gotchas: see `docs/CircaLog_ProjectInstructions.md`
-  (React imports, Vitest config, Dexie 4.x boolean fields)
+## Key files to read at session start
+- `docs/CircaLog-TO-DO-list.md` — current task list
+- `src/lib/supabase/syncService.ts` — sync logic
+- `src/lib/circadian/types.ts` — domain types including SyncQueueEntry
+- `src/lib/db/db.ts` — Dexie schema (currently v2)
