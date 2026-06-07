@@ -164,7 +164,7 @@ Report the error back to Claude.ai before proceeding.
 
 ## Step 2 — Add `sync_queue` store to Dexie
 
-Entries that are written to IndexedDB while offline need to be tracked so
+Entries that are written to IndexedDB while offline need to be tracked, so
 the sync service can flush them when connectivity returns.
 
 Edit `src/lib/db/db.ts`.
@@ -533,7 +533,7 @@ The service does not have access to the current `user` object — that
 lives in the `useAuth` hook. The cleanest way to pass it in is to
 accept an optional `user: User | null` parameter on each mutating
 function. When `null` (signed out), `syncAfterMutation` is a no-op, so
-no behaviour changes for unauthenticated users.
+no behavior changes for unauthenticated users.
 
 Read `src/lib/db/sleepEntryService.ts` first, then apply these changes:
 

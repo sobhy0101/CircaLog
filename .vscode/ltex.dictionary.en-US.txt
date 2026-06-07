@@ -80,3 +80,13 @@ Alpha-lipoic
 Sugarlo
 VLOOKUP
 gridlines
+uuid
+utc
+timestamptz
+smallint
+iana
+jsonb
+Dexie
+param
+visibilitychange
+Destructure
