@@ -81,7 +81,8 @@ export default function Toast({
       className={`
         fixed bottom-20 left-1/2 -translate-x-1/2 z-60
         w-[90%] max-w-sm
-        flex items-center gap-3
+        relative
+        flex items-center justify-center gap-3
         px-4 py-3 rounded-lg shadow-lg
         border
         text-sm font-medium
@@ -96,7 +97,7 @@ export default function Toast({
       <button
         onClick={onDismiss}
         aria-label="Dismiss notification"
-        className="ml-1 p-0.5 rounded opacity-60 hover:opacity-100 transition-opacity"
+        className="absolute right-3 p-0.5 rounded opacity-60 hover:opacity-100 transition-opacity"
       >
         <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor"
           strokeWidth="2" strokeLinecap="round" aria-hidden="true">

@@ -181,6 +181,69 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
 
 ---
 
+## Implementation Notes
+
+These are decisions made during development that are not obvious from the
+code alone. Captured here so contributors and future maintainers don't
+rediscover them the hard way.
+
+### Sync Status Indicator
+
+The sync status indicator is a **tab shape** anchored to the top edge of
+the viewport (`top-0`, `rounded-b-xl`, `border-x border-b`), not a
+floating pill. This was a deliberate design choice: pills are used
+throughout the UI (quality picker, session type badges) and a pill-shaped
+status indicator was visually indistinct. The tab shape reads as
+*infrastructure* rather than *content* — it belongs to the chrome of the
+app, not to any page.
+
+Five states are implemented: `synced` (grey) / `syncing` (amber, rotating
+icon) / `pending` (purple, pulsing red dot) / `error` (red) / `offline`
+(neutral, cloud-off icon). The `offline` state is detected via
+`navigator.onLine` (read on mount) and `window` `online`/`offline` events
+(subscribed in a `useEffect`). It is distinct from `pending` — offline is
+expected and not alarming; pending while online is not.
+
+The `navigator.onLine` guard in `syncService.ts` (`pushEntry` and
+`flushQueue`) prevents the "Syncing… → Synced" flicker that occurred
+because `flushQueue` was running, failing silently, and re-queuing entries
+into a briefly-empty queue. With the guard in place, no push is attempted
+while offline, so the queue stays non-empty and the tab correctly shows
+`offline` until connectivity is restored.
+
+### Auth Toast Notifications
+
+Toast notifications (sign-in success, sign-out, errors) are positioned at
+`bottom-20` — 80px from the bottom — to clear the 64px tab bar with
+breathing room. They use `w-[90%] max-w-sm` to prevent long display names
+(e.g. "Welcome, Mahmoud Sobhy!") from wrapping to more than two lines on
+narrow screens. The icon and message text are centered (`justify-center`)
+with the dismiss button absolutely positioned at `right-3` so it does not
+disrupt the centering.
+
+### Date Input Display
+
+`<input type="date">` renders in the browser's OS locale format. On
+en-US devices this shows `MM/DD/YYYY`, which is ambiguous for users who
+expect `DD/MM/YYYY`. A `formatDisplayDate()` helper in
+`ManualEntryForm.tsx` renders the selected date as `DD Mon YYYY`
+(e.g. `07 Jun 2026`) below each date input. This format is unambiguous
+regardless of locale. The label only renders when the field has a value,
+and each date input is wrapped in a `<div className="flex-1">` with
+`items-start` on the parent flex row so the adjacent time input does not
+stretch to match the date+label height.
+
+### `navigator.onLine` Reliability
+
+`navigator.onLine === true` means "not definitely offline" — it does not
+guarantee the server is reachable. Captive portals, DNS failures, or a
+down Supabase instance all return `onLine: true` while pushes fail. The
+`navigator.onLine` guard in `syncService.ts` catches the obvious case
+(airplane mode / no adapter); the `try/catch` in `pushEntry` catches
+subtler failures and queues the entry for retry. Both layers are needed.
+
+---
+
 ## Contributing
 
 CircaLog is open-source. Contributions are especially welcome from people

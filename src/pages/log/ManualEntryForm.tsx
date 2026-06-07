@@ -53,14 +53,18 @@ function todayLocal(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
 /**
- * Formats a YYYY-MM-DD string as DD/MM/YYYY for display.
+ * Formats a YYYY-MM-DD string as "DD Mon YYYY" (e.g. "07 Jun 2026") for display.
+ * Unambiguous regardless of browser locale — avoids the MM/DD vs DD/MM confusion
+ * that plain numeric formats create on US-locale devices.
  * Returns an empty string when the input is blank (field not yet filled).
  */
 function formatDisplayDate(ymd: string): string {
   if (!ymd) return '';
   const [y, m, d] = ymd.split('-');
-  return `${d}/${m}/${y}`;
+  return `${d} ${MONTH_ABBR[parseInt(m, 10) - 1]} ${y}`;
 }
 
 const INTERRUPTION_TYPES: { value: InterruptionType; label: string }[] = [
@@ -232,7 +236,7 @@ export default function ManualEntryForm({
           Bed Time{' '}
           <span className="text-circa-text-muted font-normal">(optional)</span>
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-start">
           <div className="flex-1">
             <input
               id="bedDate"
@@ -265,7 +269,7 @@ export default function ManualEntryForm({
         <label className="block text-sm font-medium text-circa-text-primary mb-1">
           Fell Asleep
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-start">
           <div className="flex-1">
             <input
               id="sleepDate"
@@ -296,7 +300,7 @@ export default function ManualEntryForm({
         <label className="block text-sm font-medium text-circa-text-primary mb-1">
           Woke Up
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-start">
           <div className="flex-1">
             <input
               id="wakeDate"
