@@ -8,6 +8,7 @@ import {
 } from '@/lib/db';
 import type { SleepEntry } from '@/lib/circadian';
 import { SLEEP_IN_PROGRESS_KEY } from '@/lib/constants';
+import { useAuth } from '@/hooks/useAuth';
 
 // UI-level state only — not a domain type; do not export
 interface InProgressSession {
@@ -16,6 +17,7 @@ interface InProgressSession {
 }
 
 export function useSleepLog() {
+  const { user } = useAuth();
   const [entries, setEntries] = useState<SleepEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function useSleepLog() {
     setIsLoading(true);
     setError(null);
     try {
-      await dbCreate(draft);
+      await dbCreate(draft, user);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -80,7 +82,7 @@ export function useSleepLog() {
     setIsLoading(true);
     setError(null);
     try {
-      await dbUpdate(id, changes);
+      await dbUpdate(id, changes, user);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -93,7 +95,7 @@ export function useSleepLog() {
     setIsLoading(true);
     setError(null);
     try {
-      await dbSoftDelete(id);
+      await dbSoftDelete(id, user);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -106,7 +108,7 @@ export function useSleepLog() {
     setIsLoading(true);
     setError(null);
     try {
-      await dbHardDelete(id);
+      await dbHardDelete(id, user);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));

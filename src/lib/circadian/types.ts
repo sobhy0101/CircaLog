@@ -618,3 +618,30 @@ export interface MealLogEntry {
   /** ISO 8601 UTC. Updated on every edit. */
   updatedAt: string;
 }
+
+// ---------------------------------------------------------------------------
+// Sync infrastructure
+// ---------------------------------------------------------------------------
+
+/**
+ * A lightweight record in the local `syncQueue` IndexedDB store.
+ *
+ * When a SleepEntry is written to IndexedDB while the user is offline
+ * (or the Supabase upsert fails for any reason), its id is added to this
+ * queue. The sync service reads this queue when connectivity is restored
+ * and retries the upsert for each queued id.
+ *
+ * The queue stores only the entry id — not a copy of the entry itself.
+ * The sync service fetches the current entry from IndexedDB at flush time,
+ * so the pushed version is always the latest local state.
+ *
+ * `id` here is the SleepEntry UUID (the sync key shared between
+ * IndexedDB and Supabase).
+ */
+export interface SyncQueueEntry {
+  /** The SleepEntry UUID that needs to be pushed to Supabase. */
+  id: string;
+
+  /** ISO 8601 UTC — when this entry was added to the queue. */
+  queuedAt: string;
+}

@@ -31,7 +31,7 @@ Local-first: fully functional offline (IndexedDB), optional Google Sign-In to sy
 - `circalog.app` — landing page (V1 coming soon, V2+ marketing)
 - `circalog.app/log` — the PWA app (permanent URL)
 
-## V1 Build Status (as of 06 Jun 2026)
+## V1 Build Status (as of 07 Jun 2026)
 
 **Completed:**
 - Phase 0 — Project setup, Vercel/Supabase/PWA config
@@ -39,13 +39,15 @@ Local-first: fully functional offline (IndexedDB), optional Google Sign-In to sy
 - Sleep log UI — timer flow, manual entry, back-fill, edit, soft-delete
 - History view — sortable, filterable entry list
 - **Actogram chart** — Recharts ComposedChart with inverted Y axis (00:00 at top), one ReferenceArea per sleep block, dynamic yMax, time range toggle (1W / 2W / 1M / 3M / 6M / 1Y / All), custom tooltip overlay, horizontal scroll, dark/light theme support
+- **Auth (moved into V1 for data resilience)** — optional Google Sign-In via Supabase OAuth, `useAuth` hook, `GoogleSignInButton`, `UserAvatar`, auth zone in SideDrawer, toast notifications for sign-in/sign-out/errors. See [[project-auth-system]].
 
 **Remaining in V1:**
+- Supabase sync service: IndexedDB → Supabase on connect (next task — blocked CSV import)
+- CSV import from CircaLog Daily Tracker spreadsheet
 - Insights view (drift rate, rolling averages, free-running period estimate)
 - PWA icon/manifest verification + Android splash screen
-- Data resilience: JSON export/import
 
-**V2** adds: Google Sign-In, Supabase cloud sync, push notifications, PDF/CSV reports, doctor report, medication log, Android widget.
+**V2** adds: push notifications, PDF/CSV reports, doctor report, medication log, Android widget.
 **V3** adds: multi-user, full marketing site, public open-source release.
 
 ## Design Language

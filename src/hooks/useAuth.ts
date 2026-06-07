@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
+import { syncOnConnect, flushQueue } from '@/lib/supabase/syncService';
 
 interface ToastState {
   variant: 'success' | 'neutral' | 'error';
@@ -14,6 +15,12 @@ export function useAuth() {
   const [activeToast, setActiveToast] = useState<ToastState | null>(null);
 
   useEffect(() => {
+    // Guard all Supabase calls — supabase is null when env vars are absent.
+    if (!supabase) {
+      setIsLoading(false);
+      return;
+    }
+
     // Restore any session that survived a page reload / OAuth redirect
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user ?? null);
@@ -26,7 +33,8 @@ export function useAuth() {
     // SIGNED_OUT covers both manual sign-out and token expiry.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setUser(session?.user ?? null);
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
 
         if (event === 'SIGNED_IN') {
           const name = session?.user?.user_metadata?.full_name as string | undefined;
@@ -34,6 +42,15 @@ export function useAuth() {
             variant: 'success',
             message: name ? `Welcome, ${name}!` : 'Signed in successfully.',
           });
+          // Trigger full bidirectional sync now that we have a user.
+          if (currentUser) syncOnConnect(currentUser);
+        }
+
+        if (event === 'INITIAL_SESSION' && currentUser) {
+          // App loaded with an existing session (e.g. page refresh while
+          // signed in). Pull any remote entries the local store may be
+          // missing.
+          syncOnConnect(currentUser);
         }
 
         if (event === 'SIGNED_OUT') {
@@ -42,10 +59,34 @@ export function useAuth() {
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Flush the sync queue when connectivity is restored.
+    function handleOnline() {
+      supabase!.auth.getSession().then(({ data }) => {
+        if (data.session?.user) flushQueue(data.session.user);
+      });
+    }
+
+    // Flush the sync queue when the user returns to the tab.
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        supabase!.auth.getSession().then(({ data }) => {
+          if (data.session?.user) flushQueue(data.session.user);
+        });
+      }
+    }
+
+    window.addEventListener('online', handleOnline);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('online', handleOnline);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   async function signInWithGoogle(): Promise<void> {
+    if (!supabase) return;
     try {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -58,6 +99,7 @@ export function useAuth() {
   }
 
   async function signOut(): Promise<void> {
+    if (!supabase) return;
     try {
       await supabase.auth.signOut();
     } catch (err) {

@@ -5,6 +5,9 @@ import {
   detectSessionType,
 } from '@/lib/circadian'
 import type { SleepEntry } from '@/lib/circadian'
+import { syncAfterMutation } from '@/lib/supabase/syncService'
+import { supabase } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 /**
  * Recomputes cycle numbers for all entries after any mutation and bulk-writes
@@ -39,11 +42,13 @@ async function reassignAndPersist(): Promise<void> {
  *
  * @param draft - All SleepEntry fields except id, cycleNumber, sessionType,
  *   createdAt, updatedAt, and isDeleted — those are set internally.
+ * @param user - Signed-in user, or null when offline/unauthenticated.
  * @returns The fully populated SleepEntry as persisted in IDB.
  * @throws If wakeUtc is not strictly after sleepStartUtc.
  */
 export async function createEntry(
-  draft: Omit<SleepEntry, 'id' | 'cycleNumber' | 'sessionType' | 'createdAt' | 'updatedAt' | 'isDeleted'>
+  draft: Omit<SleepEntry, 'id' | 'cycleNumber' | 'sessionType' | 'createdAt' | 'updatedAt' | 'isDeleted'>,
+  user: User | null = null
 ): Promise<SleepEntry> {
   const id = crypto.randomUUID()
   const now = new Date().toISOString()
@@ -68,6 +73,7 @@ export async function createEntry(
 
   const persisted = await db.sleepEntries.get(id)
   if (!persisted) throw new Error(`createEntry: entry ${id} not found after write`)
+  await syncAfterMutation(persisted, user)
   return persisted
 }
 
@@ -103,13 +109,15 @@ export async function getEntryById(id: string): Promise<SleepEntry | undefined> 
  * @param id - UUID of the entry to update.
  * @param changes - Partial set of fields to merge onto the existing entry.
  *   Cannot change id, cycleNumber, sessionType, createdAt, or isDeleted here.
+ * @param user - Signed-in user, or null when offline/unauthenticated.
  * @returns The updated SleepEntry as persisted in IDB.
  * @throws If no entry with the given id exists.
  * @throws If the updated timestamps would make wakeUtc <= sleepStartUtc.
  */
 export async function updateEntry(
   id: string,
-  changes: Partial<Omit<SleepEntry, 'id' | 'cycleNumber' | 'sessionType' | 'createdAt' | 'isDeleted'>>
+  changes: Partial<Omit<SleepEntry, 'id' | 'cycleNumber' | 'sessionType' | 'createdAt' | 'isDeleted'>>,
+  user: User | null = null
 ): Promise<SleepEntry> {
   const existing = await db.sleepEntries.get(id)
   if (!existing) throw new Error(`updateEntry: entry ${id} not found`)
@@ -127,6 +135,7 @@ export async function updateEntry(
 
   const persisted = await db.sleepEntries.get(id)
   if (!persisted) throw new Error(`updateEntry: entry ${id} not found after write`)
+  await syncAfterMutation(persisted, user)
   return persisted
 }
 
@@ -135,9 +144,10 @@ export async function updateEntry(
  * from getAllEntries() and cycle number calculations.
  *
  * @param id - UUID of the entry to soft-delete.
+ * @param user - Signed-in user, or null when offline/unauthenticated.
  * @throws If no entry with the given id exists.
  */
-export async function softDeleteEntry(id: string): Promise<void> {
+export async function softDeleteEntry(id: string, user: User | null = null): Promise<void> {
   const existing = await db.sleepEntries.get(id)
   if (!existing) throw new Error(`softDeleteEntry: entry ${id} not found`)
 
@@ -149,14 +159,30 @@ export async function softDeleteEntry(id: string): Promise<void> {
 
   await db.sleepEntries.put(updated)
   await reassignAndPersist()
+
+  const updated2 = await db.sleepEntries.get(id)
+  if (updated2) await syncAfterMutation(updated2, user)
 }
 
 /**
  * Permanently removes an entry from IDB. This operation is irreversible.
+ * Soft-deletes the entry in Supabase first so other devices see the tombstone.
  *
  * @param id - UUID of the entry to hard-delete.
+ * @param user - Signed-in user, or null when offline/unauthenticated.
  */
-export async function hardDeleteEntry(id: string): Promise<void> {
+export async function hardDeleteEntry(
+  id: string,
+  user: User | null = null
+): Promise<void> {
+  // Soft-delete in Supabase first so other devices see the tombstone.
+  if (user && supabase) {
+    await supabase
+      .from('sleep_entries')
+      .update({ is_deleted: true, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+  }
   await db.sleepEntries.delete(id)
   await reassignAndPersist()
 }

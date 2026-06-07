@@ -32,6 +32,7 @@ export type {
   DriftResult,
   RollingAverages,
   NormalizedSleepSpan,
+  SyncQueueEntry,
 } from './types'
 
 export type { FragmentationResult } from './detectFragmentation'
