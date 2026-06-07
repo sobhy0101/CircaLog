@@ -644,4 +644,12 @@ export interface SyncQueueEntry {
 
   /** ISO 8601 UTC — when this entry was added to the queue. */
   queuedAt: string;
+
+  /**
+   * Number of times this entry has failed to push to Supabase.
+   * When this reaches 3, the entry is considered errored and
+   * the UI shows a "Sync error" state until the next successful push.
+   * Defaults to 0 when first enqueued.
+   */
+  failCount: number;
 }

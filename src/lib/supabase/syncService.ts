@@ -18,6 +18,23 @@ import type { SleepEntry, SyncQueueEntry } from '@/lib/circadian'
 import type { User } from '@supabase/supabase-js'
 
 // ---------------------------------------------------------------------------
+// Sync state — readable by useSyncStatus via the getters below
+// ---------------------------------------------------------------------------
+
+// True while syncOnConnect or flushQueue is actively running.
+let _isSyncing = false
+
+// Count of entries that have failed to push 3 or more times.
+// Tracked in the sync queue via a `failCount` field (see SyncQueueEntry).
+let _errorCount = 0
+
+/** Returns true if a sync operation is currently in progress. */
+export function isSyncing(): boolean { return _isSyncing }
+
+/** Returns the number of entries that have failed to push 3+ times. */
+export function errorCount(): number { return _errorCount }
+
+// ---------------------------------------------------------------------------
 // Column mapping helpers
 // ---------------------------------------------------------------------------
 
@@ -81,13 +98,21 @@ function fromSupabaseRow(row: Record<string, unknown>): SleepEntry {
 // ---------------------------------------------------------------------------
 
 /**
- * Adds a SleepEntry id to the sync queue, meaning it needs to be pushed
- * to Supabase. Safe to call when the entry already exists in the queue
- * (the upsert-style put in Dexie handles it).
+ * Adds a SleepEntry id to the sync queue.
+ * Increments failCount if the entry is already queued (repeated failure),
+ * rather than resetting it — so the error state accumulates correctly.
  */
 async function enqueue(id: string): Promise<void> {
-  const item: SyncQueueEntry = { id, queuedAt: new Date().toISOString() }
+  // Check if this entry is already queued (a previous push failed).
+  const existing = await db.syncQueue.get(id)
+  const failCount = existing ? existing.failCount + 1 : 1
+
+  const item: SyncQueueEntry = { id, queuedAt: new Date().toISOString(), failCount }
   await db.syncQueue.put(item)
+
+  // Recount error entries (failCount >= 3) and update the module-level flag.
+  const all = await db.syncQueue.toArray()
+  _errorCount = all.filter(e => e.failCount >= 3).length
 }
 
 /**
@@ -95,6 +120,10 @@ async function enqueue(id: string): Promise<void> {
  */
 async function dequeue(id: string): Promise<void> {
   await db.syncQueue.delete(id)
+
+  // Recount after removal so the error state clears when the push succeeds.
+  const all = await db.syncQueue.toArray()
+  _errorCount = all.filter(e => e.failCount >= 3).length
 }
 
 // ---------------------------------------------------------------------------
@@ -161,74 +190,79 @@ export async function syncAfterMutation(entry: SleepEntry, user: User | null): P
 export async function syncOnConnect(user: User): Promise<void> {
   if (!supabase) return
 
-  // --- 1. Pull all entries for this user from Supabase ---
-  const { data: remoteRows, error } = await supabase
-    .from('sleep_entries')
-    .select('*')
-    .eq('user_id', user.id)
+  _isSyncing = true
+  try {
+    // --- 1. Pull all entries for this user from Supabase ---
+    const { data: remoteRows, error } = await supabase
+      .from('sleep_entries')
+      .select('*')
+      .eq('user_id', user.id)
 
-  if (error) {
-    console.warn('syncService: pull failed on connect.', error.message)
-    // Pull failed — still flush the local queue so offline writes get pushed.
+    if (error) {
+      console.warn('syncService: pull failed on connect.', error.message)
+      // Pull failed — still flush the local queue so offline writes get pushed.
+      await flushQueue(user)
+      return
+    }
+
+    const remoteEntries: SleepEntry[] = (remoteRows ?? []).map(
+      // Cast each row to the generic record shape the mapper expects.
+      row => fromSupabaseRow(row as Record<string, unknown>)
+    )
+
+    // --- 2. Load all local entries ---
+    const localEntries: SleepEntry[] = await db.sleepEntries.toArray()
+
+    // --- 3. Merge: last-write-wins by updatedAt ---
+    // Build a map keyed by entry id, starting from local entries.
+    const merged = new Map<string, SleepEntry>()
+    for (const entry of localEntries) {
+      merged.set(entry.id, entry)
+    }
+
+    // For each remote entry, keep whichever version has the later updatedAt.
+    const toUpsertRemotely: SleepEntry[] = []
+    for (const remote of remoteEntries) {
+      const local = merged.get(remote.id)
+      if (!local) {
+        // Entry exists on server but not locally — add it.
+        merged.set(remote.id, remote)
+      } else if (remote.updatedAt > local.updatedAt) {
+        // Server version is newer — replace the local copy.
+        merged.set(remote.id, remote)
+      } else if (local.updatedAt > remote.updatedAt) {
+        // Local version is newer — flag the remote for update.
+        toUpsertRemotely.push(local)
+      }
+      // If updatedAt is identical, no action needed (already in sync).
+    }
+
+    // Any local entry that has no remote counterpart needs to be pushed up.
+    for (const local of localEntries) {
+      if (!remoteEntries.find(r => r.id === local.id)) {
+        toUpsertRemotely.push(local)
+      }
+    }
+
+    // --- 4. Write merged set to IndexedDB ---
+    const mergedArray = Array.from(merged.values())
+
+    // Re-assign cycle numbers across the full merged set before writing.
+    // assignCycleNumber returns a new array — it does not mutate in place.
+    const renumbered = assignCycleNumber(mergedArray)
+    await db.sleepEntries.bulkPut(renumbered)
+
+    // --- 5. Push entries that the server is missing or behind on ---
+    // Also push the renumbered versions so cycle numbers stay in sync.
+    const renumberedMap = new Map(renumbered.map(e => [e.id, e]))
+    const allToPush = toUpsertRemotely.map(e => renumberedMap.get(e.id) ?? e)
+    await Promise.all(allToPush.map(e => pushEntry(e, user.id)))
+
+    // --- 6. Flush any remaining queued entries ---
     await flushQueue(user)
-    return
+  } finally {
+    _isSyncing = false
   }
-
-  const remoteEntries: SleepEntry[] = (remoteRows ?? []).map(
-    // Cast each row to the generic record shape the mapper expects.
-    row => fromSupabaseRow(row as Record<string, unknown>)
-  )
-
-  // --- 2. Load all local entries ---
-  const localEntries: SleepEntry[] = await db.sleepEntries.toArray()
-
-  // --- 3. Merge: last-write-wins by updatedAt ---
-  // Build a map keyed by entry id, starting from local entries.
-  const merged = new Map<string, SleepEntry>()
-  for (const entry of localEntries) {
-    merged.set(entry.id, entry)
-  }
-
-  // For each remote entry, keep whichever version has the later updatedAt.
-  const toUpsertRemotely: SleepEntry[] = []
-  for (const remote of remoteEntries) {
-    const local = merged.get(remote.id)
-    if (!local) {
-      // Entry exists on server but not locally — add it.
-      merged.set(remote.id, remote)
-    } else if (remote.updatedAt > local.updatedAt) {
-      // Server version is newer — replace the local copy.
-      merged.set(remote.id, remote)
-    } else if (local.updatedAt > remote.updatedAt) {
-      // Local version is newer — flag the remote for update.
-      toUpsertRemotely.push(local)
-    }
-    // If updatedAt is identical, no action needed (already in sync).
-  }
-
-  // Any local entry that has no remote counterpart needs to be pushed up.
-  for (const local of localEntries) {
-    if (!remoteEntries.find(r => r.id === local.id)) {
-      toUpsertRemotely.push(local)
-    }
-  }
-
-  // --- 4. Write merged set to IndexedDB ---
-  const mergedArray = Array.from(merged.values())
-
-  // Re-assign cycle numbers across the full merged set before writing.
-  // assignCycleNumber returns a new array — it does not mutate in place.
-  const renumbered = assignCycleNumber(mergedArray)
-  await db.sleepEntries.bulkPut(renumbered)
-
-  // --- 5. Push entries that the server is missing or behind on ---
-  // Also push the renumbered versions so cycle numbers stay in sync.
-  const renumberedMap = new Map(renumbered.map(e => [e.id, e]))
-  const allToPush = toUpsertRemotely.map(e => renumberedMap.get(e.id) ?? e)
-  await Promise.all(allToPush.map(e => pushEntry(e, user.id)))
-
-  // --- 6. Flush any remaining queued entries ---
-  await flushQueue(user)
 }
 
 /**
@@ -245,16 +279,21 @@ export async function flushQueue(user: User): Promise<void> {
   const queued = await db.syncQueue.toArray()
   if (queued.length === 0) return
 
-  // Fetch each queued entry from IndexedDB and push it.
-  // We fetch fresh from IDB (not from a stale closure) so the pushed
-  // version always reflects the latest local edits.
-  for (const item of queued) {
-    const entry = await db.sleepEntries.get(item.id)
-    if (entry) {
-      await pushEntry(entry, user.id)
-    } else {
-      // Entry was hard-deleted locally — remove from queue silently.
-      await dequeue(item.id)
+  _isSyncing = true
+  try {
+    // Fetch each queued entry from IndexedDB and push it.
+    // We fetch fresh from IDB (not from a stale closure) so the pushed
+    // version always reflects the latest local edits.
+    for (const item of queued) {
+      const entry = await db.sleepEntries.get(item.id)
+      if (entry) {
+        await pushEntry(entry, user.id)
+      } else {
+        // Entry was hard-deleted locally — remove from queue silently.
+        await dequeue(item.id)
+      }
     }
+  } finally {
+    _isSyncing = false
   }
 }

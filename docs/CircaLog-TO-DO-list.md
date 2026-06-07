@@ -207,10 +207,10 @@
 - [x] 🟢 Show sign-in success toast notification
 - [x] 🟢 Show signed-out toast notification
 - [x] 🟢 Show error toast notification (sign-in / sign-out failures)
-- [ ] 🔴 Build sync service: IndexedDB → Supabase on connect
-- [ ] 🟡 Handle sync conflicts (local wins by default)
-- [ ] 🟡 Show sync status indicator in UI
-- [ ] 🟢 Allow sign-out (data remains local)
+- [x] 🔴 Build sync service: IndexedDB → Supabase on connect
+- [x] 🟡 Handle sync conflicts (local wins by default)
+- [x] 🟡 Show sync status indicator in UI
+- [x] 🟢 Allow sign-out (data remains local)
 
 ### 📥 Data Import
 

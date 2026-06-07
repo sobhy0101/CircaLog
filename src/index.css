@@ -25,6 +25,14 @@
   --circa-accent-subtle:  #EDE9FE; /* Badge / chip backgrounds (light surface) */
   --circa-accent-light:   #5B21B6; /* Accent text on light surfaces */
 
+  /* Semantic state colors */
+  --circa-success:        #16A34A; /* Green — confirmed sync, positive states */
+  --circa-success-subtle: #DCFCE7; /* Green tint — success badge background */
+  --circa-warning:        #D97706; /* Amber — in-progress, caution states */
+  --circa-warning-subtle: #FEF3C7; /* Amber tint — warning badge background */
+  --circa-error:          #DC2626; /* Red — sync error, destructive states */
+  --circa-error-subtle:   #FEE2E2; /* Red tint — error badge background */
+
   /* Text */
   --circa-text-primary:   #1A1A2E; /* Headings, body copy */
   --circa-text-secondary: #4A4A6A; /* Labels, captions */
@@ -49,6 +57,14 @@
   --circa-accent-subtle:  #2D1B6E; /* Muted accent background (dark surface) */
   --circa-accent-light:   #A78BFA; /* Accent text on dark surfaces */
 
+  /* Semantic state colors */
+  --circa-success:        #22C55E; /* Lifted green — readable on dark surfaces */
+  --circa-success-subtle: #14532D; /* Dark green tint */
+  --circa-warning:        #F59E0B; /* Lifted amber */
+  --circa-warning-subtle: #78350F; /* Dark amber tint */
+  --circa-error:          #EF4444; /* Lifted red — readable on dark surfaces */
+  --circa-error-subtle:   #7F1D1D; /* Dark red tint */
+
   /* Text */
   --circa-text-primary:   #F0F0FA; /* Headings, body copy */
   --circa-text-secondary: #B8B8D8; /* Labels, captions — lifted for WCAG AA contrast */
@@ -65,8 +81,14 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 @theme inline {
-  --animate-fade-in: fade-in 150ms ease-out;
+  --animate-fade-in:    fade-in 150ms ease-out;
+  --animate-spin-slow:  spin-slow 1.5s linear infinite;
 
   --color-circa-bg:             var(--circa-bg);
   --color-circa-surface:        var(--circa-surface);
@@ -76,6 +98,12 @@
   --color-circa-accent:         var(--circa-accent);
   --color-circa-accent-subtle:  var(--circa-accent-subtle);
   --color-circa-accent-light:   var(--circa-accent-light);
+  --color-circa-success:        var(--circa-success);
+  --color-circa-success-subtle: var(--circa-success-subtle);
+  --color-circa-warning:        var(--circa-warning);
+  --color-circa-warning-subtle: var(--circa-warning-subtle);
+  --color-circa-error:          var(--circa-error);
+  --color-circa-error-subtle:   var(--circa-error-subtle);
   --color-circa-text-primary:   var(--circa-text-primary);
   --color-circa-text-secondary: var(--circa-text-secondary);
   --color-circa-text-muted:     var(--circa-text-muted);
