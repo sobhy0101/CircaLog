@@ -202,8 +202,8 @@
 > immediately on import. Nothing in this section should be built after the
 > CSV import below.
 
-- [ ] 🔴 Implement optional Google Sign-In (Required for data resilience)
-- [ ] 🔴 Connect Supabase auth to Google OAuth
+- [x] 🔴 Implement optional Google Sign-In (Required for data resilience)
+- [x] 🔴 Connect Supabase auth to Google OAuth
 - [ ] 🔴 Build sync service: IndexedDB → Supabase on connect
 - [ ] 🟡 Handle sync conflicts (local wins by default)
 - [ ] 🟡 Show sync status indicator in UI
