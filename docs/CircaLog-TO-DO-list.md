@@ -204,6 +204,9 @@
 
 - [x] 🔴 Implement optional Google Sign-In (Required for data resilience)
 - [x] 🔴 Connect Supabase auth to Google OAuth
+- [x] 🟢 Show sign-in success toast notification
+- [x] 🟢 Show signed-out toast notification
+- [x] 🟢 Show error toast notification (sign-in / sign-out failures)
 - [ ] 🔴 Build sync service: IndexedDB → Supabase on connect
 - [ ] 🟡 Handle sync conflicts (local wins by default)
 - [ ] 🟡 Show sync status indicator in UI

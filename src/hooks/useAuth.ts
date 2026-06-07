@@ -2,10 +2,16 @@ import { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
+interface ToastState {
+  variant: 'success' | 'neutral' | 'error';
+  message: string;
+}
+
 export function useAuth() {
-  const [user, setUser]           = useState<User | null>(null);
+  const [user, setUser]               = useState<User | null>(null);
   // true only while the initial getSession() call is in flight
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading]     = useState(true);
+  const [activeToast, setActiveToast] = useState<ToastState | null>(null);
 
   useEffect(() => {
     // Restore any session that survived a page reload / OAuth redirect
@@ -14,10 +20,25 @@ export function useAuth() {
       setIsLoading(false);
     });
 
-    // Keep local state in sync with Supabase's auth events
+    // Keep local state in sync with Supabase's auth events.
+    // SIGNED_IN fires on a fresh OAuth completion; INITIAL_SESSION fires on
+    // page reload — so the success toast only appears after an actual sign-in.
+    // SIGNED_OUT covers both manual sign-out and token expiry.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setUser(session?.user ?? null);
+
+        if (event === 'SIGNED_IN') {
+          const name = session?.user?.user_metadata?.full_name as string | undefined;
+          setActiveToast({
+            variant: 'success',
+            message: name ? `Welcome, ${name}!` : 'Signed in successfully.',
+          });
+        }
+
+        if (event === 'SIGNED_OUT') {
+          setActiveToast({ variant: 'neutral', message: 'Signed out.' });
+        }
       }
     );
 
@@ -32,6 +53,7 @@ export function useAuth() {
       });
     } catch (err) {
       console.error('Google sign-in failed:', err);
+      setActiveToast({ variant: 'error', message: 'Sign-in failed. Please try again.' });
     }
   }
 
@@ -40,8 +62,13 @@ export function useAuth() {
       await supabase.auth.signOut();
     } catch (err) {
       console.error('Sign-out failed:', err);
+      setActiveToast({ variant: 'error', message: 'Sign-out failed. Please try again.' });
     }
   }
 
-  return { user, isLoading, signInWithGoogle, signOut };
+  function clearToast() {
+    setActiveToast(null);
+  }
+
+  return { user, isLoading, signInWithGoogle, signOut, activeToast, clearToast };
 }
