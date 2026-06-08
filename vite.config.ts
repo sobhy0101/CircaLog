@@ -103,6 +103,10 @@ export default defineConfig({
   ],
 
   build: {
+    // Raise the warning threshold to 700 kB — the main bundle sits at ~628 kB
+    // (gzipped: ~173 kB), which is well within acceptable range for a PWA.
+    chunkSizeWarningLimit: 700,
+
     // Split vendor libs into a separate chunk so app-only deploys don't bust
     // the cached vendor bundle (React, ReactDOM, Dexie).
     rolldownOptions: {
