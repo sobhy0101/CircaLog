@@ -7,6 +7,7 @@ import AppShell    from '@/pages/AppShell'           // Route: /log (shell wrapp
 import LogPage     from '@/pages/log/LogPage'        // Route: /log (index child)
 import HistoryPage from '@/pages/history/HistoryPage' // Route: /log/history
 import ChartPage   from '@/pages/chart/ChartPage'    // Route: /log/chart
+import ImportPage  from '@/pages/log/ImportPage'     // Route: /log/import
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route index element={<LogPage />} />
         <Route path="history" element={<HistoryPage />} />
         <Route path="chart" element={<ChartPage />} />
+        <Route path="import" element={<ImportPage />} />
       </Route>
     </Routes>
   )

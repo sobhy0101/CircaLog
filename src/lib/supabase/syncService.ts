@@ -304,3 +304,27 @@ export async function flushQueue(user: User): Promise<void> {
     _isSyncing = false
   }
 }
+
+/**
+ * Performs a lightweight connectivity check against Supabase.
+ *
+ * Used by the import gate to verify the server is reachable before
+ * starting an import that requires cloud sync.
+ *
+ * Returns true if the query succeeds (even with zero rows).
+ * Returns false if supabase is null, the browser is offline, or the
+ * query returns an error for any reason.
+ */
+export async function checkSupabaseReachable(): Promise<boolean> {
+  if (!supabase) return false
+  if (!navigator.onLine) return false
+  try {
+    const { error } = await supabase
+      .from('sleep_entries')
+      .select('id')
+      .limit(1)
+    return error === null
+  } catch {
+    return false
+  }
+}

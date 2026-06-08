@@ -224,7 +224,7 @@
 
 ### 📥 Data Import
 
-- [ ] 🟡 Import sleep log from CSV
+- [x] ✅ Import sleep log from CSV
        - Accepts CSV exported from the CircaLog Daily Tracker spreadsheet
          (`C:\Users\sobhy\OneDrive\CircaLog-Daily-Tracker.xlsx`)
        - Column mapping: Date, Bed Time, Sleep Start, Wake Time, Quality,
