@@ -158,7 +158,7 @@ export default function ImportPage() {
               Sign in with Google to import your data. Imported sessions are
               saved to your account so they sync across devices.
             </p>
-            <GoogleSignInButton />
+            <GoogleSignInButton returnPath="/log/import" />
           </div>
         )}
 

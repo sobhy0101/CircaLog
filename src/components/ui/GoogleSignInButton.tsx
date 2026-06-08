@@ -1,6 +1,16 @@
 import { useAuth } from '@/hooks/useAuth';
 
-export default function GoogleSignInButton() {
+interface GoogleSignInButtonProps {
+  /**
+   * Optional app path to return to after sign-in completes.
+   * Passed through to signInWithGoogle() and stored in sessionStorage
+   * before the OAuth redirect so it survives the full-page reload.
+   * Defaults to "/log" when omitted.
+   */
+  returnPath?: string;
+}
+
+export default function GoogleSignInButton({ returnPath }: GoogleSignInButtonProps) {
   const { isLoading, signInWithGoogle } = useAuth();
 
   // Don't render until auth state is known — avoids layout shift
@@ -8,7 +18,7 @@ export default function GoogleSignInButton() {
 
   return (
     <button
-      onClick={signInWithGoogle}
+      onClick={() => signInWithGoogle(returnPath)}
       className="
         flex items-center justify-center gap-2.5
         w-full min-h-[44px] px-4 py-2.5
