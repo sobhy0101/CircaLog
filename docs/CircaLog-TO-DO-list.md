@@ -238,12 +238,12 @@
 
 ### 💡 Insights View
 
-- [ ] 🟡 Average sleep duration (rolling 7-day and 30-day)
-- [ ] 🟡 Average drift per cycle (how many minutes later per cycle)
-- [ ] 🟡 Longest and shortest sleep sessions
-- [ ] 🟡 Total sleep sessions logged
-- [ ] 🟡 Current streak (consecutive days with at least one log)
-- [ ] 🟢 Free-running period estimate
+- [x] 🟡 Average sleep duration (rolling 7-day and 30-day)
+- [x] 🟡 Average drift per cycle (how many minutes later per cycle)
+- [x] 🟡 Longest and shortest sleep sessions
+- [x] 🟡 Total sleep sessions logged
+- [x] 🟡 Current streak (consecutive days with at least one log)
+- [x] 🟢 Free-running period estimate
        - Requires minimum 14 days of data
        - Calculated via linear regression on sleep onset times
        - Show "Pending — log 14+ days to unlock" until threshold is met

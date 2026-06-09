@@ -8,6 +8,7 @@ import LogPage     from '@/pages/log/LogPage'        // Route: /log (index child
 import HistoryPage from '@/pages/history/HistoryPage' // Route: /log/history
 import ChartPage   from '@/pages/chart/ChartPage'    // Route: /log/chart
 import ImportPage  from '@/pages/log/ImportPage'     // Route: /log/import
+import InsightsPage from '@/pages/insights/InsightsPage' // Route: /log/insights
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="history" element={<HistoryPage />} />
         <Route path="chart" element={<ChartPage />} />
         <Route path="import" element={<ImportPage />} />
+        <Route path="insights" element={<InsightsPage />} />
       </Route>
     </Routes>
   )
