@@ -253,13 +253,11 @@
 
 - [x] 🔴 Configure Vite PWA plugin (Workbox service worker)
 - [x] 🔴 Silent auto-update on new deployments
-- [ ] 🟡 Verify PWA icons are wired into the manifest (all sizes for Android, iOS, PWA)
+- [x] 🟡 Verify PWA icons are wired into the manifest (all sizes for Android, iOS, PWA)
        (Icons already generated under `public/images/brand/` — this is configuration verification)
-- [ ] 🟡 Verify Android splash screen coverage; design branded splash if needed
-- [ ] 🟡 App installable on Android (add to home screen — verify after icons are wired)
-- [ ] 🟢 Offline fallback page
-- [ ] 🟢 In-app changelog modal — show on first load after update
-       (UX polish, not a blocker for V1 functionality)
+- [x] 🟡 Verify Android splash screen coverage; design branded splash if needed
+- [x] 🟡 App installable on Android (add to home screen — verify after icons are wired)
+- [x] 🟢 Offline fallback page
 
 ### 🛟 Data Resilience
 
@@ -273,6 +271,10 @@
 - [ ] 🟢 Populate `profiles` table in Supabase on first sign-in
        (Currently empty — no trigger fires on Google OAuth sign-in.
         Needed for Doctor Report PDF (display name, email). Defer until that task.)
+
+### Change Log
+
+- [ ] 🟢 In-app changelog modal — show on first load after update (UX polish, not a blocker for V1 functionality)
 
 ---
 
