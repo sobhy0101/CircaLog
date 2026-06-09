@@ -1,30 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><g clip-path="url(#SvgjsClipPath1022)"><rect width="1000" height="1000" fill="#0f0f1e"></rect><g transform="matrix(1.3671875,0,0,1.3671875,150,150)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><defs>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><style>
+    #light-icon {
+      display: inline;
+    }
+    #dark-icon {
+      display: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #light-icon {
+        display: none;
+      }
+      #dark-icon {
+        display: inline;
+      }
+    }
+  </style><g id="light-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g clip-path="url(#SvgjsClipPath1077)"><rect width="1000" height="1000" fill="#0f0f1e"></rect><g transform="matrix(2.5318287037037037,0,0,2.5318287037037037,150,235.99356192129633)"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_2" data-name="Layer 2" viewBox="0 0 276.48 208.55" width="276.48" height="208.55"><defs>
     <style>
       .cls-1 {
-        fill: #0f0f1e;
-      }
-
-      .cls-2 {
         fill: #7c3aed;
       }
 
-      .cls-3 {
+      .cls-2 {
         fill: #6d28d9;
       }
 
-      .cls-4 {
+      .cls-3 {
         fill: #a78bfa;
       }
 
-      .cls-5 {
+      .cls-4 {
         fill: #8b5cf6;
       }
     </style>
-  <clipPath id="SvgjsClipPath1022"><rect width="1000" height="1000" x="0" y="0" rx="350" ry="350"></rect></clipPath></defs><rect class="cls-1" width="512" height="512"></rect><g id="Layer_1" data-name="Layer 1">
+  <clipPath id="SvgjsClipPath1077"><rect width="1000" height="1000" x="0" y="0" rx="250" ry="250"></rect></clipPath></defs><g id="Layer_1-2" data-name="Layer 1">
     <g>
-      <path class="cls-3" d="M248.33,128.98H36.23c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
-      <path class="cls-2" d="M324.86,234.4H112.76c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
-      <path class="cls-5" d="M399.96,339.82h-212.1c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
-      <path class="cls-4" d="M475.77,445.24h-212.1c-17.18,0-31.11-13.93-31.11-31.11s13.93-31.11,31.11-31.11h212.1c17.18,0,31.11,13.93,31.11,31.11s-13.93,31.11-31.11,31.11Z"></path>
+      <path class="cls-2" d="M134.01,34.28H17.14C7.67,34.28,0,26.61,0,17.14S7.67,0,17.14,0h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
+      <path class="cls-1" d="M176.19,92.37H59.31c-9.47,0-17.14-7.67-17.14-17.14s7.67-17.14,17.14-17.14h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
+      <path class="cls-4" d="M217.56,150.46h-116.87c-9.47,0-17.14-7.67-17.14-17.14s7.67-17.14,17.14-17.14h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
+      <path class="cls-3" d="M259.34,208.55h-116.87c-9.47,0-17.14-7.67-17.14-17.14s7.67-17.14,17.14-17.14h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
     </g>
-  </g></svg></g></g></svg>
+  </g></svg></g></g></svg></g><g id="dark-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g clip-path="url(#SvgjsClipPath1078)"><rect width="1000" height="1000" fill="#0f0f1e"></rect><g transform="matrix(2.5318287037037037,0,0,2.5318287037037037,150,235.99356192129633)"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_2" data-name="Layer 2" viewBox="0 0 276.48 208.55" width="276.48" height="208.55"><defs>
+    <style>
+      .cls-1 {
+        fill: #7c3aed;
+      }
+
+      .cls-2 {
+        fill: #6d28d9;
+      }
+
+      .cls-3 {
+        fill: #a78bfa;
+      }
+
+      .cls-4 {
+        fill: #8b5cf6;
+      }
+    </style>
+  <clipPath id="SvgjsClipPath1078"><rect width="1000" height="1000" x="0" y="0" rx="400" ry="400"></rect></clipPath></defs><g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <path class="cls-2" d="M134.01,34.28H17.14C7.67,34.28,0,26.61,0,17.14S7.67,0,17.14,0h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
+      <path class="cls-1" d="M176.19,92.37H59.31c-9.47,0-17.14-7.67-17.14-17.14s7.67-17.14,17.14-17.14h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
+      <path class="cls-4" d="M217.56,150.46h-116.87c-9.47,0-17.14-7.67-17.14-17.14s7.67-17.14,17.14-17.14h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
+      <path class="cls-3" d="M259.34,208.55h-116.87c-9.47,0-17.14-7.67-17.14-17.14s7.67-17.14,17.14-17.14h116.87c9.47,0,17.14,7.67,17.14,17.14s-7.67,17.14-17.14,17.14Z"></path>
+    </g>
+  </g></svg></g></g></svg></g></svg>
