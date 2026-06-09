@@ -183,6 +183,124 @@ Answer: A, with the ability to import from other health apps later if possible.
 
 ---
 
+### 📥 Supplementary: CSV Import Architecture
+
+*Decided 08 Jun 2026 — built to migrate real patient data from the
+CircaLog Daily Tracker spreadsheet into the app before medication and
+food logging features are complete.*
+
+**The case for CSV import**
+
+The CircaLog Daily Tracker spreadsheet (`CircaLog-Daily-Tracker.xlsx`)
+was used as a bridge logging tool while V1 was in development. It
+captures sleep, medication, and food data together. When the app reaches
+a usable state, the sleep log data needs to be migrated in without manual
+re-entry. Import also serves future users who may be arriving from other
+CSV-exporting sleep trackers.
+
+**Route and entry point**
+
+- Route: `/log/import` (full page inside AppShell, bottom tab bar visible)
+- Entry: Side Drawer → More → Import (visible to all users regardless of
+  sign-in state)
+- Sign-in gate: the Import page itself shows `GoogleSignInButton` when the
+  user is not signed in. Import requires an active connection and a signed-in
+  account because all imported entries are synced to Supabase immediately.
+
+**New files created**
+
+| File | Purpose |
+|---|---|
+| `src/utils/csvParser.ts` | Pure TypeScript parser — no React, no side effects. Takes PapaParse row objects and returns `ParsedRow[]` (ok or error per row). |
+| `src/hooks/useImport.ts` | React state machine for the import flow. Manages gate checks, row-by-row processing, progress, and result. |
+| `src/pages/log/ImportPage.tsx` | Full-page UI component. Four phases: idle (file picker), parsed (preview table), importing (progress), done (result). |
+
+**Modified files**
+
+| File | Change |
+|---|---|
+| `src/lib/supabase/syncService.ts` | Added `checkSupabaseReachable()` — lightweight connectivity check used by the import gate. |
+| `src/App.tsx` | Added `/log/import` route inside the `/log` block. |
+| `src/components/layout/SideDrawer.tsx` | Added Import entry in the More section. |
+
+**CSV format expected**
+
+Exported from the CircaLog Daily Tracker spreadsheet via the prompt in
+`docs/CircaLog-Daily-Tracker-Spreadsheet.md`. Column headers:
+
+`Date`, `Bed Time`, `Sleep Start`, `Wake Time`, `Sleep Onset Latency`,
+`Sleep Duration`, `Time in Bed`, `Session Type`, `Quality`, `Had Dreams?`,
+`Dream Notes`, `Interruptions`, `Notes`, `Cycle Number`
+
+- Date format: `DD-MM-YYYY`
+- Time format: `HH:MM` (24-hour)
+- Parsed by PapaParse (`papaparse@5.5.3`) with `header: true`
+
+**Midnight crossover logic**
+
+1. If `Sleep Start` time < `Bed Time` (lexicographic HH:MM comparison),
+   sleep start date = `Date` + 1 day.
+2. If `Wake Time` < `Sleep Start` time, wake date = sleep start date + 1 day.
+
+This correctly handles sessions that begin after midnight, sessions that
+span two calendar days, and sessions that span three calendar days.
+
+**Interruption mapping**
+
+Free-text interruption values are mapped to structured `Interruption[]`
+objects rather than appended to `notes`, so they remain queryable for
+future Insights features:
+
+| Raw value | Maps to |
+|---|---|
+| Empty / `"N/A"` / `"none"` | `undefined` |
+| Contains `pee`, `peed`, `bathroom`, `toilet`, `loo` | `{ type: 'bathroom', note: originalText }` |
+| Anything else | `{ type: 'other', note: originalText }` |
+
+The original text is always preserved in `note`. See
+`docs/SleepEntry-Field-Guide.md` for the full entry guide.
+
+**Pre-import gate (three checks, in order)**
+
+1. `navigator.onLine` — must be true
+2. `checkSupabaseReachable()` — lightweight Supabase query must succeed
+3. User must be signed in (`user !== null`)
+
+If any check fails, the gate error is displayed with a Retry button.
+Import does not proceed until all three pass.
+
+**Duplicate detection**
+
+Before calling `createEntry()` for a row, `useImport` checks whether an
+entry with the same `sleepStartUtc` already exists in IndexedDB. If it
+does, the row is skipped and counted as a duplicate. Re-importing the same
+file is always safe.
+
+**Post-import sync**
+
+After all rows are processed, `flushQueue()` is called once to push any
+entries that ended up in the sync queue. If the flush fails, the result
+screen shows a `SYNC_ERR_503` message with the support email address. The
+data is always saved to IndexedDB regardless of sync outcome.
+
+**Navigation safety**
+
+Navigating away mid-import shows a confirmation dialog ("Leaving now will
+stop the import. Any sessions already processed will be kept."). The user
+can stay or leave. Partially completed imports are safe to retry because
+duplicates are skipped.
+
+**Return path after sign-in**
+
+`GoogleSignInButton` on ImportPage passes `returnPath="/log/import"` to
+`signInWithGoogle()`. The path is written to `sessionStorage` before the
+OAuth redirect (which destroys React state) and consumed on the
+`SIGNED_IN` event in `useAuth`, navigating back to `/log/import`
+automatically. See Implementation Notes in `README.md` for the full
+mechanism.
+
+---
+
 **Q15. How should "days" be defined in the app, given Non-24 has no fixed day?**
 
 - A) Use calendar dates (standard clock days)

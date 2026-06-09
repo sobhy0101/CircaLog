@@ -47,6 +47,23 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Bedtime reminder notifications based on predicted sleep window
 - Configurable lead time for reminders (default: 30–60 minutes)
 
+### 📥 Import
+- Import past sleep sessions from a CSV file exported from the
+  CircaLog Daily Tracker spreadsheet (or any CSV matching the format)
+- Full preview table before confirming — shows every parsed row with
+  date, sleep start, wake time, duration, quality, session type, and
+  parse status
+- Duplicate detection: sessions already in the app are skipped
+  automatically — re-importing is always safe
+- Midnight crossover handled automatically: sessions where sleep start
+  falls past midnight are correctly dated to the following calendar day
+- Structured interruption mapping: free-text interruption notes are
+  mapped to typed objects (`bathroom`, `other`) so they are queryable
+  in future Insights views
+- Row-by-row progress indicator during import
+- Warn-before-leave: navigating away mid-import shows a confirmation
+  dialog; any sessions already processed are kept
+
 ### 📤 Export & Reports
 - Weekly and monthly health summaries
 - Export as CSV and PDF
@@ -59,7 +76,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
   night sky elements
 - Color palette: dark charcoal with purple/violet accents
 - Bottom tab bar (Log / Chart / History / Insights) + hamburger side drawer
-  for secondary features (Settings, Reports, Export, About, Privacy, etc.)
+  for secondary features (Settings, Reports, Export, Import, About, Privacy, etc.)
 - Accessible: high contrast, legible typography, mobile-first layout
 - Proper bottom padding for Android and iOS system navigation bars
 
@@ -67,6 +84,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Fully functional offline without login (IndexedDB local storage)
 - Optional Google Sign-In to enable cloud sync and backup
 - Local-first architecture: data lives on device, syncs to cloud when connected
+- After OAuth sign-in, the app returns the user to the page they came from
 
 ---
 
@@ -78,7 +96,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 | Language           | TypeScript 6                                    |
 | Styling            | TailwindCSS 4                                   |
 | Charts             | Recharts 3                                      |
-| Local Storage      | IndexedDB                                       |
+| Local Storage      | IndexedDB via Dexie 4                           |
 | Cloud Database     | Supabase (PostgreSQL)                           |
 | Authentication     | Google Sign-In (optional)                       |
 | Hosting            | Vercel                                          |
@@ -93,6 +111,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 |------------------------|------------------------------------------------------|
 | `circalog.app`         | Landing page / coming soon (V1) → marketing page (V2+) |
 | `circalog.app/log`     | The PWA app — permanent, never changes               |
+| `circalog.app/log/import` | CSV import page                                   |
 
 ---
 
@@ -105,11 +124,12 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Dark/light mode with user toggle
 - PWA manifest + service worker (offline support + auto-update)
 - Local IndexedDB storage
+- Optional Google Sign-In with cloud sync to Supabase
+- CSV import from CircaLog Daily Tracker spreadsheet
 - Coming soon landing page at root domain
 - Continuous Vercel deployment from GitHub
 
 ### V2 — Enhanced
-- Google Sign-In + Supabase cloud sync
 - Push notifications + configurable bedtime reminders
 - Free-running period calculation display
 - Weekly + monthly PDF and CSV reports
@@ -241,6 +261,48 @@ down Supabase instance all return `onLine: true` while pushes fail. The
 `navigator.onLine` guard in `syncService.ts` catches the obvious case
 (airplane mode / no adapter); the `try/catch` in `pushEntry` catches
 subtler failures and queues the entry for retry. Both layers are needed.
+
+### CSV Import — Return Path After Sign-In
+
+When `GoogleSignInButton` is rendered on a page other than the main log
+(e.g. `ImportPage`), it accepts a `returnPath` prop. Before triggering
+the OAuth redirect, `signInWithGoogle()` in `useAuth.ts` writes the path
+to `sessionStorage` under the key `circalog-auth-return-path`. OAuth
+requires a full-page reload, which destroys React state; `sessionStorage`
+survives this reload. On the `SIGNED_IN` auth event, `useAuth` reads the
+key, navigates to that path with `replace: true`, and immediately removes
+the key. If no return path was stored, the user lands on `/log` as normal.
+
+### CSV Import — Midnight Crossover Logic
+
+The CSV parser in `src/utils/csvParser.ts` handles sessions that cross
+midnight using a two-step comparison:
+
+1. If `Sleep Start` time is earlier in the day than `Bed Time`, the sleep
+   start date is the calendar day after the `Date` column value.
+2. If `Wake Time` is earlier in the day than `Sleep Start`, the wake date
+   is the calendar day after the sleep start date.
+
+Time comparison uses lexicographic string comparison on `HH:MM` strings,
+which is correct for 24-hour time. The `Date` constructor interprets
+`YYYY-MM-DDTHH:MM:00` (no timezone offset) as local time, so all UTC
+conversion reflects the user's actual local timezone at import time.
+
+### CSV Import — Interruption Mapping
+
+Free-text interruption values from the CSV are mapped to structured
+`Interruption[]` objects rather than appended to the `notes` field. This
+preserves queryability for future Insights features (e.g. "how often did
+you wake to use the bathroom this week?"). The mapping strategy:
+
+- Empty, `"N/A"`, `"none"` (case-insensitive) → `undefined`
+- Text containing `pee`, `peed`, `bathroom`, `toilet`, or `loo`
+  (case-insensitive) → `{ type: 'bathroom', note: originalText }`
+- Anything else → `{ type: 'other', note: originalText }`
+
+The original text is always preserved in the `note` field so no
+information is lost. See `docs/SleepEntry-Field-Guide.md` for the full
+guide on what to enter in these fields for clean future imports.
 
 ---
 
