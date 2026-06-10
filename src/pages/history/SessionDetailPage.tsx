@@ -48,6 +48,17 @@ function QualityDots({ quality }: { quality: number }) {
   );
 }
 
+// ── Section label ─────────────────────────────────────────────────────────────
+// Muted, uppercase, small — clearly metadata, never competing with body text.
+
+function FieldLabel({ children }: { children: string }) {
+  return (
+    <p className="text-circa-text-muted text-xs uppercase tracking-wide mb-1">
+      {children}
+    </p>
+  );
+}
+
 // ── Interruption label map ────────────────────────────────────────────────────
 
 const INTERRUPTION_LABELS: Record<string, string> = {
@@ -225,29 +236,31 @@ export default function SessionDetailPage() {
 
         {/* Optional fields card — omitted when no optional data is present */}
         {hasOptional && (
-          <div className="bg-circa-surface border border-circa-border rounded-xl p-4 space-y-3">
+          <div className="bg-circa-surface border border-circa-border rounded-xl p-4 space-y-4">
+
             {entry.hadDreams !== undefined && (
               <div>
-                <span className="text-circa-text-secondary text-xs">
-                  Dreams: {entry.hadDreams ? 'Yes' : 'No'}
-                </span>
+                <FieldLabel>Dreams</FieldLabel>
+                <p className="text-circa-text-primary text-sm">
+                  {entry.hadDreams ? 'Yes' : 'No'}
+                </p>
                 {entry.hadDreams && entry.dreamNotes && (
-                  <p className="text-circa-text-primary text-sm mt-1">{entry.dreamNotes}</p>
+                  <p className="text-circa-text-secondary text-sm mt-1">
+                    {entry.dreamNotes}
+                  </p>
                 )}
               </div>
             )}
 
             {entry.interruptions && entry.interruptions.length > 0 && (
               <div>
-                <span className="text-circa-text-secondary text-xs">
-                  Interruptions:{' '}
-                  {entry.interruptions
-                    .map(i => INTERRUPTION_LABELS[i.type] ?? i.type)
-                    .join(', ')}
-                </span>
-                {entry.interruptions.filter(i => i.note).map(i => (
-                  <p key={i.type} className="text-circa-text-primary text-sm mt-0.5">
-                    {INTERRUPTION_LABELS[i.type] ?? i.type}: {i.note}
+                <FieldLabel>Interruptions</FieldLabel>
+                {entry.interruptions.map(i => (
+                  <p key={i.type} className="text-circa-text-primary text-sm">
+                    {INTERRUPTION_LABELS[i.type] ?? i.type}
+                    {i.note && (
+                      <span className="text-circa-text-secondary">: {i.note}</span>
+                    )}
                   </p>
                 ))}
               </div>
@@ -255,18 +268,22 @@ export default function SessionDetailPage() {
 
             {entry.medications !== undefined && (
               <div>
-                <span className="text-circa-text-secondary text-xs">
-                  Medication taken:{' '}
+                <FieldLabel>Medication</FieldLabel>
+                <p className="text-circa-text-primary text-sm">
                   {entry.medications.length > 0
-                    ? `Yes — ${entry.medications[0].timing}`
-                    : 'No'}
-                </span>
+                    ? `Taken — ${entry.medications[0].timing}`
+                    : 'Not taken'}
+                </p>
               </div>
             )}
 
             {entry.notes && (
-              <p className="text-circa-text-primary text-sm">{entry.notes}</p>
+              <div>
+                <FieldLabel>Notes</FieldLabel>
+                <p className="text-circa-text-primary text-sm">{entry.notes}</p>
+              </div>
             )}
+
           </div>
         )}
       </div>
