@@ -51,10 +51,20 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       >
 
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-circa-border">
-          <span className="text-circa-accent font-heading text-lg font-semibold tracking-wide">
-            CircaLog
-          </span>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-circa-border">
+          {/* Logo — two <picture> elements toggled via CSS dark: variant so they
+              respond to the .dark class on <html> instantly, without React state.
+              Fallback chain per element: SVG → WebP → PNG. */}
+          <picture className="dark:hidden">
+            <source srcSet="/images/brand/logo/circalog-light-logo.svg" type="image/svg+xml" />
+            <source srcSet="/images/brand/logo/circalog-light-logo@2x.webp" type="image/webp" />
+            <img src="/images/brand/logo/circalog-light-logo@2x.png" alt="CircaLog" className="h-7 w-auto" />
+          </picture>
+          <picture className="hidden dark:block">
+            <source srcSet="/images/brand/logo/circalog-dark-logo.svg" type="image/svg+xml" />
+            <source srcSet="/images/brand/logo/circalog-dark-logo@2x.webp" type="image/webp" />
+            <img src="/images/brand/logo/circalog-dark-logo@2x.png" alt="CircaLog" className="h-7 w-auto" />
+          </picture>
           <button
             onClick={onClose}
             aria-label="Close menu"
