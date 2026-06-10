@@ -23,7 +23,7 @@ export default function StartSleepScreen({ onStartSleep, inProgress }: StartSlee
         className="w-48 h-48 rounded-full bg-circa-accent flex items-center justify-center
                    shadow-lg active:scale-95 transition-transform"
       >
-        <span className="text-white font-display font-semibold text-xl">
+        <span className="text-white font-heading font-semibold text-xl">
           Start Sleep
         </span>
       </button>

@@ -181,7 +181,7 @@ export default function WakeUpScreen({
           confirm the timer is live. colonVisible toggles each interval tick. */}
       <div className="text-center">
         <p className="text-circa-text-secondary text-sm mb-1">Sleep duration so far</p>
-        <p className="text-circa-text-primary font-display text-4xl font-semibold tracking-tight tabular-nums">
+        <p className="text-circa-text-primary font-heading text-4xl font-semibold tracking-tight tabular-nums">
           {elapsed.h}
           <span
             className="transition-opacity duration-100"

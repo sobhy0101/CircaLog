@@ -37,18 +37,18 @@ export default function ComingSoon() {
         </div>
 
         {/* App name — styled as the wordmark until a proper logo is designed */}
-        {/* <h1 className="text-4xl font-bold tracking-tight text-circa-text-primary font-family-display">
+        {/* <h1 className="text-4xl font-bold tracking-tight text-circa-text-primary font-heading">
           Circa<span className="text-circa-accent">Log</span>
         </h1> */}
       </div>
 
       {/* ── Headline ───────────────────────────────────────────────────── */}
-      <p className="text-2xl font-semibold text-circa-accent-light mb-3 font-family-display">
+      <p className="text-2xl font-semibold text-circa-accent-light mb-3 font-heading">
         Coming Soon
       </p>
 
       {/* ── Tagline ────────────────────────────────────────────────────── */}
-      <p className="max-w-sm text-circa-text-secondary text-base leading-relaxed font-family-body">
+      <p className="max-w-sm text-circa-text-secondary text-base leading-relaxed font-sans">
         A sleep tracker built for Non-24-Hour Sleep–Wake Disorder.
         <br />
         Something's taking shape, hopefully in the dark.
@@ -60,7 +60,7 @@ export default function ComingSoon() {
       </div>
 
       {/* ── Footer links — pinned to bottom, outside the centered stack ── */}
-      <footer className="absolute bottom-6 flex items-center gap-6 text-xs font-family-body">
+      <footer className="absolute bottom-6 flex items-center gap-6 text-xs font-sans">
         <a
           href="https://github.com/sobhy0101/CircaLog"
           target="_blank"

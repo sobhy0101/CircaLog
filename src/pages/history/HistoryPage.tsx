@@ -279,7 +279,7 @@ export default function HistoryPage() {
     <div>
       <header className="px-4 pt-5 pb-2 flex items-start justify-between">
         <div>
-          <h1 className="text-circa-text-primary font-display text-lg font-semibold tracking-wide">
+          <h1 className="text-circa-text-primary font-heading text-lg font-semibold tracking-wide">
             History
           </h1>
           {!isLoading && entries.length > 0 && (

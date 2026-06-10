@@ -50,7 +50,7 @@ function StatCard({ label, value, subValue, valueClassName }: StatCardProps) {
   return (
     <div className="bg-circa-surface rounded-xl p-4 border border-circa-border">
       <p className="text-circa-text-muted text-xs uppercase tracking-wide">{label}</p>
-      <p className={valueClassName ?? 'text-circa-accent font-display text-2xl font-semibold mt-1'}>
+      <p className={valueClassName ?? 'text-circa-accent font-heading text-2xl font-semibold mt-1'}>
         {value}
       </p>
       {subValue && (
@@ -78,7 +78,7 @@ export default function InsightsPage() {
 
   return (
     <div className="px-4 pt-6 pb-4 flex flex-col gap-6">
-      <h1 className="text-circa-text-primary font-display text-lg font-semibold tracking-wide">
+      <h1 className="text-circa-text-primary font-heading text-lg font-semibold tracking-wide">
         Insights
       </h1>
 
@@ -122,14 +122,14 @@ export default function InsightsPage() {
               </p>
               {avgDriftMinutesPerCycle === null ? (
                 <>
-                  <p className="text-circa-accent font-display text-2xl font-semibold mt-1">—</p>
+                  <p className="text-circa-accent font-heading text-2xl font-semibold mt-1">—</p>
                   <p className="text-circa-text-muted text-sm mt-1">
                     Log 2+ sleep sessions to unlock
                   </p>
                 </>
               ) : avgDriftMinutesPerCycle === 0 ? (
                 <>
-                  <p className="text-circa-success font-display text-2xl font-semibold mt-1">
+                  <p className="text-circa-success font-heading text-2xl font-semibold mt-1">
                     Stable
                   </p>
                   <p className="text-circa-text-secondary text-sm mt-1">
@@ -138,7 +138,7 @@ export default function InsightsPage() {
                 </>
               ) : avgDriftMinutesPerCycle > 0 ? (
                 <>
-                  <p className="text-circa-warning font-display text-2xl font-semibold mt-1">
+                  <p className="text-circa-warning font-heading text-2xl font-semibold mt-1">
                     +{formatHm(avgDriftMinutesPerCycle)} later
                   </p>
                   <p className="text-circa-text-secondary text-sm mt-1">
@@ -147,7 +147,7 @@ export default function InsightsPage() {
                 </>
               ) : (
                 <>
-                  <p className="text-circa-accent-light font-display text-2xl font-semibold mt-1">
+                  <p className="text-circa-accent-light font-heading text-2xl font-semibold mt-1">
                     {formatHm(avgDriftMinutesPerCycle)} earlier
                   </p>
                   <p className="text-circa-text-secondary text-sm mt-1">
@@ -188,11 +188,11 @@ export default function InsightsPage() {
                   Current Streak
                 </p>
                 {currentStreakDays === 0 ? (
-                  <p className="text-circa-accent font-display text-2xl font-semibold mt-1">
+                  <p className="text-circa-accent font-heading text-2xl font-semibold mt-1">
                     No streak yet
                   </p>
                 ) : (
-                  <p className="text-circa-accent font-display text-2xl font-semibold mt-1">
+                  <p className="text-circa-accent font-heading text-2xl font-semibold mt-1">
                     {currentStreakDays === 1 ? '1 day' : `${currentStreakDays} days`}
                     {currentStreakDays >= 7 && ' 🔥'}
                   </p>
@@ -210,7 +210,7 @@ export default function InsightsPage() {
             <div className="bg-circa-accent-subtle border border-circa-accent rounded-xl p-5">
               {freeRunningPeriod.status === 'pending' ? (
                 <>
-                  <p className="text-circa-text-secondary font-display text-2xl">Pending</p>
+                  <p className="text-circa-text-secondary font-heading text-2xl">Pending</p>
                   <p className="text-circa-text-secondary text-sm mt-1">
                     Log {Math.max(0, 14 - mainSleepCount)} more days to unlock
                   </p>
@@ -222,7 +222,7 @@ export default function InsightsPage() {
                 </>
               ) : (
                 <>
-                  <p className="text-circa-accent font-display text-3xl font-bold">
+                  <p className="text-circa-accent font-heading text-3xl font-bold">
                     {formatPeriodHours(freeRunningPeriod.periodHours)}
                   </p>
                   <p className="text-circa-text-secondary text-sm mt-1">

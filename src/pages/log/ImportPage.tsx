@@ -143,7 +143,7 @@ export default function ImportPage() {
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
-        <h1 className="font-display text-lg font-semibold text-circa-text-primary tracking-wide">
+        <h1 className="font-heading text-lg font-semibold text-circa-text-primary tracking-wide">
           Import Sleep Log
         </h1>
       </div>
@@ -465,7 +465,7 @@ export default function ImportPage() {
           <div className="fixed inset-0 z-40 bg-black/60" aria-hidden="true" />
           <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
             <div className="w-full max-w-sm rounded-2xl bg-circa-surface border border-circa-border p-6 space-y-4">
-              <h2 className="font-display text-base font-semibold text-circa-text-primary">
+              <h2 className="font-heading text-base font-semibold text-circa-text-primary">
                 Import in progress
               </h2>
               <p className="text-sm text-circa-text-secondary">

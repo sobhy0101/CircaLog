@@ -71,6 +71,13 @@
   --circa-text-muted:     #7878A0; /* Placeholders, disabled, truly secondary UI */
 }
 
+/* ── Base typography ────────────────────────────────────────────────────────
+   Tailwind's preflight applies --font-sans to body, but we set it explicitly
+   here as well so the intent is unambiguous and visible at the CSS layer.   */
+body {
+  font-family: var(--font-sans);
+}
+
 /* ── Tailwind v4 theme mapping ──────────────────────────────────────────
    @theme inline maps each circa-* variable to a Tailwind utility name.
    'inline' is required — without it Tailwind resolves var() at build
@@ -114,12 +121,13 @@
   --color-circa-text-secondary: var(--circa-text-secondary);
   --color-circa-text-muted:     var(--circa-text-muted);
 
-  /* Font family tokens — loaded via <link> in index.html.
-     font-display: swap is handled by Google Fonts (display=swap in the URL).
-     'inline' keeps these as var() references at runtime, consistent with
-     how the color tokens above are mapped. */
-  --font-family-display: "Exo 2", sans-serif;   /* headings, callouts, wordmark */
-  --font-family-body:    "Inter",  sans-serif;   /* all body text and UI copy   */
+  /* Font tokens — loaded via <link> in index.html (display=swap).
+     --font-heading overrides nothing (new name).
+     --font-sans overrides Tailwind's default sans stack with Inter,
+     which causes Tailwind's preflight to apply Inter to body automatically.
+     Utility classes generated: font-heading, font-sans.                     */
+  --font-heading: "Exo 2", sans-serif;   /* headings, callouts, wordmark */
+  --font-sans:    "Inter",  sans-serif;  /* all body text and UI copy — overrides Tailwind default */
 }
 
 

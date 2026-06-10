@@ -32,7 +32,7 @@ export default function ChartPage() {
   return (
     <div>
       <header className="px-4 pt-5 pb-2">
-        <h1 className="text-circa-text-primary font-display text-lg font-semibold tracking-wide">
+        <h1 className="text-circa-text-primary font-heading text-lg font-semibold tracking-wide">
           Chart
         </h1>
         {!isLoading && subtitle && (

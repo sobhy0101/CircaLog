@@ -98,9 +98,13 @@
 - [x] 🟢 Integrate Google Fonts — Exo 2 (variable weight) and Inter (variable):
        - Added preconnect hints to `index.html` (fonts.googleapis.com + fonts.gstatic.com)
        - Added `<link rel="stylesheet">` tags in `index.html` for both fonts (full variable axis, display=swap)
-       - Defined `--font-family-display` and `--font-family-body` tokens in `@theme inline` in `index.css`
        - Note: used `<link>` in HTML instead of CSS `@import` — parallel loading, not render-blocking
        - Weight pruning deferred to performance pass (full axis loaded until UI is designed)
+       - Token naming fix (CC_TASK_Phase1_FontTokenFix.md): original tokens `--font-family-display` /
+         `--font-family-body` were renamed to `--font-heading` / `--font-sans` to follow Tailwind v4
+         convention (`--font-{name}` → utility `font-{name}`). `--font-sans` overrides Tailwind's
+         default sans stack so Inter applies to `body` automatically via Tailwind's preflight.
+         All page files updated from `font-display` → `font-heading`.
        (Fonts decided — see `docs/CircaLog_DevPlan_QA.md` → Typography section)
 - [x] 🟢 Build dark/light mode toggle
        (useTheme hook with THEME_KEY export, ThemeToggle component with SVG icons,

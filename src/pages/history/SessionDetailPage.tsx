@@ -127,7 +127,7 @@ export default function SessionDetailPage() {
           >
             ← Back
           </button>
-          <h1 className="text-circa-text-primary font-display text-lg font-semibold tracking-wide">
+          <h1 className="text-circa-text-primary font-heading text-lg font-semibold tracking-wide">
             Edit Session
           </h1>
           {/* Spacer balances the header so the title appears centred */}
@@ -174,7 +174,7 @@ export default function SessionDetailPage() {
         >
           ← Back
         </button>
-        <h1 className="text-circa-text-primary font-display text-lg font-semibold tracking-wide">
+        <h1 className="text-circa-text-primary font-heading text-lg font-semibold tracking-wide">
           Session #{entry.cycleNumber}
         </h1>
         <button
