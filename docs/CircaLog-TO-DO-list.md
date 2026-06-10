@@ -160,6 +160,9 @@
        (ManualEntryForm in edit mode, pre-fills all fields from existing SleepEntry)
 - [x] 🟢 Delete sleep entries — confirmation dialog UX (CRUD layer already exists from above)
        (Soft delete via DeleteConfirmDialog; cycle numbers renumber automatically)
+- [x] Session Detail Page + Clickable Cards in History View (V2 candidate — not a blocker for V1, but a strong UX improvement)
+       (SessionDetailPage component; route `/log/session/:id`)
+
 
 ### 📋 History View
 

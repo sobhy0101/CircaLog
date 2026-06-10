@@ -117,6 +117,11 @@ export function useSleepLog() {
     }
   }
 
+  // Reads from the in-memory entries array — no DB call needed.
+  function getEntryById(id: string): SleepEntry | undefined {
+    return entries.find(e => e.id === id);
+  }
+
   function startSession(): void {
     const now = new Date().toISOString();
     const session: InProgressSession = { bedTimeUtc: now, startedAt: now };
@@ -139,6 +144,8 @@ export function useSleepLog() {
     updateEntry,
     softDeleteEntry,
     hardDeleteEntry,
+    // Lookup
+    getEntryById,
     // In-progress session
     inProgress,
     startSession,

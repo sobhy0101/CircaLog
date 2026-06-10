@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSleepLog } from '@/hooks/useSleepLog';
 import type { SleepEntry } from '@/lib/circadian';
-import ManualEntryForm from '@/pages/log/ManualEntryForm';
 import DeleteConfirmDialog from '@/components/ui/DeleteConfirmDialog';
 
 // ── Display helpers ─────────────────────────────────────────────────────────
@@ -57,11 +57,12 @@ function QualityDots({ quality }: { quality: number }) {
 
 interface EntryCardProps {
   entry: SleepEntry;
+  onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
+function EntryCard({ entry, onView, onEdit, onDelete }: EntryCardProps) {
   const tz = entry.ianaTimezone;
   const date = formatLocalDate(entry.sleepStartUtc, tz);
   const startTime = formatLocalTime(entry.sleepStartUtc, tz);
@@ -70,8 +71,15 @@ function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
   const typeLabel = entry.sessionType === 'nap' ? 'Nap' : 'Main Sleep';
 
   return (
-    <div className="bg-circa-surface border border-circa-border rounded-xl p-4">
-      {/* Row 1: cycle badge + type + date */}
+    <div
+      className="bg-circa-surface border border-circa-border rounded-xl p-4 cursor-pointer"
+      onClick={onView}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onView(); }}
+      aria-label={`View session #${entry.cycleNumber}`}
+    >
+      {/* Row 1: cycle badge + type + date + chevron */}
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <span className="bg-circa-accent-subtle text-circa-accent-light text-xs font-semibold px-2 py-0.5 rounded-full">
@@ -80,7 +88,25 @@ function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
           {/* secondary (not muted) — readable content, not a placeholder */}
           <span className="text-circa-text-secondary text-xs">{typeLabel}</span>
         </div>
-        <span className="text-circa-text-secondary text-xs">{date}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-circa-text-secondary text-xs">{date}</span>
+          {/* Chevron signals the card is navigable */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-circa-text-muted"
+            aria-hidden="true"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
       </div>
 
       {/* Row 2: times + duration */}
@@ -95,12 +121,12 @@ function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
         <QualityDots quality={entry.quality} />
 
         <div className="flex items-center gap-3">
-          {/* Edit button */}
+          {/* Edit button — stopPropagation prevents card navigation from firing */}
           <button
             type="button"
-            onClick={onEdit}
+            onClick={e => { e.stopPropagation(); onEdit(); }}
             aria-label="Edit session"
-            className="text-circa-accent-light text-xs font-medium min-h-[44px] px-2
+            className="text-circa-accent-light text-xs font-medium min-h-11 px-2
                        hover:text-circa-text-primary transition-colors"
           >
             Edit
@@ -109,9 +135,9 @@ function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
           {/* Delete button — secondary (not muted) so the icon is visible */}
           <button
             type="button"
-            onClick={onDelete}
+            onClick={e => { e.stopPropagation(); onDelete(); }}
             aria-label="Delete session"
-            className="text-circa-text-secondary text-xs min-h-[44px] px-2
+            className="text-circa-text-secondary text-xs min-h-11 px-2
                        hover:text-red-400 transition-colors"
           >
             {/* Trash icon */}
@@ -170,15 +196,13 @@ function EmptyState() {
 
 // ── HistoryPage ──────────────────────────────────────────────────────────────
 
-type HistoryView = 'list' | 'edit';
 type SortMode = 'newest' | 'oldest' | 'rating-asc' | 'rating-desc';
 type FilterType = 'all' | 'main' | 'nap';
 
 export default function HistoryPage() {
-  const { entries, isLoading, error, updateEntry, softDeleteEntry } = useSleepLog();
+  const navigate = useNavigate();
+  const { entries, isLoading, error, softDeleteEntry } = useSleepLog();
 
-  const [view, setView] = useState<HistoryView>('list');
-  const [editingEntry, setEditingEntry] = useState<SleepEntry | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SleepEntry | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -220,9 +244,12 @@ export default function HistoryPage() {
     setFilterQuality(0);
   }
 
+  function handleViewClick(entry: SleepEntry) {
+    navigate(`/log/history/${entry.id}`);
+  }
+
   function handleEditClick(entry: SleepEntry) {
-    setEditingEntry(entry);
-    setView('edit');
+    navigate(`/log/history/${entry.id}?edit=true`);
   }
 
   function handleDeleteClick(entry: SleepEntry) {
@@ -238,35 +265,6 @@ export default function HistoryPage() {
       setIsDeleting(false);
       setDeleteTarget(null);
     }
-  }
-
-  // ── Edit view ──────────────────────────────────────────────────────────────
-
-  if (view === 'edit' && editingEntry) {
-    return (
-      <div>
-        <header className="px-4 pt-5 pb-2 flex items-center justify-between">
-          <h1 className="text-circa-text-primary font-display text-lg font-semibold tracking-wide">
-            Edit Session
-          </h1>
-          <button
-            onClick={() => { setView('list'); setEditingEntry(null); }}
-            className="text-circa-accent-light text-sm"
-          >
-            ← Back
-          </button>
-        </header>
-
-        <ManualEntryForm
-          editEntry={editingEntry}
-          updateEntry={updateEntry}
-          onSaved={() => { setView('list'); setEditingEntry(null); }}
-          onCancel={() => { setView('list'); setEditingEntry(null); }}
-          error={error}
-          isLoading={isLoading}
-        />
-      </div>
-    );
   }
 
   // ── List view ──────────────────────────────────────────────────────────────
@@ -480,6 +478,7 @@ export default function HistoryPage() {
                 <EntryCard
                   key={entry.id}
                   entry={entry}
+                  onView={() => handleViewClick(entry)}
                   onEdit={() => handleEditClick(entry)}
                   onDelete={() => handleDeleteClick(entry)}
                 />

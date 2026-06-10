@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ComposedChart,
   XAxis,
@@ -51,7 +52,7 @@ function useChartHeight(): number {
     const handler = () => setHeight(calculate());
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return height;
 }
@@ -151,6 +152,7 @@ interface TooltipOverlayProps {
 }
 
 function TooltipOverlay({ block, cycle, onClose }: TooltipOverlayProps) {
+  const navigate  = useNavigate();
   const tz        = block.ianaTimezone;
   const startTime = formatLocalTime(block.sleepStartUtc, tz);
   const wakeTime  = formatLocalTime(block.wakeUtc, tz);
@@ -159,12 +161,15 @@ function TooltipOverlay({ block, cycle, onClose }: TooltipOverlayProps) {
   const dateStr   = cycle ? formatCalendarDate(cycle.calendarDate) : '';
 
   return (
-    <div className="fixed inset-0 z-40" onClick={onClose} aria-hidden="true">
+    // pointer-events-none on the backdrop prevents the browser from drawing a
+    // focus outline around this full-screen div when a block is clicked.
+    // pointer-events-auto is restored on the card so it remains interactive.
+    <div className="fixed inset-0 z-40 pointer-events-none" onClick={onClose} aria-hidden="true">
       <div
-        className="absolute bottom-20 left-4 right-4 bg-circa-surface border border-circa-border rounded-xl p-4 shadow-xl"
-        onClick={e => e.stopPropagation()}
-        role="dialog"
-        aria-label="Sleep session details"
+        className="absolute bottom-20 left-4 right-4 bg-circa-surface border border-circa-border rounded-xl p-4 shadow-xl pointer-events-auto cursor-pointer"
+        onClick={() => navigate(`/log/history/${block.entryId}`)}
+        role="button"
+        aria-label="View session details"
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -173,9 +178,14 @@ function TooltipOverlay({ block, cycle, onClose }: TooltipOverlayProps) {
             </span>
             <span className="text-circa-text-secondary text-xs">{dateStr}</span>
           </div>
-          <button onClick={onClose}
+          {/* stopPropagation prevents card navigation from firing when × is tapped */}
+          <button
+            onClick={e => { e.stopPropagation(); onClose(); }}
             className="text-circa-text-muted hover:text-circa-text-primary text-xl leading-none min-h-8 min-w-8 flex items-center justify-center"
-            aria-label="Close">×</button>
+            aria-label="Close"
+          >
+            ×
+          </button>
         </div>
         <p className="text-circa-text-muted text-xs mb-2">{typeLabel}</p>
         <p className="text-circa-text-primary text-sm font-medium mb-3">
@@ -183,6 +193,7 @@ function TooltipOverlay({ block, cycle, onClose }: TooltipOverlayProps) {
           <span className="text-circa-text-secondary font-normal ml-2">· {duration}</span>
         </p>
         <QualityDots quality={block.quality} />
+        <p className="text-circa-text-muted text-xs mt-3 text-right">View details →</p>
       </div>
     </div>
   );
@@ -263,8 +274,13 @@ export default function Actogram({ data, selectedRange, onRangeChange }: Actogra
     <div>
       <RangeButtons selected={selectedRange} onChange={onRangeChange} />
 
-      {/* containerRef tracks width for horizontal scroll sizing */}
-      <div ref={containerRef} style={{ overflowX: 'auto' }}>
+      {/*
+        actogram-chart-container: scoping class used by index.css to suppress
+        focus outlines on the Recharts SVG and any focusable element inside it.
+        Recharts renders an <svg> that becomes focused on click; without this,
+        the browser draws a focus ring around the entire plot area.
+      */}
+      <div ref={containerRef} className="actogram-chart-container" style={{ overflowX: 'auto' }}>
         <ComposedChart
           width={chartWidth}
           height={chartHeight}
@@ -303,24 +319,42 @@ export default function Actogram({ data, selectedRange, onRangeChange }: Actogra
           */}
           <Bar dataKey="x" opacity={0} isAnimationActive={false} />
 
-          {allBlocks.map(block => (
-            <ReferenceArea
-              key={block.entryId}
-              x1={block.cycleNumber - 0.4}
-              x2={block.cycleNumber + 0.4}
-              y1={block.startMinute}
-              y2={block.endMinute}
-              ifOverflow="visible"
-              fill="var(--circa-accent)"
-              fillOpacity={block.sessionType === 'nap' ? 0.35 : 0.85}
-              stroke={block.sessionType === 'nap' ? 'var(--circa-accent)' : 'none'}
-              strokeDasharray={block.sessionType === 'nap' ? '4 2' : undefined}
-              style={{ cursor: 'pointer' }}
-              // The click event from ReferenceArea carries Recharts internal
-              // data we don't need — we capture the block directly from closure.
-              onClick={() => setSelectedBlock(block)}
-            />
-          ))}
+          {allBlocks.map(block => {
+            const isSelected = selectedBlock?.entryId === block.entryId;
+            return (
+              <ReferenceArea
+                key={block.entryId}
+                x1={block.cycleNumber - 0.4}
+                x2={block.cycleNumber + 0.4}
+                y1={block.startMinute}
+                y2={block.endMinute}
+                ifOverflow="visible"
+                fill="var(--circa-accent)"
+                fillOpacity={block.sessionType === 'nap' ? 0.35 : 0.85}
+                // Selected block: bright white border to make it unmistakable.
+                // Unselected: preserve existing nap dashed stroke / main sleep no stroke.
+                stroke={
+                  isSelected
+                    ? 'rgba(255, 255, 255, 0.9)'
+                    : block.sessionType === 'nap'
+                      ? 'var(--circa-accent)'
+                      : 'none'
+                }
+                strokeWidth={isSelected ? 2.5 : 1}
+                strokeDasharray={
+                  isSelected
+                    ? undefined
+                    : block.sessionType === 'nap'
+                      ? '4 2'
+                      : undefined
+                }
+                style={{ cursor: 'pointer' }}
+                // The click event from ReferenceArea carries Recharts internal
+                // data we don't need — we capture the block directly from closure.
+                onClick={() => setSelectedBlock(block)}
+              />
+            );
+          })}
         </ComposedChart>
       </div>
 

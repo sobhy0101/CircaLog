@@ -121,3 +121,16 @@
   --font-family-display: "Exo 2", sans-serif;   /* headings, callouts, wordmark */
   --font-family-body:    "Inter",  sans-serif;   /* all body text and UI copy   */
 }
+
+
+/* ── Actogram chart — suppress Recharts SVG focus ring ──────────────────
+   Recharts renders a focusable <svg> element. When the user clicks any
+   ReferenceArea block inside it, the browser focuses the SVG and draws a
+   native focus ring around the entire plot area. This is purely a side
+   effect of mouse interaction — not intentional keyboard focus — so we
+   suppress it unconditionally for every element inside the chart wrapper.
+   The scoped class keeps this from accidentally affecting other SVGs.    */
+.actogram-chart-container *:focus,
+.actogram-chart-container svg {
+  outline: none !important;
+}
