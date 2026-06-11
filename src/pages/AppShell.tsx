@@ -6,13 +6,16 @@ import { Outlet } from 'react-router-dom';
 import BottomTabBar    from '@/components/layout/BottomTabBar';
 import SideDrawer      from '@/components/layout/SideDrawer';
 import Toast           from '@/components/ui/Toast';
+import ChangelogModal  from '@/components/ui/ChangelogModal';
 import { useAuth }     from '@/hooks/useAuth';
 import { useSyncStatus } from '@/hooks/useSyncStatus';
+import { useChangelog } from '@/hooks/useChangelog';
 
 export default function AppShell() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { activeToast, clearToast } = useAuth();
   const { status } = useSyncStatus();
+  const { isOpen: isChangelogOpen, entries, currentVersion, open: openChangelog, close: closeChangelog } = useChangelog();
 
   return (
     // Outer wrapper fills the viewport
@@ -107,8 +110,16 @@ export default function AppShell() {
         </div>
       )}
 
+      {/* Changelog modal — auto-opens on first load after an update (z-60) */}
+      <ChangelogModal
+        isOpen={isChangelogOpen}
+        entries={entries}
+        currentVersion={currentVersion}
+        onClose={closeChangelog}
+      />
+
       {/* Side drawer (fixed, sits above everything) */}
-      <SideDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      <SideDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} onOpenChangelog={openChangelog} />
 
       {/* Main scrollable content area — pb-16 clears the 64px tab bar */}
       <main className="flex-1 overflow-y-auto pb-16">

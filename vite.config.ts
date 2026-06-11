@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
+import { readFileSync } from 'fs'
 // https://vitejs.dev/config/
 // Vite 8 uses rolldown; Vitest 3 bundles an older rollup-based Vite.
 // Using defineConfig from 'vite' keeps correct plugin types; the cast below
@@ -101,6 +102,21 @@ export default defineConfig({
       },
     }),
   ],
+
+  define: {
+    // __APP_VERSION__ is replaced at build time with the version string from
+    // package.json. Using process.env.npm_package_version means it always
+    // matches package.json without any manual synchronisation.
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+
+    // __CHANGELOG_CONTENT__ is replaced at build time with the full text of
+    // CHANGELOG.md, read from disk. The hook (useChangelog.ts) parses this
+    // string into structured entries. Bundling it here means the changelog
+    // works fully offline — no network fetch needed at runtime.
+    __CHANGELOG_CONTENT__: JSON.stringify(
+      readFileSync(path.resolve(__dirname, 'CHANGELOG.md'), 'utf-8')
+    ),
+  },
 
   build: {
     // Raise the warning threshold to 700 kB — the main bundle sits at ~628 kB

@@ -203,7 +203,7 @@
        (Part of the core build — required for mobile readability)
 - [x] 🟡 Render actogram in dark and light themes correctly
 - [x] 🟡 Handle empty state (no data yet — prompt to log first sleep)
-- [ ] 🟢 Pinch-to-zoom (V2 candidate; basic pan is sufficient for V1)
+- [x] 🟢 Pinch-to-zoom (V2 candidate; basic pan is sufficient for V1)
 
 ### 🔐 Auth & Cloud Sync
 
@@ -282,13 +282,6 @@
         `migrateBackup()` with a chain-based `if (version < N)` pattern so future
         migrations append without restructuring the function.
         Task: `tasks/CC_TASK_Phase1_DataResilience.md`)
-- [ ] 🟢 Export & Import hub pages (consolidation — future task, not in scope above)
-       When PDF export, CSV export, and additional import types exist, consolidate into:
-       `/log/export` hub (JSON backup, CSV, PDF, Doctor Report, Verify backup) and
-       `/log/import` hub (CSV import, JSON restore, Verify import). Currently the
-       drawer has three separate entries: "Export" → ExportPage (JSON only),
-       "Import" → ImportPage (CSV only), "Restore Backup" → RestorePage (JSON only).
-       These collapse into two hub entries once there is enough content to justify them.
 - [x] 🟢 Populate `profiles` table in Supabase on first sign-in
        (Confirmed complete 11 Jun 2026 — both accounts present in Supabase:
         `sobhy0101@gmail.com` (Mahmoud Sobhy) and `circalog.app@gmail.com` (CircaLog).
@@ -297,7 +290,7 @@
 
 ### Change Log
 
-- [ ] 🟢 In-app changelog modal — show on first load after update (UX polish, not a blocker for V1 functionality)
+- [x] 🟢 In-app changelog modal — show on first load after update (UX polish, not a blocker for V1 functionality)
 
 ---
 
@@ -370,6 +363,13 @@
        - Tier B fields are never saved to IndexedDB or Supabase
        - Consider optional `localStorage` pre-fill checkbox (decide at
          build time)
+- [ ] 🟢 Export & Import hub pages (consolidation — do after PDF, CSV export, and additional import types exist)
+       Consolidate drawer entries into two hub pages:
+       `/log/export` hub (JSON backup, CSV, PDF, Doctor Report, Verify backup) and
+       `/log/import` hub (CSV import, JSON restore, Verify import). Currently the
+       drawer has three separate entries: "Export" → ExportPage (JSON only),
+       "Import" → ImportPage (CSV only), "Restore Backup" → RestorePage (JSON only).
+       These collapse into two hub entries once there is enough content to justify them.
 
 ### 🩺 Health Tracking (Optional Fields)
 

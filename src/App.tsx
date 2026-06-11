@@ -12,6 +12,7 @@ import ExportPage  from '@/pages/log/ExportPage'     // Route: /log/export
 import RestorePage from '@/pages/log/RestorePage'    // Route: /log/restore
 import InsightsPage from '@/pages/insights/InsightsPage' // Route: /log/insights
 import SessionDetailPage from '@/pages/history/SessionDetailPage' // Route: /log/history/:entryId
+import ChangelogPage from '@/pages/changelog/ChangelogPage'     // Route: /log/changelog
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="export"   element={<ExportPage />} />
         <Route path="restore"  element={<RestorePage />} />
         <Route path="insights" element={<InsightsPage />} />
+        <Route path="changelog" element={<ChangelogPage />} />
       </Route>
     </Routes>
   )

@@ -104,3 +104,4 @@ athan
 furoate
 DevPlan
 SessionDetailPage
+globals
