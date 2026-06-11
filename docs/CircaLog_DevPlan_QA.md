@@ -301,6 +301,129 @@ mechanism.
 
 ---
 
+### 🔒 Supplementary: JSON Backup Export / Restore Architecture
+
+*Decided 11 Jun 2026 — Data Resilience Phase 1. Implements the offline
+safety net before Supabase sync is available to all users.*
+
+**Why JSON backup is needed**
+
+IndexedDB can be silently evicted by the browser — during low-disk
+cleanup, when the user clears site data, or after a browser reinstall.
+For a patient tracking months or years of data, this is a real risk.
+Supabase sync is the long-term answer but requires Google Sign-In.
+JSON export/restore is the signed-out safety net that works for every
+user regardless of auth state.
+
+**Route and entry points**
+
+- `/log/export` — JSON backup download page (Side Drawer → "Export")
+- `/log/restore` — JSON backup restore page (Side Drawer → "Restore Backup")
+- Both pages are accessible without sign-in
+
+**New files created**
+
+| File | Purpose |
+|---|---|
+| `src/utils/backupSchema.ts` | `SCHEMA_VERSION = 1` constant, `CircaLogBackup` type, `migrateBackup()` function |
+| `src/hooks/useExport.ts` | React hook — reads all active IDB entries, serialises to JSON, triggers browser download |
+| `src/hooks/useRestore.ts` | React hook — 5-phase state machine for the restore flow |
+| `src/pages/log/ExportPage.tsx` | Export UI — entry count on mount, download button, success/error feedback |
+| `src/pages/log/RestorePage.tsx` | Restore UI — all 5 phases rendered |
+
+**Modified files**
+
+| File | Change |
+|---|---|
+| `src/lib/db/db.ts` | Dexie schema bumped to version 3 (no store changes; housekeeping) |
+| `src/App.tsx` | Added `/log/export` and `/log/restore` routes |
+| `src/components/layout/SideDrawer.tsx` | Existing "Export" button wired; "Restore Backup" entry added after "Import" |
+
+**Backup file format**
+
+```json
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-06-11T14:23:00.000Z",
+  "appVersion": "0.0.0",
+  "entryCount": 42,
+  "entries": [ ...SleepEntry objects... ]
+}
+```
+
+- Only **active** entries are exported — soft-deleted entries are
+  intentionally excluded (the user deleted them; restoring them would
+  be surprising and wrong).
+- Filename pattern: `circalog-backup-YYYY-MM-DD.json`. The `sv`
+  (Swedish) locale is used with `toLocaleDateString('sv')` because it
+  always produces `YYYY-MM-DD` regardless of the device's locale
+  settings — the most portable way to get ISO-style local dates.
+
+**Restore state machine**
+
+```txt
+idle → parsing → previewing → restoring → done
+                                        ↘ error (any phase)
+```
+
+- **parsing** — `file.text()` → `JSON.parse` → `migrateBackup()`
+- **previewing** — shows `entryCount`, `newCount`, `duplicateCount`
+  (duplicates matched by `id`); user chooses Merge or Replace
+- **restoring** — writes to IDB and renumbers cycle numbers
+- **done** — shows `restoredCount`; button to View sleep history
+
+**Merge vs Replace**
+
+- **Merge** — `bulkPut` only entries whose `id` is not already in IDB.
+  Existing data is untouched. `restoredCount = newCount`.
+- **Replace** — fetches all IDB entries (including soft-deleted) via
+  `db.sleepEntries.toArray()`, calls `hardDeleteEntry(id, null)` for
+  each (Supabase step skipped when user is null), then `bulkPut` all
+  backup entries. `restoredCount = backup.entries.length`.
+
+Both modes end with a full `assignCycleNumber` pass over all IDB
+entries to ensure cycle numbers are correct after the mutation.
+
+**Why `bulkPut` instead of `createEntry`**
+
+`createEntry` generates a new `crypto.randomUUID()` for each entry,
+which would lose the original `id` values. Preserving ids is essential
+for duplicate detection on future restores and for Supabase sync
+correctness (the server uses `id` as the primary key). Direct
+`db.sleepEntries.bulkPut()` is the correct tool here.
+
+**Schema migration handler**
+
+`migrateBackup(raw: unknown): CircaLogBackup` in `backupSchema.ts`:
+
+- Validates the basic shape (object, `schemaVersion` number, `entries`
+  array) and throws descriptive errors on invalid input.
+- If `schemaVersion > SCHEMA_VERSION`, throws — user must update the
+  app before restoring a newer backup.
+- If `schemaVersion === SCHEMA_VERSION`, returns the backup with
+  `entryCount` patched to `entries.length` (trust the array, not the
+  stored count).
+- If `schemaVersion < SCHEMA_VERSION`, runs a chain of `if (version < N)`
+  blocks to patch the data forward. Currently empty — `SCHEMA_VERSION`
+  starts at 1, so no prior version exists. Future migrations are appended
+  as new `if` blocks without restructuring the function.
+
+**Two-version-counter design**
+
+The Dexie version number and `SCHEMA_VERSION` are separate counters that
+track different things:
+
+- **Dexie version** — IndexedDB store structure changes (indexes,
+  stores added/removed). Consumers: Dexie's migration engine.
+- **SCHEMA_VERSION** — the shape of `SleepEntry` in backup files
+  (field renames, type changes, removals). Consumers: `migrateBackup()`.
+
+They will diverge over time. Increment `SCHEMA_VERSION` only when a
+**breaking** change is made to `SleepEntry` (renames, removals, type
+changes). Additive changes (new optional fields) do not require a bump.
+
+---
+
 **Q15. How should "days" be defined in the app, given Non-24 has no fixed day?**
 
 - A) Use calendar dates (standard clock days)

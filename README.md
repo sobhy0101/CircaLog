@@ -64,11 +64,15 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Warn-before-leave: navigating away mid-import shows a confirmation
   dialog; any sessions already processed are kept
 
-### 📤 Export & Reports
-- Weekly and monthly health summaries
-- Export as CSV and PDF
-- In-app changelog with version history
-- Subtle logging streak counter for motivation
+### 📤 Backup & Export
+- Export all sleep sessions as a JSON backup file (`circalog-backup-YYYY-MM-DD.json`)
+- Restore from a JSON backup — preview session counts (new vs. already present)
+  before confirming
+- **Merge mode** — adds only new sessions, keeps existing data intact
+- **Replace mode** — wipes all current sessions and restores the full backup
+- Schema migration handler: backups from older app versions are automatically
+  upgraded to the current format before restore, so data is always safe to use
+- Full reports (PDF/CSV, weekly/monthly summaries, doctor report) — V2
 
 ### 🎨 Design
 - Dark mode by default, user-selectable light/dark toggle
@@ -112,6 +116,8 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 | `circalog.app`         | Landing page / coming soon (V1) → marketing page (V2+) |
 | `circalog.app/log`     | The PWA app — permanent, never changes               |
 | `circalog.app/log/import` | CSV import page                                   |
+| `circalog.app/log/export` | JSON backup export page                           |
+| `circalog.app/log/restore` | JSON backup restore page                         |
 
 ---
 
@@ -126,6 +132,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Local IndexedDB storage
 - Optional Google Sign-In with cloud sync to Supabase
 - CSV import from CircaLog Daily Tracker spreadsheet
+- JSON backup export and restore with schema migration handler
 - Coming soon landing page at root domain
 - Continuous Vercel deployment from GitHub
 

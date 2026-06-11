@@ -17,7 +17,7 @@ CircaLog is an open-source, offline-first Progressive Web App (PWA) for people l
 - Framework: React + Vite
 - Styling: TailwindCSS
 - Charts: Recharts
-- Local Storage: IndexedDB
+- Local Storage: IndexedDB via Dexie (currently v3)
 - Cloud DB: Supabase (PostgreSQL)
 - Auth: Google Sign-In (optional)
 - Hosting: Vercel
@@ -30,21 +30,25 @@ Local-first: fully functional offline (IndexedDB), optional Google Sign-In to sy
 ## Key URLs
 - `circalog.app` — landing page (V1 coming soon, V2+ marketing)
 - `circalog.app/log` — the PWA app (permanent URL)
+- `circalog.app/log/import` — CSV import
+- `circalog.app/log/export` — JSON backup export
+- `circalog.app/log/restore` — JSON backup restore
 
-## V1 Build Status (as of 07 Jun 2026)
+## V1 Build Status (as of 11 Jun 2026)
 
 **Completed:**
 - Phase 0 — Project setup, Vercel/Supabase/PWA config
 - Phase 0.5 — Full circadian engine (normalizeSleepSpan, detectSessionType, assignCycleNumber, calculateDrift, estimateFreeRunningPeriod, groupEntriesByCycle, detectFragmentation, calculateRollingAverages) + Vitest suite
 - Sleep log UI — timer flow, manual entry, back-fill, edit, soft-delete
-- History view — sortable, filterable entry list
+- History view — sortable, filterable entry list; Session Detail page (`/log/history/:entryId`)
 - **Actogram chart** — Recharts ComposedChart with inverted Y axis (00:00 at top), one ReferenceArea per sleep block, dynamic yMax, time range toggle (1W / 2W / 1M / 3M / 6M / 1Y / All), custom tooltip overlay, horizontal scroll, dark/light theme support
 - **Auth (moved into V1 for data resilience)** — optional Google Sign-In via Supabase OAuth, `useAuth` hook, `GoogleSignInButton`, `UserAvatar`, auth zone in SideDrawer, toast notifications for sign-in/sign-out/errors. See [[project-auth-system]].
+- **CSV import** — imports from CircaLog Daily Tracker spreadsheet; preview table; gate checks (online + Supabase + signed-in); duplicate skip; interruption mapping; return-path after OAuth redirect
+- **Data Resilience (Phase 1)** — JSON backup export (`/log/export`), JSON restore with Merge/Replace modes (`/log/restore`), `migrateBackup()` schema migration handler (`SCHEMA_VERSION = 1`), Dexie schema at v3
+- **Insights view** — drift rate, rolling averages (7-day / 30-day), free-running period estimate (pending until 14+ entries), longest/shortest sessions, total sessions, streak
 
 **Remaining in V1:**
-- Supabase sync service: IndexedDB → Supabase on connect (next task — blocked CSV import)
-- CSV import from CircaLog Daily Tracker spreadsheet
-- Insights view (drift rate, rolling averages, free-running period estimate)
+- Supabase sync service: IndexedDB → Supabase on connect
 - PWA icon/manifest verification + Android splash screen
 
 **V2** adds: push notifications, PDF/CSV reports, doctor report, medication log, Android widget.
@@ -55,3 +59,8 @@ Dark mode default, light/dark toggle. "Clinical + cosmic" aesthetic — dark cha
 
 ## Recharts gotcha (actogram)
 Custom XAxis ticks that need extra props (e.g. a lookup map) must use a factory function pattern — `makeXTick(lookup)` returns a closure whose prop type contains only Recharts-native fields. Passing extra required props directly on the tick component type causes a TS contravariance error against `TickProp<XAxisTickContentProps>`.
+
+## Backup schema design notes
+- `SCHEMA_VERSION` (in `src/utils/backupSchema.ts`) and Dexie version are separate counters. Dexie version = IDB store structure. SCHEMA_VERSION = SleepEntry shape in backup files.
+- Increment SCHEMA_VERSION only on breaking SleepEntry changes (renames, removals). Additive changes (new optional fields) do not require a bump.
+- `bulkPut` is used directly in restore (not `createEntry`) to preserve original `id` values — essential for duplicate detection and Supabase sync correctness.
