@@ -8,6 +8,8 @@ import LogPage     from '@/pages/log/LogPage'        // Route: /log (index child
 import HistoryPage from '@/pages/history/HistoryPage' // Route: /log/history
 import ChartPage   from '@/pages/chart/ChartPage'    // Route: /log/chart
 import ImportPage  from '@/pages/log/ImportPage'     // Route: /log/import
+import ExportPage  from '@/pages/log/ExportPage'     // Route: /log/export
+import RestorePage from '@/pages/log/RestorePage'    // Route: /log/restore
 import InsightsPage from '@/pages/insights/InsightsPage' // Route: /log/insights
 import SessionDetailPage from '@/pages/history/SessionDetailPage' // Route: /log/history/:entryId
 
@@ -23,7 +25,9 @@ export default function App() {
         <Route path="history" element={<HistoryPage />} />
         <Route path="history/:entryId" element={<SessionDetailPage />} />
         <Route path="chart" element={<ChartPage />} />
-        <Route path="import" element={<ImportPage />} />
+        <Route path="import"   element={<ImportPage />} />
+        <Route path="export"   element={<ExportPage />} />
+        <Route path="restore"  element={<RestorePage />} />
         <Route path="insights" element={<InsightsPage />} />
       </Route>
     </Routes>

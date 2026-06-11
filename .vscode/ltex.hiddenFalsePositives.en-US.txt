@@ -38,3 +38,6 @@
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q6\n02-06-2026 15:48 15:50 17:05 0h 2m 1h 15m 1h 17m Nap 1 No N/A N/A   7\n03-06-2026 00:20 03:14 08:18 2h 54m 5h 4m 7h 58m Main Sleep 1 Yes Multiple what IFs nightmares about what might happen to my wife's journey to Egypt.\\E$"}
 {"rule":"ENGLISH_WORD_REPEAT_BEGINNING_RULE","sentence":"^\\QDo not change any dependencies in \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q.\\E$"}
 {"rule":"ENGLISH_WORD_REPEAT_BEGINNING_RULE","sentence":"^\\QDo not modify any source files in \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q.\\E$"}
+{"rule":"EN_A_VS_AN","sentence":"^\\QExpose a \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q state: \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q and an \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q so the UI can reflect what is happening.\\E$"}
+{"rule":"SIGN_IN_HYPHEN","sentence":"^\\QSupabase sync is the long-term answer, but it requires sign-in.\\E$"}
+{"rule":"ID_CASING","sentence":"^\\QCurrent columns: id, email, full_name, created_at, updated_at.\\E$"}

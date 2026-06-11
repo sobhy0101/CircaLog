@@ -103,3 +103,4 @@ dohr
 athan
 furoate
 DevPlan
+SessionDetailPage

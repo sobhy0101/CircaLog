@@ -165,8 +165,7 @@
 - [x] 🟢 Delete sleep entries — confirmation dialog UX (CRUD layer already exists from above)
        (Soft delete via DeleteConfirmDialog; cycle numbers renumber automatically)
 - [x] Session Detail Page + Clickable Cards in History View (V2 candidate — not a blocker for V1, but a strong UX improvement)
-       (SessionDetailPage component; route `/log/session/:id`)
-
+       (SessionDetailPage component; route `/log/history/:entryId`)
 
 ### 📋 History View
 
@@ -272,12 +271,29 @@
 > the safety net before cloud sync arrives in V2 — for a tool tracking
 > months or years of personal health data, this is not optional.
 
-- [ ] 🔴 Export all data as JSON (manual backup)
-- [ ] 🔴 Import JSON backup (manual restore, with merge-vs-replace prompt)
-- [ ] 🟡 Schema migration handler (for when the engine model evolves)
-- [ ] 🟢 Populate `profiles` table in Supabase on first sign-in
-       (Currently empty — no trigger fires on Google OAuth sign-in.
-        Needed for Doctor Report PDF (display name, email). Defer until that task.)
+- [x] 🔴 Export all data as JSON (manual backup)
+       (`src/pages/log/ExportPage.tsx` at route `/log/export`. Drawer "Export"
+        button wired to this route. Task: `tasks/CC_TASK_Phase1_DataResilience.md`)
+- [x] 🔴 Restore from JSON backup (merge-vs-replace prompt, preview counts)
+       (`src/pages/log/RestorePage.tsx` at route `/log/restore`. New "Restore Backup"
+        drawer entry added. Task: `tasks/CC_TASK_Phase1_DataResilience.md`)
+- [x] 🟡 Schema migration handler (for when the engine model evolves)
+       (`src/utils/backupSchema.ts` — `SCHEMA_VERSION = 1` constant +
+        `migrateBackup()` with a chain-based `if (version < N)` pattern so future
+        migrations append without restructuring the function.
+        Task: `tasks/CC_TASK_Phase1_DataResilience.md`)
+- [ ] 🟢 Export & Import hub pages (consolidation — future task, not in scope above)
+       When PDF export, CSV export, and additional import types exist, consolidate into:
+       `/log/export` hub (JSON backup, CSV, PDF, Doctor Report, Verify backup) and
+       `/log/import` hub (CSV import, JSON restore, Verify import). Currently the
+       drawer has three separate entries: "Export" → ExportPage (JSON only),
+       "Import" → ImportPage (CSV only), "Restore Backup" → RestorePage (JSON only).
+       These collapse into two hub entries once there is enough content to justify them.
+- [x] 🟢 Populate `profiles` table in Supabase on first sign-in
+       (Confirmed complete 11 Jun 2026 — both accounts present in Supabase:
+        `sobhy0101@gmail.com` (Mahmoud Sobhy) and `circalog.app@gmail.com` (CircaLog).
+        Current columns: id, email, full_name, created_at, updated_at.
+        Schema extension for Doctor Report deferred — see V2 Reports & Export below.)
 
 ### Change Log
 
@@ -298,12 +314,62 @@
 
 ### 📤 Reports & Export
 
+> **Architecture decisions — decided 11 Jun 2026:**
+>
+> **Patient data split (privacy-first):**
+> The `profiles` table currently stores only `full_name` and `email`.
+> Additional patient details needed for the Doctor Report are split into
+> two tiers to avoid GDPR / data minimization risk:
+>
+> **Tier A — stored in `profiles` (low-risk, already there):**
+> - `full_name` ✅
+> - `email` ✅
+>
+> **Tier B — entered in the PDF export dialog only, never persisted to
+> IndexedDB or Supabase (ephemeral collection):**
+> - Date of birth
+> - Phone number (some clinics require it to link records)
+> - Treating doctor's name
+> - Diagnosis / condition label (e.g. "Non-24-Hour Sleep-Wake Disorder")
+> - Report notes (free-text context the patient wants the doctor to see)
+>
+> Rationale: date of birth, phone number, and health conditions are
+> "special category" personal data under GDPR. Ephemeral collection
+> (data lives only in browser memory during PDF generation, never written
+> to any database) avoids the compliance obligations of storing them:
+> no right-to-erasure workflow, no Data Protection Officer threshold risk,
+> no breach surface. The user types these fields once per export.
+>
+> **Optional middle path (decide at build time, not now):**
+> A `localStorage`-backed "remember these details" checkbox could let the
+> user opt in to having Tier B fields pre-filled on their device only —
+> never synced to Supabase. This is acceptable under GDPR because data
+> that never leaves the user's own device is not processed by Anthropic
+> or by the CircaLog backend. Decide this when building the export dialog.
+>
+> **`profiles` schema extension:**
+> No `profiles` columns need to be added for V2. Tier B fields are
+> entered at export time. If the optional localStorage pre-fill is
+> implemented, those values live in the browser only and never touch
+> Supabase. The `profiles` table requires no migration for Doctor Report.
+
 - [ ] Weekly sleep summary (auto-generated)
 - [ ] Monthly sleep summary
 - [ ] Export as CSV (all fields)
 - [ ] Export as PDF (formatted health report)
-- [ ] Doctor report: one-tap PDF including actogram chart,
-       free-running period, average cycle length, drift rate
+- [ ] Doctor report: one-tap PDF
+       - Actogram chart (rendered to canvas, embedded in PDF)
+       - Free-running period (or "Pending" if < 14 days of data)
+       - Average cycle length and drift rate
+       - Medication compliance summary (once V2 medication log exists)
+       - Caffeine intake summary (once V2 drinks log exists)
+       - **Export dialog collects Tier B patient details (see above):**
+         date of birth, phone number, treating doctor's name,
+         diagnosis/condition label, free-text report notes
+       - All Tier B fields are optional — report generates without them
+       - Tier B fields are never saved to IndexedDB or Supabase
+       - Consider optional `localStorage` pre-fill checkbox (decide at
+         build time)
 
 ### 🩺 Health Tracking (Optional Fields)
 

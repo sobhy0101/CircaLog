@@ -178,7 +178,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             </button>
 
             {/* Export */}
-            <button className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
+            <button
+              onClick={() => { navigate('/log/export'); onClose(); }}
+              className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
@@ -200,6 +202,20 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
               Import
+            </button>
+
+            {/* Restore Backup */}
+            <button
+              onClick={() => { navigate('/log/restore'); onClose(); }}
+              className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 .49-4.5" />
+              </svg>
+              Restore Backup
             </button>
 
             {/* About */}

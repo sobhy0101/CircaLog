@@ -21,6 +21,16 @@ class CircaLogDB extends Dexie {
       sleepEntries: '&id, sleepStartUtc, cycleNumber, sessionType, isDeleted, wakeUtc',
       syncQueue:    '&id, queuedAt',
     })
+
+    // Version 3 — no store structure changes.
+    // Note: the Dexie version number and the app's SCHEMA_VERSION constant
+    // (src/utils/backupSchema.ts) are separate counters that track different
+    // things. Dexie version = IndexedDB store structure changes. SCHEMA_VERSION
+    // = the shape of SleepEntry in backup files. They will diverge over time.
+    this.version(3).stores({
+      sleepEntries: '&id, sleepStartUtc, cycleNumber, sessionType, isDeleted, wakeUtc',
+      syncQueue:    '&id, queuedAt',
+    })
   }
 }
 
