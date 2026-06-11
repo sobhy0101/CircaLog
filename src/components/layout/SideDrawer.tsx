@@ -7,8 +7,7 @@
 //   Footer       — Dark mode toggle
 //
 // Backdrop closes the drawer when tapped; rendered before the panel so panel sits on top.
-// All nav links are placeholder <button> elements — routes don't exist yet in V1.
-// TODO: replace all <button> nav items with <Link> once routes are wired in a future batch.
+// Nav links use navigate() + onClose() so the drawer closes when the user taps a destination.
 
 import ThemeToggle        from '@/components/ui/ThemeToggle';
 import GoogleSignInButton  from '@/components/ui/GoogleSignInButton';
@@ -116,7 +115,9 @@ export default function SideDrawer({ isOpen, onClose, onOpenChangelog }: SideDra
             </p>
 
             {/* Log */}
-            <button className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
+            <button
+              onClick={() => { navigate('/log'); onClose(); }}
+              className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -125,7 +126,9 @@ export default function SideDrawer({ isOpen, onClose, onOpenChangelog }: SideDra
             </button>
 
             {/* Chart */}
-            <button className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
+            <button
+              onClick={() => { navigate('/log/chart'); onClose(); }}
+              className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3"  y="12" width="4" height="10" rx="1" />
                 <rect x="10" y="7"  width="4" height="15" rx="1" />
@@ -135,7 +138,9 @@ export default function SideDrawer({ isOpen, onClose, onOpenChangelog }: SideDra
             </button>
 
             {/* History */}
-            <button className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
+            <button
+              onClick={() => { navigate('/log/history'); onClose(); }}
+              className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" />
                 <polyline points="12 7 12 12 15 15" />
@@ -144,7 +149,9 @@ export default function SideDrawer({ isOpen, onClose, onOpenChangelog }: SideDra
             </button>
 
             {/* Insights */}
-            <button className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
+            <button
+              onClick={() => { navigate('/log/insights'); onClose(); }}
+              className="flex items-center gap-3 w-full text-left px-6 py-3 text-sm text-circa-text-primary hover:bg-circa-accent-subtle transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M12 2 L13.5 10.5 L22 12 L13.5 13.5 L12 22 L10.5 13.5 L2 12 L10.5 10.5 Z" />
               </svg>
