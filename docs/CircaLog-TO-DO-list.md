@@ -291,6 +291,7 @@
 ### Change Log
 
 - [x] 🟢 In-app changelog modal — show on first load after update (UX polish, not a blocker for V1 functionality)
+- [x] 🟢 GitHub Release — add a release on GitHub marking the latest version 0.1.0
 
 ---
 
