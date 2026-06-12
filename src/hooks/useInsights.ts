@@ -50,9 +50,10 @@ function calculateStreak(active: SleepEntry[]): number {
 export interface InsightsData {
   isLoading: boolean;
 
-  // Rolling averages — null when no entries fall in the window
-  avg7d: { durationMinutes: number; quality: number } | null;
-  avg30d: { durationMinutes: number; quality: number } | null;
+  // Rolling averages — null when no entries fall in the window.
+  // entryCount tells the UI how many sessions the average is based on.
+  avg7d: { durationMinutes: number; quality: number; entryCount: number } | null;
+  avg30d: { durationMinutes: number; quality: number; entryCount: number } | null;
 
   // Drift — null when fewer than 2 main-sleep sessions
   avgDriftMinutesPerCycle: number | null;
@@ -63,15 +64,19 @@ export interface InsightsData {
 
   // Counts
   totalSessions: number;
+  mainSleepCount: number;
+  napCount: number;
+
+  // Number of days spanned from earliest to latest active entry.
+  // Used by the 30-Day Avg card to show a contextual note when the
+  // dataset covers fewer than 30 days.
+  dataSpanDays: number;
 
   // Streak — consecutive calendar days with at least one logged session
   currentStreakDays: number;
 
   // Free-running period — passed through from estimateFreeRunningPeriod()
   freeRunningPeriod: FreeRunningPeriodResult;
-
-  // Needed by the component to display "Log N more days to unlock" in pending state
-  mainSleepCount: number;
 }
 
 export function useInsights(): InsightsData {
@@ -103,12 +108,12 @@ export function useInsights(): InsightsData {
 
   const raw7d = calculateRollingAverages(entries, 7);
   const avg7d = raw7d.entryCount > 0
-    ? { durationMinutes: raw7d.avgDurationMinutes, quality: raw7d.avgQuality }
+    ? { durationMinutes: raw7d.avgDurationMinutes, quality: raw7d.avgQuality, entryCount: raw7d.entryCount }
     : null;
 
   const raw30d = calculateRollingAverages(entries, 30);
   const avg30d = raw30d.entryCount > 0
-    ? { durationMinutes: raw30d.avgDurationMinutes, quality: raw30d.avgQuality }
+    ? { durationMinutes: raw30d.avgDurationMinutes, quality: raw30d.avgQuality, entryCount: raw30d.entryCount }
     : null;
 
   // ── Drift ─────────────────────────────────────────────────────────────────
@@ -137,10 +142,26 @@ export function useInsights(): InsightsData {
     }
   }
 
+  // ── Session type counts ────────────────────────────────────────────────────
+
+  const mainSleepCount = active.filter(e => e.sessionType === 'main').length;
+  const napCount = active.filter(e => e.sessionType === 'nap').length;
+
+  // ── Data span ─────────────────────────────────────────────────────────────
+  // Days from the earliest to the latest active entry.
+  // Requires at least 2 entries; returns 0 for 0 or 1 entries.
+
+  let dataSpanDays = 0;
+  if (active.length >= 2) {
+    const times = active.map(e => new Date(e.sleepStartUtc).getTime());
+    const earliestMs = Math.min(...times);
+    const latestMs = Math.max(...times);
+    dataSpanDays = Math.floor((latestMs - earliestMs) / (1000 * 60 * 60 * 24));
+  }
+
   // ── Free-running period ────────────────────────────────────────────────────
 
   const freeRunningPeriod = estimateFreeRunningPeriod(entries);
-  const mainSleepCount = active.filter(e => e.sessionType === 'main').length;
 
   return {
     isLoading,
@@ -150,8 +171,10 @@ export function useInsights(): InsightsData {
     longestSession,
     shortestSession,
     totalSessions: active.length,
+    mainSleepCount,
+    napCount,
+    dataSpanDays,
     currentStreakDays: calculateStreak(active),
     freeRunningPeriod,
-    mainSleepCount,
   };
 }

@@ -70,11 +70,22 @@ export default function InsightsPage() {
     avgDriftMinutesPerCycle,
     longestSession,
     shortestSession,
-    totalSessions,
+    mainSleepCount,
+    napCount,
+    dataSpanDays,
     currentStreakDays,
     freeRunningPeriod,
-    mainSleepCount,
   } = useInsights();
+
+  // Sub-value for the 30-Day Avg card.
+  // When the dataset spans fewer than 30 days, the label is accurate but
+  // the context would be misleading without a note. Show how many days are
+  // actually covered so the number can be interpreted correctly.
+  const avg30dSubValue = avg30d
+    ? (dataSpanDays < 30
+        ? `Based on ${dataSpanDays}d of data · ${avg30d.entryCount} sessions`
+        : `★ ${avg30d.quality.toFixed(1)} · ${avg30d.entryCount} sessions`)
+    : undefined;
 
   return (
     <div className="px-4 pt-6 pb-4 flex flex-col gap-6">
@@ -103,12 +114,14 @@ export default function InsightsPage() {
               <StatCard
                 label="7-Day Avg"
                 value={avg7d ? formatHm(avg7d.durationMinutes) : '—'}
-                subValue={avg7d ? `★ ${avg7d.quality.toFixed(1)}` : undefined}
+                subValue={avg7d
+                  ? `★ ${avg7d.quality.toFixed(1)} · ${avg7d.entryCount} sessions`
+                  : undefined}
               />
               <StatCard
                 label="30-Day Avg"
                 value={avg30d ? formatHm(avg30d.durationMinutes) : '—'}
-                subValue={avg30d ? `★ ${avg30d.quality.toFixed(1)}` : undefined}
+                subValue={avg30dSubValue}
               />
             </div>
           </section>
@@ -175,32 +188,42 @@ export default function InsightsPage() {
             </div>
           </section>
 
-          {/* ── Section D: Totals & Streak ────────────────────────────────── */}
+          {/* ── Section D: Activity ───────────────────────────────────────── */}
           <section>
             <SectionHeading>Activity</SectionHeading>
+
+            {/* Row 1: Main sleep and nap counts side by side */}
             <div className="grid grid-cols-2 gap-3">
               <StatCard
-                label="Sessions Logged"
-                value={String(totalSessions)}
+                label="Main Sessions"
+                value={String(mainSleepCount)}
+                subValue="3h or longer"
               />
-              <div className="bg-circa-surface rounded-xl p-4 border border-circa-border">
-                <p className="text-circa-text-muted text-xs uppercase tracking-wide">
-                  Current Streak
+              <StatCard
+                label="Nap Sessions"
+                value={String(napCount)}
+                subValue="Under 3 hours"
+              />
+            </div>
+
+            {/* Row 2: Current Streak — full width */}
+            <div className="mt-3 bg-circa-surface rounded-xl p-4 border border-circa-border">
+              <p className="text-circa-text-muted text-xs uppercase tracking-wide">
+                Current Streak
+              </p>
+              {currentStreakDays === 0 ? (
+                <p className="text-circa-accent font-heading text-2xl font-semibold mt-1">
+                  No streak yet
                 </p>
-                {currentStreakDays === 0 ? (
-                  <p className="text-circa-accent font-heading text-2xl font-semibold mt-1">
-                    No streak yet
-                  </p>
-                ) : (
-                  <p className="text-circa-accent font-heading text-2xl font-semibold mt-1">
-                    {currentStreakDays === 1 ? '1 day' : `${currentStreakDays} days`}
-                    {currentStreakDays >= 7 && ' 🔥'}
-                  </p>
-                )}
-                <p className="text-circa-text-secondary text-sm mt-1">
-                  Consecutive days logged
+              ) : (
+                <p className="text-circa-accent font-heading text-2xl font-semibold mt-1">
+                  {currentStreakDays === 1 ? '1 day' : `${currentStreakDays} days`}
+                  {currentStreakDays >= 7 && ' 🔥'}
                 </p>
-              </div>
+              )}
+              <p className="text-circa-text-secondary text-sm mt-1">
+                Consecutive days logged
+              </p>
             </div>
           </section>
 
@@ -212,7 +235,7 @@ export default function InsightsPage() {
                 <>
                   <p className="text-circa-text-secondary font-heading text-2xl">Pending</p>
                   <p className="text-circa-text-secondary text-sm mt-1">
-                    Log {Math.max(0, 14 - mainSleepCount)} more days to unlock
+                    Log {Math.max(0, 14 - mainSleepCount)} more main sessions to unlock
                   </p>
                   <p className="text-circa-text-muted text-sm mt-3">
                     Your free-running period (τ) is an estimate of how long your circadian
