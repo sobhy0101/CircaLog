@@ -32,7 +32,7 @@ import type { User } from '@supabase/supabase-js'
 //   1. Set SYNC_ENABLED = true here.
 //   2. Commit and push.
 // ---------------------------------------------------------------------------
-const SYNC_ENABLED = false
+const SYNC_ENABLED = true
 
 // ---------------------------------------------------------------------------
 // Sync state — readable by useSyncStatus via the getters below

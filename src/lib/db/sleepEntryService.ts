@@ -48,9 +48,10 @@ async function reassignAndPersist(): Promise<void> {
  */
 export async function createEntry(
   draft: Omit<SleepEntry, 'id' | 'cycleNumber' | 'sessionType' | 'createdAt' | 'updatedAt' | 'isDeleted'>,
-  user: User | null = null
+  user: User | null = null,
+  overrideId?: string          // NEW — omit to get a random UUID as before
 ): Promise<SleepEntry> {
-  const id = crypto.randomUUID()
+  const id = overrideId ?? crypto.randomUUID()
   const now = new Date().toISOString()
 
   const entry: SleepEntry = {

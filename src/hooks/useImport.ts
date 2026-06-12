@@ -12,6 +12,7 @@ import Papa from 'papaparse'
 import { parseCsvRows } from '@/utils/csvParser'
 import type { ParsedRow } from '@/utils/csvParser'
 import { createEntry } from '@/lib/db/sleepEntryService'
+import { deriveEntryId } from '@/lib/db/deriveEntryId'
 import { flushQueue, checkSupabaseReachable } from '@/lib/supabase/syncService'
 import { db } from '@/lib/db/db'
 import type { User } from '@supabase/supabase-js'
@@ -164,17 +165,21 @@ export function useImport(user: User | null) {
     for (let i = 0; i < okRows.length; i++) {
       const row = okRows[i]
 
-      // Duplicate detection: skip if sleepStartUtc already exists in IDB.
-      const existing = await db.sleepEntries
-        .where('sleepStartUtc')
-        .equals(row.draft.sleepStartUtc)
-        .count()
+      // Derive the deterministic id for this session.
+      // user is always non-null here — the gate check enforces signedIn before
+      // the import loop is ever reached.
+      const entryId = await deriveEntryId(user!.id, row.draft.sleepStartUtc)
 
-      if (existing > 0) {
+      // Duplicate check: a direct primary-key lookup is cheaper than an index
+      // scan, and with deterministic ids it is exactly equivalent to checking
+      // sleepStartUtc for the same user. Skip regardless of isDeleted status —
+      // if the user previously deleted this entry, respect that decision.
+      const existing = await db.sleepEntries.get(entryId)
+
+      if (existing) {
         skipped++
       } else {
-        // createEntry handles IDB write, cycle reassignment, and Supabase push.
-        await createEntry(row.draft, user)
+        await createEntry(row.draft, user, entryId)
         imported++
       }
 
