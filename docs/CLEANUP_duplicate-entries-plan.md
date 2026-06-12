@@ -42,8 +42,8 @@ When `false`, `syncOnConnect`, `syncAfterMutation`, `flushQueue`, and
 | 7 | CC executes the deterministic UUID task. CC writes session report, Mahmoud confirms, CC commits. `SYNC_ENABLED` is set to `true` as the final step of this task. | CC + Mahmoud | ✅ Done |
 | 8 | Wait for Vercel deployment (~2 min), then sign in on **Vercel production only**. `syncOnConnect` fires: IDB = 0, Supabase = 0 → nothing syncs. Confirm History still shows empty. | Mahmoud | ✅ Done |
 | 9 | Export the sleep log from Excel to CSV using the export prompt in `docs/CircaLog-Daily-Tracker-Spreadsheet.md`. | Mahmoud | ✅ Done |
-| 10 | Import the CSV in the app (Import page). Verify the preview table shows the expected row count with no errors before confirming. | Mahmoud | ⬜ Pending |
-| 11 | Final verification: History entry count matches the CSV row count. Claude.ai confirms Supabase row count matches. Cycle numbers are sequential and correct. | Mahmoud + Claude.ai | ⬜ Pending |
+| 10 | Import the CSV in the app (Import page). Verify the preview table shows the expected row count with no errors before confirming. | Mahmoud | ✅ Done |
+| 11 | Final verification: History entry count matches the CSV row count. Claude.ai confirms Supabase row count matches. Cycle numbers are sequential and correct. | Mahmoud + Claude.ai | ✅ Done |
 
 ---
 
