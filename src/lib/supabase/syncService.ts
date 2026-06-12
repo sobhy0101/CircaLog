@@ -18,6 +18,23 @@ import type { SleepEntry, SyncQueueEntry } from '@/lib/circadian'
 import type { User } from '@supabase/supabase-js'
 
 // ---------------------------------------------------------------------------
+// SYNC KILL SWITCH
+//
+// Set to false before running the duplicate-entry cleanup procedure so that
+// no IDB data can reach Supabase while environments are being wiped.
+//
+// To disable sync:
+//   1. Set SYNC_ENABLED = false here.
+//   2. Commit and push — Vercel auto-deploys.
+//   3. Proceed with the cleanup steps in docs/CLEANUP_duplicate-entries-plan.md
+//
+// To re-enable:
+//   1. Set SYNC_ENABLED = true here.
+//   2. Commit and push.
+// ---------------------------------------------------------------------------
+const SYNC_ENABLED = false
+
+// ---------------------------------------------------------------------------
 // Sync state — readable by useSyncStatus via the getters below
 // ---------------------------------------------------------------------------
 
@@ -141,6 +158,7 @@ async function dequeue(id: string): Promise<void> {
  */
 async function pushEntry(entry: SleepEntry, userId: string): Promise<void> {
   if (!supabase) return
+  if (!SYNC_ENABLED) return
   // Do not attempt a network push while offline. The entry is already
   // in the sync queue (or will be added by the caller) — it will be
   // retried when connectivity is restored.
@@ -175,6 +193,7 @@ async function pushEntry(entry: SleepEntry, userId: string): Promise<void> {
  */
 export async function syncAfterMutation(entry: SleepEntry, user: User | null): Promise<void> {
   if (!supabase || !user) return
+  if (!SYNC_ENABLED) return
   await pushEntry(entry, user.id)
 }
 
@@ -193,6 +212,7 @@ export async function syncAfterMutation(entry: SleepEntry, user: User | null): P
  */
 export async function syncOnConnect(user: User): Promise<void> {
   if (!supabase) return
+  if (!SYNC_ENABLED) return
 
   _isSyncing = true
   try {
@@ -279,6 +299,7 @@ export async function syncOnConnect(user: User): Promise<void> {
  */
 export async function flushQueue(user: User): Promise<void> {
   if (!supabase) return
+  if (!SYNC_ENABLED) return
 
   const queued = await db.syncQueue.toArray()
   if (queued.length === 0) return
