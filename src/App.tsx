@@ -13,6 +13,11 @@ import RestorePage from '@/pages/log/RestorePage'    // Route: /log/restore
 import InsightsPage from '@/pages/insights/InsightsPage' // Route: /log/insights
 import SessionDetailPage from '@/pages/history/SessionDetailPage' // Route: /log/history/:entryId
 import ChangelogPage from '@/pages/changelog/ChangelogPage'     // Route: /log/changelog
+import SettingsPage  from '@/pages/settings/SettingsPage'       // Route: /log/settings
+import ReportsPage   from '@/pages/reports/ReportsPage'         // Route: /log/reports
+import AboutPage     from '@/pages/about/AboutPage'             // Route: /log/about
+import PrivacyPolicyPage from '@/pages/legal/PrivacyPolicyPage' // Route: /log/privacy
+import TermsPage     from '@/pages/legal/TermsPage'             // Route: /log/terms
 
 export default function App() {
   return (
@@ -31,6 +36,11 @@ export default function App() {
         <Route path="restore"  element={<RestorePage />} />
         <Route path="insights" element={<InsightsPage />} />
         <Route path="changelog" element={<ChangelogPage />} />
+        <Route path="settings"  element={<SettingsPage />} />
+        <Route path="reports"   element={<ReportsPage />} />
+        <Route path="about"     element={<AboutPage />} />
+        <Route path="privacy"   element={<PrivacyPolicyPage />} />
+        <Route path="terms"     element={<TermsPage />} />
       </Route>
     </Routes>
   )

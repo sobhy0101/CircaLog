@@ -347,6 +347,10 @@
 > implemented, those values live in the browser only and never touch
 > Supabase. The `profiles` table requires no migration for Doctor Report.
 
+- [x] Create `/log/reports` route and `ReportsPage` stub — wire "Reports"
+       drawer button to this route. Can be a placeholder ("Reports — coming
+       soon") until the Doctor Report PDF work begins; the button must not
+       remain a dead button in the meantime.
 - [ ] Weekly sleep summary (auto-generated)
 - [ ] Monthly sleep summary
 - [ ] Export as CSV (all fields)
@@ -379,6 +383,14 @@
 - [ ] Headache / pain level (0–10 scale)
 - [ ] Mood / energy upon waking (1–5 scale)
 - [ ] All fields optional, off by default, toggleable in Settings
+
+### ⚙️ Settings Page
+
+- [x] Create `/log/settings` route and `SettingsPage` component
+- [x] Wire "Settings" drawer button to `/log/settings`
+       (This page is the container for the Caffeine reference table, Medication
+        Library, and Meal Library listed in their respective V2 sections below.
+        Build the shell now; each sub-section populates it as it is built.)
 
 ### ☕ Drinks Log
 
@@ -472,6 +484,9 @@
 
 ### 📚 Educational Resources
 
+- [x] "About CircaLog" page at `/log/about` — wire "About" drawer button
+       (App version, open-source attribution, contact/support link.
+        Distinct from the "About Non-24" educational content below.)
 - [ ] "About Non-24" section in side drawer
 - [ ] Brief explanation of Non-24, free-running period, actograms
 - [ ] Curated links to reputable resources (NIH, Sleep Foundation, etc.)
@@ -481,6 +496,16 @@
 - [ ] User-configurable sleep target (default: 8 hours)
 - [ ] Display cumulative sleep debt / surplus
 - [ ] Note in UI that Non-24 makes standard targets approximate
+
+### 📃 Policies
+- [x] Privacy Policy page — decide: internal route `/log/privacy` or external
+       hosted URL; then wire the "Privacy Policy" drawer button accordingly
+- [x] Terms & Conditions page — same decision; wire the "Terms & Conditions"
+       drawer button
+- [ ] Cookie Policy page (if applicable — only if using cookies beyond what's needed for basic auth/session management)
+- [ ] Data Retention Policy page (if applicable — only if storing user data beyond what's needed for core functionality, which is unlikely given the current IndexedDB + Supabase model)
+- [ ] Accessibility Statement page
+- [ ] Open Source License page (if any third-party libraries with specific licenses are used beyond MIT)
 
 ---
 
