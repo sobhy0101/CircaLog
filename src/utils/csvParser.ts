@@ -76,8 +76,19 @@ function mapInterruptions(raw: string): Interruption[] | undefined {
 // ---------------------------------------------------------------------------
 
 /**
- * Parses a "DD-MM-YYYY" date string into its numeric parts.
- * Returns null if the format is unrecognized.
+ * Month name → 1-based month number map.
+ * Used by parseMonthNameDate().
+ */
+const MONTH_NAMES: Record<string, number> = {
+  january: 1, february: 2, march: 3, april: 4,  may: 5,      june: 6,
+  july: 7,    august: 8,   september: 9,         october: 10, november: 11, december: 12,
+}
+
+/**
+ * Parses a "DD-MM-YYYY" date string (hyphens) into its numeric parts.
+ * Returns null if the format is unrecognised.
+ *
+ * Example input: "29-05-2026"
  */
 function parseDDMMYYYY(raw: string): { day: number; month: number; year: number } | null {
   const match = raw.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/)
@@ -87,6 +98,60 @@ function parseDDMMYYYY(raw: string): { day: number; month: number; year: number 
     month: parseInt(match[2], 10),
     year:  parseInt(match[3], 10),
   }
+}
+
+/**
+ * Parses a month-name date string into its numeric parts.
+ * Returns null if the format is unrecognised.
+ *
+ * Handles two variants:
+ *   - "Friday, May 29, 2026"  (day-name prefix — Claude in Excel export format)
+ *   - "May 29, 2026"          (no day-name prefix)
+ */
+function parseMonthNameDate(raw: string): { day: number; month: number; year: number } | null {
+  // Optional leading "Weekday, " followed by "Month D[D], YYYY"
+  const match = raw.trim().match(/(?:[A-Za-z]+,\s+)?([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})/)
+  if (!match) return null
+  const month = MONTH_NAMES[match[1].toLowerCase()]
+  if (!month) return null
+  return {
+    day:   parseInt(match[2], 10),
+    month,
+    year:  parseInt(match[3], 10),
+  }
+}
+
+/**
+ * Parses a "DD/MM/YYYY" date string (slashes, non-US Excel locale) into
+ * its numeric parts. Returns null if the format is unrecognised.
+ *
+ * Example input: "29/05/2026"
+ */
+function parseDDMMYYYYSlash(raw: string): { day: number; month: number; year: number } | null {
+  const match = raw.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (!match) return null
+  return {
+    day:   parseInt(match[1], 10),
+    month: parseInt(match[2], 10),
+    year:  parseInt(match[3], 10),
+  }
+}
+
+/**
+ * Attempts to parse a raw date string using all known formats, in order
+ * of specificity. Returns null if no format matches.
+ *
+ * Supported formats (tried in order):
+ *   1. DD-MM-YYYY        — CircaLog spreadsheet export format
+ *   2. DD/MM/YYYY        — non-US Excel "Save As CSV" format
+ *   3. Month DD, YYYY    — Claude in Excel export format (with optional day-name prefix)
+ */
+function parseDate(raw: string): { day: number; month: number; year: number } | null {
+  return (
+    parseDDMMYYYY(raw) ??
+    parseDDMMYYYYSlash(raw) ??
+    parseMonthNameDate(raw)
+  )
 }
 
 /**
@@ -150,9 +215,13 @@ export function parseCsvRows(
       // ── 1. Date ────────────────────────────────────────────────────────────
 
       const rawDate = (row['Date'] ?? '').trim()
-      const dateParts = parseDDMMYYYY(rawDate)
+      const dateParts = parseDate(rawDate)
       if (!dateParts) {
-        return { status: 'error', rowIndex, reason: `Invalid date format: "${rawDate}" (expected DD-MM-YYYY)` }
+        return {
+          status: 'error',
+          rowIndex,
+          reason: `Invalid date format: "${rawDate}" (expected DD-MM-YYYY, DD/MM/YYYY, or "Month DD, YYYY")`,
+        }
       }
       const { day, month, year } = dateParts
       const baseDateYMD = formatYMD(day, month, year)
@@ -219,8 +288,10 @@ export function parseCsvRows(
       const quality = qualityNum as QualityRating
 
       // ── 8. Had Dreams? ─────────────────────────────────────────────────────
+      // Accept both "Had Dreams?" (original spec) and "Had Dreams" (no question
+      // mark — produced by some export tools including Claude in Excel).
 
-      const rawHadDreams = (row['Had Dreams?'] ?? '').trim()
+      const rawHadDreams = (row['Had Dreams?'] ?? row['Had Dreams'] ?? '').trim()
       const hadDreams: boolean | undefined =
         rawHadDreams === 'Yes' ? true :
         rawHadDreams === 'No'  ? false :

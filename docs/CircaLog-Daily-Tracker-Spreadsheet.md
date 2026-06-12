@@ -209,11 +209,11 @@ When you need to bring spreadsheet data into a Claude.ai chat, paste this
 prompt into Claude in Excel first:
 
 ```text
-Please export a plain text summary of all four sheets in this workbook for
+Please export CSV summary of all four sheets in this workbook for
 sharing with an external assistant. Format it exactly as follows:
 
 **SHEET: Sleep Log**
-Print all rows that have data as a markdown table with columns: Date, Bed Time,
+Print all rows that have data as a CSV with columns: Date, Bed Time,
 Sleep Start, Wake Time, Sleep Onset Latency, Sleep Duration, Time in Bed,
 Session Type, Quality, Had Dreams, Dream Notes, Interruptions, Notes,
 Cycle Number
