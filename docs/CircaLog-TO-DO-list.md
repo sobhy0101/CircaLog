@@ -112,12 +112,50 @@
 - [x] 🟢 Design app logo / splash screen
        (Brand logo SVG + PWA icons already generated under `public/images/brand/`.
        Remaining: review splash screen coverage on Android; design branded splash if needed.)
+- [ ] 🟢 Font weight pruning — performance pass (deferred from initial font integration)
+       Both Exo 2 and Inter are currently loaded with their full variable axis.
+       Once the UI is stable and all used weights are known, prune to only the
+       weights actually in use (e.g., Inter 400, 500, 600; Exo 2 600, 700).
+       Reduces the font payload and improves initial load time on slow connections.
+       Do this after the UI design is fully settled — premature pruning breaks typography.
 
 ### 🌐 Landing Page (circalog.app root)
 
 - [x] 🟢 Design and build coming soon page
 - [x] 🟢 App name + tagline
 - [x] 🟢 "Get notified at launch" email capture (optional, simple)
+
+### 🔍 SEO & Discoverability
+
+> Applies primarily to the landing page at `/`. The `/log` app itself does
+> not need search engine visibility — it is an authenticated tool, not a
+> public content page. The goal here is that when CircaLog is shared or
+> searched, it presents correctly: in Google results, in link previews on
+> WhatsApp/X/LinkedIn, and in browser/OS UI chrome.
+
+- [ ] 🟢 `<meta name="description">` — landing page summary, ≤160 characters
+- [ ] 🟢 Open Graph meta tags in `index.html`
+       (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`)
+       — controls link preview appearance on WhatsApp, X, LinkedIn, iMessage, etc.
+- [ ] 🟢 Twitter Card meta tags in `index.html`
+       (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`)
+- [ ] 🟢 Social preview image — design and export a 1200×630 px OG image
+       (`public/images/brand/og-image.png`); reference it in both OG and Twitter tags
+- [ ] 🟢 `robots.txt` — allow crawling of `/`, disallow `/log/*`
+       (the PWA app should not appear in search results)
+- [ ] 🟢 `sitemap.xml` — list the landing page URL only; submit to Google Search Console
+- [ ] 🟢 Google Search Console — add property, verify ownership, submit sitemap
+       (can be done with the `circalog.vercel.app` URL until the real domain is purchased)
+- [ ] 🟢 Security headers in `vercel.json`
+       (`Content-Security-Policy`, `X-Frame-Options: DENY`, `Referrer-Policy`,
+       `Permissions-Policy`, `X-Content-Type-Options: nosniff`)
+       — important for a health app; prevents clickjacking and data leakage
+- [ ] ⚪ Google Analytics (GA4) — **UNDETERMINED**
+       Dedicated planning session required before implementation.
+       Vercel Analytics already provides page views and web vitals.
+       GA4 adds funnel analysis and audience data but introduces GDPR obligations
+       (cookie consent banner, privacy policy update, data processing agreement).
+       Do not implement until the tradeoffs have been evaluated in full.
 
 ### 🏠 App Shell & Navigation
 
@@ -264,6 +302,21 @@
 - [x] 🟡 Verify Android splash screen coverage; design branded splash if needed
 - [x] 🟡 App installable on Android (add to home screen — verify after icons are wired)
 - [x] 🟢 Offline fallback page
+- [ ] 🔴 `vercel.json` SPA rewrite rule — redirect all routes to `index.html`
+       Without this, direct navigation to any `/log/*` route (bookmarked URL,
+       browser refresh, shared link) returns a Vercel 404. Verify this is in place
+       and covers all client-side routes including `/log/history/:entryId`.
+- [ ] 🟢 iOS PWA meta tags in `index.html`
+       (`apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`,
+       `apple-mobile-web-app-title`) — Safari ignores the web manifest for these;
+       they must be set as explicit `<meta>` tags
+- [ ] 🟢 `<meta name="theme-color">` in `index.html`
+       Controls the browser chrome / status bar color on Android Chrome and iOS Safari.
+       Set to the dark background token by default; update when the light theme is active.
+- [ ] 🟢 PWA App Manifest shortcuts
+       Long-press the home screen icon to expose quick-action shortcuts:
+       "Log Sleep" (opens `/log` in timer mode) and "Wake Up" (opens the wake screen).
+       Defined in `manifest.json` under the `shortcuts` key.
 
 ### 🛟 Data Resilience
 
@@ -279,7 +332,7 @@
         drawer entry added. Task: `tasks/CC_TASK_Phase1_DataResilience.md`)
 - [x] 🟡 Schema migration handler (for when the engine model evolves)
        (`src/utils/backupSchema.ts` — `SCHEMA_VERSION = 1` constant +
-        `migrateBackup()` with a chain-based `if (version < N)` pattern so future
+        `migrateBackup()` with a chain-based `if (version < N)` pattern, so future
         migrations append without restructuring the function.
         Task: `tasks/CC_TASK_Phase1_DataResilience.md`)
 - [x] 🟢 Populate `profiles` table in Supabase on first sign-in
@@ -287,6 +340,34 @@
         `sobhy0101@gmail.com` (Mahmoud Sobhy) and `circalog.app@gmail.com` (CircaLog).
         Current columns: id, email, full_name, created_at, updated_at.
         Schema extension for Doctor Report deferred — see V2 Reports & Export below.)
+
+### 🐞 App Debugging & Logging
+
+> These items ensure the app fails gracefully, that errors are diagnosable,
+> and that the developer has visibility into what the app is doing in
+> production. None of these require a third-party service.
+
+- [ ] 🔴 React Error Boundary — wrap the app shell
+       If the circadian engine or any component throws an unhandled error, the app
+       currently shows a blank white screen with no recovery path. The Error Boundary
+       must catch the error, display a calm recovery screen (with a Reload button
+       and a way to copy the error message), and prevent the whole app from going dark.
+- [ ] 🟢 Structured console logging — define log levels
+       Gate `debug` and `info` output behind `import.meta.env.DEV` so they are
+       stripped from production builds. `warn` and `error` always emit.
+       Establish a consistent format: `[CircaLog][module] message — {context}`.
+- [ ] 🟢 Debug mode in Settings (developer-only; hidden unless unlocked)
+       Unlock via a tap sequence on the version number or `?debug=true` URL param.
+       When active, display: app version, build timestamp, IndexedDB entry counts,
+       sync queue depth, last successful sync time.
+       Include a manual "Flush sync queue" button and a "Clear all local data" button
+       (double-confirmed — this is destructive and irreversible).
+- [ ] 🟢 Error reporting to user — on unhandled errors caught by the Error Boundary,
+       offer a one-tap "Copy error details" button so the user can paste into an
+       email to `circalog.app@gmail.com`. No third-party service required.
+- [ ] 🟢 Production error tracking — evaluate options when real users exist
+       Sentry free tier vs. Vercel's built-in error tracking. Defer until the app
+       is shared externally and the volume of errors justifies the setup cost.
 
 ### Change Log
 
@@ -371,7 +452,7 @@
 - [ ] 🟢 Export & Import hub pages (consolidation — do after PDF, CSV export, and additional import types exist)
        Consolidate drawer entries into two hub pages:
        `/log/export` hub (JSON backup, CSV, PDF, Doctor Report, Verify backup) and
-       `/log/import` hub (CSV import, JSON restore, Verify import). Currently the
+       `/log/import` hub (CSV import, JSON restore, Verify import). Currently, the
        drawer has three separate entries: "Export" → ExportPage (JSON only),
        "Import" → ImportPage (CSV only), "Restore Backup" → RestorePage (JSON only).
        These collapse into two hub entries once there is enough content to justify them.
@@ -467,6 +548,16 @@
        - User picks a `MealDefinition` from their library and records actual
          eat time; the engine uses this as the food anchor for dose
          compliance checks
+- [ ] GERD safety window — "Safe to Sleep After" indicator
+       Doctor's order: minimum 4 hours between last meal and sleep start.
+       After a meal is logged, surface a live status showing: time elapsed
+       since last meal, time remaining until the window opens, and a
+       red/yellow/green indicator (red = < 2h, yellow = 2–4h, green = ≥ 4h).
+       This mirrors the spreadsheet dashboard logic and is one of the most
+       practically urgent features for this patient's daily routine.
+       Surface on: the Log screen (when the user initiates sleep logging),
+       the Insights view, and optionally as a push notification
+       (tie into the Notifications section above when it is built).
 - [ ] Logging screen integration
        - When waking, show a pre-populated list of today's due/overdue doses
        - Tap a medication → enter actual time taken (or mark skipped)
@@ -491,6 +582,36 @@
 - [ ] Brief explanation of Non-24, free-running period, actograms
 - [ ] Curated links to reputable resources (NIH, Sleep Foundation, etc.)
 
+### 📖 Help & Onboarding
+
+> New users — including the patient themselves returning after a long break —
+> need orientation. The actogram, cycle numbers, and free-running period are
+> not self-explanatory. This section ensures the app can be understood
+> without reading documentation.
+
+- [ ] 🟡 First-use onboarding flow — display on first launch when the database is empty
+       - What CircaLog tracks and why
+       - What a cycle number is (not a calendar day)
+       - Why the actogram drifts diagonally
+       - A brief walkthrough of the four tabs (Log / Chart / History / Insights)
+       - Dismissible and skippable; re-accessible from the Help page
+       - Must not appear again after dismissal (store a flag in `localStorage`)
+- [ ] 🟢 In-app Help page at `/log/help` — wire a "Help" drawer button
+       - FAQ: "How do I log a sleep session?", "What is a cycle number?",
+         "Why does my free-running period say Pending?",
+         "How do I export my data?", "What does the actogram show?"
+       - Link back to the first-use onboarding flow ("Show intro again")
+- [ ] 🟢 Contextual "?" tooltips on complex UI elements
+       - Free-running period label in Insights
+       - Drift rate label in Insights
+       - Cycle number badge on entry cards
+       - Actogram axes labels
+       Tapping a "?" opens a one-sentence explanation in a small popover.
+       No modal — the explanation must be readable inline without losing context.
+- [ ] 🟢 Glossary page (or collapsible section within Help)
+       Definitions: Non-24, free-running period, circadian cycle, actogram,
+       sleep onset latency, drift rate, nap vs. main sleep.
+
 ### 😴 Sleep Debt Tracker
 
 - [ ] User-configurable sleep target (default: 8 hours)
@@ -498,10 +619,23 @@
 - [ ] Note in UI that Non-24 makes standard targets approximate
 
 ### 📃 Policies
+
 - [x] Privacy Policy page — decide: internal route `/log/privacy` or external
        hosted URL; then wire the "Privacy Policy" drawer button accordingly
 - [x] Terms & Conditions page — same decision; wire the "Terms & Conditions"
        drawer button
+- [ ] Medical disclaimer — display on first use and in the About page
+       "CircaLog is not a medical device and does not provide medical advice.
+       It is a personal logging tool. Always consult a qualified healthcare
+       provider for diagnosis and treatment decisions."
+       Must appear: (1) as a dismissible notice on first launch, (2) in the
+       About page, (3) referenced in the Terms & Conditions.
+       Required before sharing the app with anyone beyond the developer.
+- [ ] Account deletion — GDPR right to erasure
+       User-initiated: delete Supabase auth record, delete all rows across
+       all Supabase tables belonging to the user, clear local IndexedDB.
+       Requires double confirmation ("This cannot be undone").
+       Surface in Settings under a clearly labelled "Danger Zone" section.
 - [ ] Cookie Policy page (if applicable — only if using cookies beyond what's needed for basic auth/session management)
 - [ ] Data Retention Policy page (if applicable — only if storing user data beyond what's needed for core functionality, which is unlikely given the current IndexedDB + Supabase model)
 - [ ] Accessibility Statement page
@@ -527,11 +661,45 @@
 - [ ] One-tap Log Sleep / Wake widget for Android home screen
 - [ ] Last sleep entry summary widget
 
+### ⌚ Wearable Integration
+
+> Automatic sleep detection from a wearable eliminates manual logging
+> friction and produces more accurate onset/offset times than self-report.
+> Samsung Galaxy Watch 7/8 and Garmin Venu 3 are the recommended targets
+> based on their sleep data export compatibility.
+>
+> This is V3 scope — the manual logging and CSV import paths in V1/V2 are
+> the foundation. Wearable import supplements them; it does not replace them.
+> Patients without a compatible device must always have a fully functional
+> manual path.
+
+- [ ] Research and decide on the integration approach
+       Options: Samsung Health export file (JSON/CSV), Garmin Connect IQ data export,
+       Google Fit API, or a direct Bluetooth/SDK path. Evaluate data availability,
+       export granularity (onset time, wake time, duration, sleep stages if available),
+       and whether the integration requires a companion app or can run entirely in-browser.
+- [ ] Map wearable sleep session fields to `SleepEntry` — decide what to auto-fill
+       vs. what to prompt the user to confirm (quality rating cannot come from the
+       wearable; the user must still rate each session)
+- [ ] Build wearable import UI — similar to the CSV import flow:
+       connect / authorize, preview mapped sessions, confirm, import
+- [ ] Handle conflicts between manually-logged entries and wearable entries
+       for the same time window (merge vs. prefer-wearable vs. prefer-manual)
+- [ ] Supabase table / IndexedDB store extension if wearable-specific fields
+       (e.g., sleep stages, HRV, SpO₂) need to be stored beyond the core `SleepEntry`
+
 ### Marketing
 
 - [ ] Full marketing landing page at `circalog.app`
 - [ ] App moves to `circalog.app/log` (already planned)
 - [ ] Screenshots, feature highlights, testimonials
+
+### 🌐 Domain & Infrastructure
+
+- [ ] Purchase `circalog.app` domain
+       Prerequisite for: full marketing page, Play Store listing URL, Google Search
+       Console real-domain property. Can use `circalog.vercel.app` for everything
+       until this point — purchase only when the app is otherwise ready for public launch.
 
 ### Open Source
 
@@ -541,12 +709,35 @@
 - [ ] Tag V1.0.0 release on GitHub
 - [ ] Publish as public repository
 
+### 🏪 Play Store
+
+> Bubblewrap wraps the CircaLog PWA into a Trusted Web Activity (TWA) for
+> distribution via the Google Play Store. One-time setup; no ongoing maintenance
+> beyond keeping the app URL and asset links file in sync.
+
+- [ ] Set up Bubblewrap (one-time local tool setup; requires Node.js + Java JDK)
+- [ ] Configure TWA: package name, app title, theme color, launch URL (`circalog.app/log`)
+- [ ] Generate Android APK / AAB (Android App Bundle)
+- [ ] Create Google Play Developer account (one-time $25 USD registration fee)
+- [ ] Write Play Store listing: title, short description, full description,
+       screenshots (at least 2), feature graphic, content rating, privacy policy URL
+- [ ] Verify Digital Asset Links (`/.well-known/assetlinks.json` on `circalog.app`)
+       — required for the TWA to launch without a browser address bar
+- [ ] Submit app bundle for Google Play review
+- [ ] Publish to Play Store
+
 ---
 
 ## 🐛 Ongoing / Always
 
 - [ ] Extend unit test coverage beyond the Phase 0.5 Circadian Engine
        (UI components, IndexedDB service, integration flows)
+- [ ] CI/CD pipeline — GitHub Actions test gate on every push to `main`
+       Currently, Vercel deploys on every push regardless of test results.
+       A failing Vitest run can ship to production with no warning.
+       Add a GitHub Actions workflow that runs `npm run test` (Vitest) and
+       blocks the merge/deploy if any test fails. Vercel should only receive
+       the build after the test gate passes.
 - [ ] Test on Android (Chrome PWA)
 - [ ] Test on iOS (Safari PWA — limited but functional)
 - [ ] Test on PC (Chrome, Firefox, Edge)

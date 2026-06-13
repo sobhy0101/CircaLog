@@ -41,3 +41,4 @@
 {"rule":"EN_A_VS_AN","sentence":"^\\QExpose a \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q state: \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q and an \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q so the UI can reflect what is happening.\\E$"}
 {"rule":"SIGN_IN_HYPHEN","sentence":"^\\QSupabase sync is the long-term answer, but it requires sign-in.\\E$"}
 {"rule":"ID_CASING","sentence":"^\\QCurrent columns: id, email, full_name, created_at, updated_at.\\E$"}
+{"rule":"EN_COMPOUNDS_SUB_SECTION","sentence":"^\\QBuild the shell now; each sub-section populates it as it is built.)\\E$"}
