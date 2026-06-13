@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com) [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://react.dev) [![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev) [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com) [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white)](https://supabase.com) [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=flat&logo=vercel)](https://vercel.com) [![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?style=flat&logo=googlechrome&logoColor=white)](https://web.dev/progressive-web-apps/) [![Offline First](https://img.shields.io/badge/Offline-First-0f172a?style=flat)](https://offlinefirst.org)
 
-CircaLog is an open-source, offline-first Progressive Web App (PWA) designed specifically for people living with **Non-24-Hour Sleep-Wake Disorder (Non-24)** and other circadian rhythm disorders. Unlike every mainstream sleep app built for neurotypical sleep patterns, CircaLog tracks, visualizes, and understands the *drift* — the defining feature of your condition, not a flaw in your data.
+CircaLog is an open-source, offline-first Progressive Web App (PWA) designed specifically for people living with **Non-24-Hour Sleep-Wake Disorder (Non-24)** and other circadian rhythm disorders. Unlike every mainstream sleep app built for neurotypical sleep patterns, CircaLog tracks, visualizes, and understands the *drift*, the defining feature of your condition, not a flaw in your data.
 
 ---
 
@@ -29,11 +29,11 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Back-fill past entries going back weeks or months
 - Correct night-anchor dating: sessions that cross midnight (e.g. bed at
   23:10 May 31, asleep at 00:37 June 1) are displayed under the night they
-  started, not the calendar date of sleep onset — because that is how
+  started, not the calendar date of sleep onset, because that is how
   patients and doctors think about sleep
 
 ### 📊 Visualization
-- **Actogram** — the primary chart. A diagonal drift visualization showing
+- **Actogram**: the primary chart. A diagonal drift visualization showing
   your sleep band shifting over time, exactly as sleep researchers view Non-24
   data. Time of day on the Y axis, cycle number and calendar date on the X axis.
 - Time range toggle: `[ 1W ]  [ 2W ]  [ 1M ]  [ 3M ]  [ 6M ]  [ 1Y ]  [ All ]`
@@ -50,11 +50,10 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 ### 📥 Import
 - Import past sleep sessions from a CSV file exported from the
   CircaLog Daily Tracker spreadsheet (or any CSV matching the format)
-- Full preview table before confirming — shows every parsed row with
+- Full preview table before confirming: shows every parsed row with
   date, sleep start, wake time, duration, quality, session type, and
   parse status
-- Duplicate detection: sessions already in the app are skipped
-  automatically — re-importing is always safe
+- Duplicate detection: sessions already in the app are skipped automatically; re-importing is always safe
 - Midnight crossover handled automatically: sessions where sleep start
   falls past midnight are correctly dated to the following calendar day
 - Structured interruption mapping: free-text interruption notes are
@@ -66,17 +65,15 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 
 ### 📤 Backup & Export
 - Export all sleep sessions as a JSON backup file (`circalog-backup-YYYY-MM-DD.json`)
-- Restore from a JSON backup — preview session counts (new vs. already present)
-  before confirming
-- **Merge mode** — adds only new sessions, keeps existing data intact
-- **Replace mode** — wipes all current sessions and restores the full backup
-- Schema migration handler: backups from older app versions are automatically
-  upgraded to the current format before restore, so data is always safe to use
-- Full reports (PDF/CSV, weekly/monthly summaries, doctor report) — V2
+- Restore from a JSON backup: preview session counts (new vs. already present) before confirming
+- **Merge mode**: adds only new sessions, keeps existing data intact
+- **Replace mode**: wipes all current sessions and restores the full backup
+- Schema migration handler: backups from older app versions are automatically upgraded to the current format before restore, so data is always safe to use
+- Full reports (PDF/CSV, weekly/monthly summaries, doctor report) in V2
 
 ### 🎨 Design
 - Dark mode by default, user-selectable light/dark toggle
-- Clinical + cosmic aesthetic — clean, data-forward UI with subtle
+- Clinical + cosmic aesthetic, clean, data-forward UI with subtle
   night sky elements
 - Color palette: dark charcoal with purple/violet accents
 - Bottom tab bar (Log / Chart / History / Insights) + hamburger side drawer
@@ -114,7 +111,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 | URL                    | Content                                              |
 |------------------------|------------------------------------------------------|
 | `circalog.app`         | Landing page / coming soon (V1) → marketing page (V2+) |
-| `circalog.app/log`     | The PWA app — permanent, never changes               |
+| `circalog.app/log`     | The PWA app (permanent URL, never changes)            |
 | `circalog.app/log/import` | CSV import page                                   |
 | `circalog.app/log/export` | JSON backup export page                           |
 | `circalog.app/log/restore` | JSON backup restore page                         |
@@ -123,7 +120,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 
 ## Roadmap
 
-### V1 — Core MVP
+### V1: Core MVP
 - Sleep log with required + optional fields
 - Actogram drift chart with time range toggle
 - Nap auto-detection
@@ -136,7 +133,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Coming soon landing page at root domain
 - Continuous Vercel deployment from GitHub
 
-### V2 — Enhanced
+### V2: Enhanced
 - Push notifications + configurable bedtime reminders
 - Free-running period calculation display
 - Weekly + monthly PDF and CSV reports
@@ -146,7 +143,7 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 - Educational resources about Non-24
 - Sleep debt tracker
 
-### V3 — Public Launch
+### V3: Public Launch
 - Multi-user / multi-tenant architecture
 - Tab bar customization
 - Full marketing landing page
@@ -221,14 +218,14 @@ the viewport (`top-0`, `rounded-b-xl`, `border-x border-b`), not a
 floating pill. This was a deliberate design choice: pills are used
 throughout the UI (quality picker, session type badges) and a pill-shaped
 status indicator was visually indistinct. The tab shape reads as
-*infrastructure* rather than *content* — it belongs to the chrome of the
+*infrastructure* rather than *content*; it belongs to the chrome of the
 app, not to any page.
 
 Five states are implemented: `synced` (grey) / `syncing` (amber, rotating
 icon) / `pending` (purple, pulsing red dot) / `error` (red) / `offline`
 (neutral, cloud-off icon). The `offline` state is detected via
 `navigator.onLine` (read on mount) and `window` `online`/`offline` events
-(subscribed in a `useEffect`). It is distinct from `pending` — offline is
+(subscribed in a `useEffect`). It is distinct from `pending`: offline is
 expected and not alarming; pending while online is not.
 
 The `navigator.onLine` guard in `syncService.ts` (`pushEntry` and
@@ -241,7 +238,7 @@ while offline, so the queue stays non-empty and the tab correctly shows
 ### Auth Toast Notifications
 
 Toast notifications (sign-in success, sign-out, errors) are positioned at
-`bottom-20` — 80px from the bottom — to clear the 64px tab bar with
+`bottom-20` (80px from the bottom) to clear the 64px tab bar with
 breathing room. They use `w-[90%] max-w-sm` to prevent long display names
 (e.g. "Welcome, Mahmoud Sobhy!") from wrapping to more than two lines on
 narrow screens. The icon and message text are centered (`justify-center`)
@@ -262,14 +259,14 @@ stretch to match the date+label height.
 
 ### `navigator.onLine` Reliability
 
-`navigator.onLine === true` means "not definitely offline" — it does not
+`navigator.onLine === true` means "not definitely offline"; it does not
 guarantee the server is reachable. Captive portals, DNS failures, or a
 down Supabase instance all return `onLine: true` while pushes fail. The
 `navigator.onLine` guard in `syncService.ts` catches the obvious case
 (airplane mode / no adapter); the `try/catch` in `pushEntry` catches
 subtler failures and queues the entry for retry. Both layers are needed.
 
-### CSV Import — Return Path After Sign-In
+### CSV Import: Return Path After Sign-In
 
 When `GoogleSignInButton` is rendered on a page other than the main log
 (e.g. `ImportPage`), it accepts a `returnPath` prop. Before triggering
@@ -280,7 +277,7 @@ survives this reload. On the `SIGNED_IN` auth event, `useAuth` reads the
 key, navigates to that path with `replace: true`, and immediately removes
 the key. If no return path was stored, the user lands on `/log` as normal.
 
-### CSV Import — Midnight Crossover Logic
+### CSV Import: Midnight Crossover Logic
 
 The CSV parser in `src/utils/csvParser.ts` handles sessions that cross
 midnight using a two-step comparison:
@@ -295,7 +292,7 @@ which is correct for 24-hour time. The `Date` constructor interprets
 `YYYY-MM-DDTHH:MM:00` (no timezone offset) as local time, so all UTC
 conversion reflects the user's actual local timezone at import time.
 
-### CSV Import — Interruption Mapping
+### CSV Import: Interruption Mapping
 
 Free-text interruption values from the CSV are mapped to structured
 `Interruption[]` objects rather than appended to the `notes` field. This
@@ -316,7 +313,7 @@ guide on what to enter in these fields for clean future imports.
 ## Contributing
 
 CircaLog is open-source. Contributions are especially welcome from people
-living with Non-24, DSPD, or other circadian rhythm disorders — because
+living with Non-24, DSPD, or other circadian rhythm disorders, because
 the best people to build this tool are the ones who need it.
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
@@ -325,14 +322,14 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
 ## A Note on the Name
 
-*Circa* — from Latin: "approximately," "around."
-*Log* — a record, a diary, a history.
+*Circa*: from Latin, "approximately," "around."
+*Log*: a record, a diary, a history.
 
 **CircaLog:** an approximate record of time, for people who live
 approximately outside of it.

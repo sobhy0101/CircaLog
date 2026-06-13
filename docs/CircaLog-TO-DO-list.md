@@ -71,7 +71,7 @@
 - [x] 🔴 `calculateDrift(entries)` — minutes-per-cycle drift rate
 - [x] 🔴 `estimateFreeRunningPeriod(entries)` — linear regression on sleep onset times; returns `'pending'` until 14+ entries
 - [x] 🔴 `groupEntriesByCycle(entries)` — grouping helper for chart and history rendering
-- [x] 🔴 `detectFragmentation(entry)` — flags fragmented sleep sessions
+- [x] 🔴 `detectFragmentation(entry)` — flags fragmented sleep sections
 - [x] 🔴 `calculateRollingAverages(entries, windowDays)` — rolling 7/30-day stats
 
 ### ✅ Verification
@@ -167,7 +167,71 @@
        Privacy Policy, Terms & Conditions, Dark Mode Toggle
        (move `ThemeToggle` here from its temporary placement in `AppShell.tsx`)
 
+### ♿ Accessibility Implementation
+
+> The Ongoing section has an audit task, but audits find problems after the
+> fact. These are the implementation items that must be built in from the
+> start. A health app used by people who are often cognitively impaired by
+> sleep deprivation has a higher accessibility obligation than most.
+
+- [ ] 🟡 ARIA labels on all interactive elements that lack visible text
+       (icon-only buttons, the sync pill, the tab bar icons, the actogram
+       toggle buttons, the drawer close button, the quality rating stars)
+- [ ] 🟡 Keyboard navigation — full Tab order through all interactive elements
+       on every screen; no keyboard traps except intentional modals/drawers
+- [ ] 🟡 Focus traps in modals and the side drawer
+       When the drawer or a confirmation dialog is open, Tab must cycle within
+       it and not reach elements behind it. Focus must return to the trigger
+       element when closed.
+- [ ] 🟢 Screen reader support — test with TalkBack (Android) and VoiceOver (iOS)
+       Ensure all status changes (sync state, import progress, form errors) are
+       announced; live regions (`aria-live`) where appropriate.
+- [ ] 🟡 Minimum tap target size — 44×44 px on all tappable elements
+       Audit the tab bar icons, the quality star buttons, the filter chips,
+       and the actogram range toggle buttons. Applies especially to elements
+       used when the patient is drowsy.
+- [ ] 🟢 Keyboard shortcuts on desktop (Tab to navigate, Enter to submit forms,
+       Escape to close drawers/modals, arrow keys in the quality rating)
+       Desktop PWA users should not need to reach for the mouse.
+
 ### 🛏️ Sleep Log — Core
+
+> **Architecture note — two-step timer flow (decided Jun 2026):**
+>
+> The original single-tap "Start Sleep" timer only captures `sleepStartUtc`.
+> `bedTimeUtc` is already an optional field in `SleepEntry` (defined in
+> Phase 0.5 — no schema migration needed) but the UI never captures it.
+>
+> Sleep Onset Latency (the gap between lying down and actually falling
+> asleep) is clinically significant for Non-24 patients and their doctors,
+> and is already tracked in the CircaLog Daily Tracker spreadsheet.
+>
+> The timer screen must be redesigned as a two-step flow:
+>
+> **Step 1 — "In Bed?" button:**
+> - User taps when getting into bed
+> - Records `bedTimeUtc`
+> - A visible elapsed-time counter starts: "In bed for Xh Ym"
+> - A second button appears: "Going to Sleep?"
+>   (disabled for a short grace period to prevent accidental double-tap)
+>
+> **Step 2 — "Going to Sleep?" button:**
+> - User taps when actually closing their eyes to sleep
+> - Records `sleepStartUtc`
+> - Sleep Onset Latency displayed: "Fell asleep after Xh Ym"
+> - Session enters "Sleeping…" state; "Wake Up" button appears as before
+>
+> **State persistence:**
+> The state between Step 1 and Step 2 (and between Step 2 and Wake Up)
+> must survive app close/reopen. Persist the in-progress session to
+> `localStorage` or as a draft `SleepEntry` in IndexedDB so that closing
+> the app mid-session does not lose the bed time.
+>
+> **Manual entry form:**
+> The back-fill form already has an optional Bed Time field (implemented).
+> When both Bed Time and Sleep Start are filled, Sleep Onset Latency is
+> auto-calculated and displayed inline. `bedTimeUtc` being optional means
+> all historical entries without it remain valid.
 
 - [x] 🔴 Design sleep log data model (IndexedDB schema)
        (Derives from Phase 0.5 TypeScript interfaces — do not finalize
@@ -186,6 +250,30 @@
         regardless of the browser's native picker format.)
 - [x] 🔴 Build "Start Sleep" one-tap timer screen
 - [x] 🔴 Build "Wake Up" completion screen
+- [ ] 🔴 Redesign timer screen: replace single "Start Sleep" button with two-step flow
+       "In Bed" → elapsed-time counter → "Going to Sleep" (see architecture note above)
+       This is a rework of the existing timer screen, not a new screen.
+       The Wake Up screen needs a small companion change — see item below.
+- [ ] 🔴 Persist in-progress timer session across app close/reopen
+       Between "In Bed?" and "Going to Sleep?", and between "Going to Sleep?" and
+       "Wake Up", the partial session state must survive a browser close.
+       Use `localStorage` for the active-session draft (not IndexedDB — simpler
+       and fast enough for a single in-progress record).
+- [x] 🟡 Add Bed Time field to the manual back-fill entry form
+       Optional field, appears before Sleep Start.
+       When both Bed Time and Sleep Start are filled, calculate and display
+       Sleep Onset Latency inline (e.g., "Onset latency: 23 min").
+       `bedTimeUtc` is already defined in `SleepEntry` — no schema change needed.
+       (Already implemented in `ManualEntryForm.tsx` and `SessionDetailPage.tsx`)
+- [ ] 🟡 WakeUpScreen: show "In Bed" time read-only above the editable "Fell Asleep" field
+       After the two-step redesign, `bedTimeUtc` is captured intentionally in Step 1.
+       The Wake Up form must display it for review before saving:
+         "In bed: 11:00 PM  →  Fell asleep: 11:34 PM  →  Onset: 34 min"
+       "In bed" time is read-only here (it was recorded on purpose; History edit covers
+       corrections). "Fell asleep" remains editable as it is today.
+       When `sleepStartUtc` equals `bedTimeUtc` (user didn't edit it), show "Onset: 0 min"
+       with a subtle prompt: "Did you fall asleep immediately?" — so the user is nudged
+       to correct it if they forgot to tap "Going to Sleep" separately.
 - [x] 🟡 Required fields: sleep start, wake time, quality rating (1–5)
 - [x] 🟡 Optional fields toggle:
        - Notes (free text)
@@ -257,7 +345,7 @@
 - [x] 🟢 Show signed-out toast notification
 - [x] 🟢 Show error toast notification (sign-in / sign-out failures)
 - [x] 🔴 Build sync service: IndexedDB → Supabase on connect
-- [x] 🟡 Handle sync conflicts (local wins by default)
+- [x] 🟡 Handle sync conflicts (local wins by default — first-time sync scenario)
 - [x] 🟡 Show sync status indicator in UI
 - [x] 🟢 Fix sync pill — add distinct offline state
        (Currently shows "Synced" while offline because the flush cycle completes
@@ -265,6 +353,44 @@
         a neutral "Saved — Offline" state instead. Separate from "Pending sync" —
         offline is expected; pending while online is not.)
 - [x] 🟢 Allow sign-out (data remains local)
+- [ ] 🟡 Auth token refresh error handling
+       If the Supabase session expires mid-use (token refresh fails), the app
+       must not silently drop sync writes or crash. Detect the expired session,
+       prompt the user to re-authenticate, and queue any pending writes for
+       retry after sign-in is restored.
+- [ ] 🟡 Supabase sync write rejection handling
+       If Supabase rejects a write (RLS violation, quota exceeded, network timeout),
+       the entry must remain in the `syncQueue` with a visible retry state rather
+       than being silently discarded. The sync status indicator must reflect this.
+- [ ] 🟢 Multi-device offline conflict resolution — design decision required
+       "Local wins" covers the first-time sync scenario (device A has data, Supabase
+       does not). The distinct scenario: Device A and Device B both modify the same
+       entry while offline, then both sync. Last-write-wins on `updatedAt` is the
+       simplest resolution. Document the chosen strategy explicitly before implementing
+       sync for multi-device users. At minimum, no data should be silently discarded.
+
+### 🔒 Security
+
+> These items must be addressed before the app is shared with anyone beyond
+> the developer. A health app that stores years of sleep and medication data
+> is a high-value target for privacy violations.
+
+- [ ] 🔴 Supabase RLS policy audit — verify before any external user accesses the app
+       Confirm that no authenticated user can read, write, update, or delete
+       another user's rows in any table (`sleep_entries`, `sync_queue`,
+       `profiles`, and all future tables). Test this manually: sign in as User A,
+       attempt to query User B's data by ID. Must return empty or error.
+- [ ] 🟡 Input sanitization on all free-text fields
+       Fields: session notes, dream notes, interruption notes, medication names,
+       meal names, drink log notes. Sanitize before writing to IndexedDB and
+       before inserting into Supabase. At minimum: strip leading/trailing whitespace,
+       enforce a reasonable max length per field, reject null bytes.
+       XSS risk is low in a PWA (no server-rendered HTML), but stored values
+       are later rendered in components — sanitize defensively.
+- [ ] 🟢 Dependency security audit — run `npm audit` and resolve high/critical findings
+       before external release. Add this to the pre-release checklist.
+       Dependabot (already enabled on GitHub) is the ongoing gate; this task is
+       the point-in-time clean sweep before V1 goes public.
 
 ### 📥 Data Import
 
@@ -292,6 +418,14 @@
        - Calculated via linear regression on sleep onset times
        - Show "Pending — log 14+ days to unlock" until threshold is met
        - Display prominently once available
+- [ ] 🟢 Predicted next sleep window
+       Once the free-running period estimate is available, use it to project
+       the next expected sleep onset time forward from the last logged session.
+       Display as: "Next predicted sleep onset: ~[date] at [time]" with a
+       confidence note ("based on your X-day average cycle of Yh Zm").
+       This is arguably the most practically useful output the engine produces
+       for the patient's daily planning. Show "Pending" until the free-running
+       period threshold is met (same 14-session gate).
 
 ### 🔧 PWA & Deployment
 
@@ -303,9 +437,10 @@
 - [x] 🟡 App installable on Android (add to home screen — verify after icons are wired)
 - [x] 🟢 Offline fallback page
 - [ ] 🔴 `vercel.json` SPA rewrite rule — redirect all routes to `index.html`
-       Without this, direct navigation to any `/log/*` route (bookmarked URL,
-       browser refresh, shared link) returns a Vercel 404. Verify this is in place
-       and covers all client-side routes including `/log/history/:entryId`.
+       **Live user-visible bug.** Direct navigation to any `/log/*` route (bookmark,
+       browser refresh, shared link) currently returns a Vercel 404.
+       Verify this rule is in place and covers all client-side routes including
+       `/log/history/:entryId`. This is the highest-priority unchecked V1 item.
 - [ ] 🟢 iOS PWA meta tags in `index.html`
        (`apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`,
        `apple-mobile-web-app-title`) — Safari ignores the web manifest for these;
@@ -315,7 +450,7 @@
        Set to the dark background token by default; update when the light theme is active.
 - [ ] 🟢 PWA App Manifest shortcuts
        Long-press the home screen icon to expose quick-action shortcuts:
-       "Log Sleep" (opens `/log` in timer mode) and "Wake Up" (opens the wake screen).
+       "In Bed" (opens the timer at Step 1) and "Wake Up" (opens the wake screen).
        Defined in `manifest.json` under the `shortcuts` key.
 
 ### 🛟 Data Resilience
@@ -340,6 +475,17 @@
         `sobhy0101@gmail.com` (Mahmoud Sobhy) and `circalog.app@gmail.com` (CircaLog).
         Current columns: id, email, full_name, created_at, updated_at.
         Schema extension for Doctor Report deferred — see V2 Reports & Export below.)
+- [ ] 🟡 Verify backup integrity before applying restore
+       Currently the restore flow previews entry counts and prompts merge-vs-replace,
+       but does not validate whether the JSON file is structurally valid before
+       applying it. Add a pre-restore validation step: check schema version,
+       confirm required fields are present on a sample of entries, reject obviously
+       malformed files before any data is touched.
+- [ ] 🟢 Storage quota warning — monitor `navigator.storage.estimate()`
+       Safari aggressively evicts IndexedDB under storage pressure with no warning.
+       On app load, check the estimated quota usage. If usage exceeds 70% of the
+       estimated quota, display a persistent (non-dismissible) banner prompting the
+       user to export a JSON backup immediately. Repeat check on every app open.
 
 ### 🐞 App Debugging & Logging
 
@@ -449,6 +595,13 @@
        - Tier B fields are never saved to IndexedDB or Supabase
        - Consider optional `localStorage` pre-fill checkbox (decide at
          build time)
+- [ ] Web Share API integration
+       Allow the user to share a sleep summary or an actogram screenshot via
+       the native OS share sheet (WhatsApp, email, messaging apps).
+       Use `navigator.share()` with `navigator.canShare()` feature detection;
+       fall back to "Copy to clipboard" on unsupported browsers.
+       Primary use case: sending informal data to a doctor without generating
+       a full PDF report.
 - [ ] 🟢 Export & Import hub pages (consolidation — do after PDF, CSV export, and additional import types exist)
        Consolidate drawer entries into two hub pages:
        `/log/export` hub (JSON backup, CSV, PDF, Doctor Report, Verify backup) and
@@ -590,22 +743,28 @@
 > without reading documentation.
 
 - [ ] 🟡 First-use onboarding flow — display on first launch when the database is empty
+       - Medical disclaimer acceptance gate (see Policies below) — user must
+         acknowledge the disclaimer before the onboarding flow proceeds.
+         Store acceptance flag in `localStorage` alongside the onboarding-seen flag.
        - What CircaLog tracks and why
        - What a cycle number is (not a calendar day)
        - Why the actogram drifts diagonally
        - A brief walkthrough of the four tabs (Log / Chart / History / Insights)
-       - Dismissible and skippable; re-accessible from the Help page
+       - Dismissible and skippable after disclaimer is acknowledged; re-accessible
+         from the Help page
        - Must not appear again after dismissal (store a flag in `localStorage`)
 - [ ] 🟢 In-app Help page at `/log/help` — wire a "Help" drawer button
-       - FAQ: "How do I log a sleep session?", "What is a cycle number?",
-         "Why does my free-running period say Pending?",
+       - FAQ: "How do I log a sleep session?", "What is the 'In Bed' button for?",
+         "What is a cycle number?", "Why does my free-running period say Pending?",
          "How do I export my data?", "What does the actogram show?"
        - Link back to the first-use onboarding flow ("Show intro again")
 - [ ] 🟢 Contextual "?" tooltips on complex UI elements
        - Free-running period label in Insights
        - Drift rate label in Insights
+       - Predicted next sleep window in Insights
        - Cycle number badge on entry cards
        - Actogram axes labels
+       - Sleep Onset Latency display on the timer screen
        Tapping a "?" opens a one-sentence explanation in a small popover.
        No modal — the explanation must be readable inline without losing context.
 - [ ] 🟢 Glossary page (or collapsible section within Help)
@@ -628,7 +787,8 @@
        "CircaLog is not a medical device and does not provide medical advice.
        It is a personal logging tool. Always consult a qualified healthcare
        provider for diagnosis and treatment decisions."
-       Must appear: (1) as a dismissible notice on first launch, (2) in the
+       Must appear: (1) as an acceptance gate in the onboarding flow (see Help
+       & Onboarding above — the two items are explicitly linked), (2) in the
        About page, (3) referenced in the Terms & Conditions.
        Required before sharing the app with anyone beyond the developer.
 - [ ] Account deletion — GDPR right to erasure
@@ -644,6 +804,13 @@
 ---
 
 ## 🌍 V3 — Public Launch
+
+### 🌐 Domain & Infrastructure
+
+- [ ] Purchase `circalog.app` domain
+       Prerequisite for: full marketing page, Play Store listing URL, Google Search
+       Console real-domain property. Can use `circalog.vercel.app` for everything
+       until this point — purchase only when the app is otherwise ready for public launch.
 
 ### Multi-User Architecture
 
@@ -694,13 +861,6 @@
 - [ ] App moves to `circalog.app/log` (already planned)
 - [ ] Screenshots, feature highlights, testimonials
 
-### 🌐 Domain & Infrastructure
-
-- [ ] Purchase `circalog.app` domain
-       Prerequisite for: full marketing page, Play Store listing URL, Google Search
-       Console real-domain property. Can use `circalog.vercel.app` for everything
-       until this point — purchase only when the app is otherwise ready for public launch.
-
 ### Open Source
 
 - [ ] Review codebase for any private/sensitive data
@@ -735,13 +895,17 @@
 - [ ] CI/CD pipeline — GitHub Actions test gate on every push to `main`
        Currently, Vercel deploys on every push regardless of test results.
        A failing Vitest run can ship to production with no warning.
+       **Priority has increased** since cloud sync is now live — a broken
+       sync write or circadian engine error shipping to production risks
+       data integrity for a real patient's health records.
        Add a GitHub Actions workflow that runs `npm run test` (Vitest) and
-       blocks the merge/deploy if any test fails. Vercel should only receive
-       the build after the test gate passes.
+       blocks the deploy if any test fails. Target milestone: before the
+       first external user is given access to the app.
 - [ ] Test on Android (Chrome PWA)
 - [ ] Test on iOS (Safari PWA — limited but functional)
 - [ ] Test on PC (Chrome, Firefox, Edge)
-- [ ] Accessibility audit (contrast, font sizes, tap targets)
+- [ ] Accessibility audit (contrast, font sizes, tap targets) — do after
+       the Accessibility Implementation section above is complete, not instead of it
 - [ ] Performance audit (Lighthouse PWA score target: 95+)
 - [ ] Keep dependencies updated
 - [ ] Update changelog with every meaningful release

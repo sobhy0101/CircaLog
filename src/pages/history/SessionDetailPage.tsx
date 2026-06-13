@@ -170,7 +170,7 @@ export default function SessionDetailPage() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="text-circa-accent-light text-sm min-w-[3.5rem]"
+          className="text-circa-accent-light text-sm min-w-14"
         >
           ← Back
         </button>
@@ -180,7 +180,7 @@ export default function SessionDetailPage() {
         <button
           type="button"
           onClick={() => setSearchParams({ edit: 'true' })}
-          className="text-circa-accent-light text-sm min-w-[3.5rem] text-right"
+          className="text-circa-accent-light text-sm min-w-14 text-right"
         >
           Edit
         </button>
