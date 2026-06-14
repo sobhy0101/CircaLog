@@ -112,13 +112,6 @@
 - [x] 🟢 Design app logo / splash screen
        (Brand logo SVG + PWA icons already generated under `public/images/brand/`.
        Remaining: review splash screen coverage on Android; design branded splash if needed.)
-- [ ] 🟢 Font weight pruning — performance pass (deferred from initial font integration)
-       Both Exo 2 and Inter are currently loaded with their full variable axis.
-       Once the UI is stable and all used weights are known, prune to only the
-       weights actually in use (e.g., Inter 400, 500, 600; Exo 2 600, 700).
-       Reduces the font payload and improves initial load time on slow connections.
-       Do this after the UI design is fully settled — premature pruning breaks typography.
-
 ### 🌐 Landing Page (circalog.app root)
 
 - [x] 🟢 Design and build coming soon page
@@ -781,8 +774,22 @@
 
 - [x] Privacy Policy page — decide: internal route `/log/privacy` or external
        hosted URL; then wire the "Privacy Policy" drawer button accordingly
+- [ ] Create the content of the Privacy Policy — must be done before sharing the app externally
+       Key points to cover:
+       - Data collection: what data is collected (sleep entries, drink logs, dose logs, etc.), how it is stored (IndexedDB + Supabase), and that Tier B patient details for the Doctor Report are never stored.
+       - Data use: how the data is used (personal logging, PDF generation), and that it is not sold or shared with third parties.
+       - User rights: how users can export their data, delete their account, and contact support.
+       - Security measures: encryption in transit, RLS policies, input sanitization.
+       - Contact information: how to reach out with questions or concerns about privacy.
 - [x] Terms & Conditions page — same decision; wire the "Terms & Conditions"
        drawer button
+- [ ] Create the content of the Terms & Conditions — must be done before sharing the app externally
+       Key points to cover:
+       - User responsibilities: providing accurate data, not sharing accounts, etc.
+       - App limitations: CircaLog is a personal logging tool, not a medical device; it does not provide medical advice or diagnosis.
+       - Liability disclaimer: users use the app at their own risk; the developers are not liable for any consequences of using the app.
+       - Intellectual property: ownership of the app and its content, user-generated content policies if applicable.
+       - Changes to terms: how users will be notified of changes to the terms and conditions.
 - [ ] Medical disclaimer — display on first use and in the About page
        "CircaLog is not a medical device and does not provide medical advice.
        It is a personal logging tool. Always consult a qualified healthcare
@@ -861,6 +868,174 @@
 - [ ] App moves to `circalog.app/log` (already planned)
 - [ ] Screenshots, feature highlights, testimonials
 
+---
+
+## ⚡ Performance
+
+> Do this phase after all V1/V2/V3 feature development is complete, and the
+> UI is stable. Premature optimization causes rework — especially font pruning,
+> which breaks typography if done before all weights are finalized.
+>
+> The Lighthouse audit in "Ongoing / Always" is a quick health check to run
+> throughout development. This section is the deep optimization pass done once,
+> before public launch.
+
+### 🔤 Fonts
+
+- [ ] Font weight pruning (deferred from initial font integration)
+       Both Exo 2 and Inter are currently loaded with their full variable axis.
+       Once the UI is fully stable, audit every used weight across the codebase,
+       then prune the Google Fonts URL to only those weights
+       (e.g., Inter 400, 500, 600; Exo 2 600, 700).
+       Reduces the font payload on slow connections.
+       Do not do this before the UI design is settled — premature pruning breaks typography.
+
+### 📦 Bundle
+
+- [ ] Bundle size audit — run `rollup-plugin-visualizer` (or equivalent) on the
+       production build to map the size of every dependency.
+       Confirm Recharts, Dexie, and the circadian engine are the expected
+       top contributors. Flag any unexpectedly large transitive dependency.
+- [ ] Code splitting — lazy-load every route except the Log tab.
+       The Log tab is the first screen authenticated users see; everything else
+       (Chart, History, Insights, Import, Export, Settings, Reports, etc.) can
+       load on demand via `React.lazy()` and `Suspense`.
+       Goal: the initial JS bundle should contain only what is needed to render
+       the Log tab. Verify with the bundle visualizer after implementing.
+
+### 🎨 Rendering
+
+- [ ] Actogram performance with 500+ entries
+       The actogram renders one `ReferenceArea` per sleep block in the DOM.
+       At 500+ entries this can produce significant layout and paint work on
+       low-end Android devices. Steps:
+       - First, filter the visible blocks to only those in the active time range
+         before passing them to Recharts (currently all blocks are passed, then
+         clipped by the chart domain — this is wasteful).
+       - Profile on a real Android device after that fix. If frame drops persist,
+         evaluate a canvas-based renderer as a fallback for large datasets.
+- [ ] History View virtualization
+       The History list currently renders all entries in the DOM at once.
+       With large datasets this degrades scroll performance and initial paint time.
+       Evaluate `react-window` or a simpler pagination approach.
+       Trigger: investigate if scroll performance degrades at 300+ entries.
+
+### 🗄️ IndexedDB
+
+- [ ] Profile IndexedDB reads under large datasets
+       Most queries use `getAll()`, which loads the full dataset into memory
+       on every operation. With 500+ entries, this is the most likely source
+       of perceived sluggishness outside the actogram.
+       Investigate:
+       - Adding Dexie indexes for the most common read patterns
+         (entries by date range, entries by session type)
+       - Paginating the History View query instead of loading all entries at once
+         (links with the virtualization task above)
+
+### 📊 Core Web Vitals
+
+- [ ] Measure and address Core Web Vitals on a real device
+       - LCP: target under 2.5 s on mid-range Android
+       - INP: target under 200 ms for all taps
+       - CLS: target under 0.1; watch for shift from font-swap during load
+         and from lazy-loaded images
+
+---
+
+## 🧪 Testing
+
+> Structured pre-launch testing strategy. The Phase 0.5 Vitest suite covers
+> the circadian engine. This section covers everything else across all layers.
+>
+> Items are ordered bottom-up: unit tests first, then integration, then
+> end-to-end, then cross-device and stress. Each layer catches different
+> bugs; none replaces the others.
+
+### Unit Tests (Vitest)
+
+- [ ] Hook coverage: `useSleepLog`, `useAuth`, `useSyncStatus`, `useTheme`
+       Each hook has distinct state machines and side effects. Test each using
+       Vitest + React Testing Library `renderHook`, covering all transitions
+       (e.g. `useSleepLog`: no session → in-bed → sleeping → complete → saved).
+- [ ] Utility coverage: `csvParser`, `migrateBackup` (schema migration chain),
+       timezone helpers (`normalizeSleepSpan`, `utcToLocalDate`)
+       The CSV parser already has known edge cases that caused production bugs
+       (month-name dates, "Had Dreams" column variants, midnight crossover).
+       These must have test cases — not just the happy path.
+- [ ] IndexedDB service: `createEntry`, `updateEntry`, `deleteEntry`, `getAllEntries`
+       Use `fake-indexeddb` to run these tests without a real browser.
+       Verify that `assignCycleNumber` runs after every write and produces
+       the correct sequence — including after back-fills and deletes.
+
+### Integration Tests
+
+- [ ] Sync service round-trip
+       Write an entry to IndexedDB, flush the sync queue to Supabase, read the
+       entry back from Supabase, and verify all fields match.
+       Requires either a dedicated test Supabase project or a Supabase client
+       mock that intercepts the database call and returns a realistic response.
+- [ ] CSV import pipeline: parse → preview → confirm → verify entries in IndexedDB
+       Test the full path including duplicate detection (re-importing the same
+       file twice must not create duplicates) and cycle number assignment.
+- [ ] JSON backup round-trip: export → restore Merge → restore Replace
+       Verify entry counts and field values after each restore mode.
+       Also test `migrateBackup()` with a synthetic backup at
+       `SCHEMA_VERSION = 0` (or any version below current) to confirm the
+       migration chain upgrades it correctly before restore.
+
+### End-to-End Tests (Playwright)
+
+- [ ] Timer flow: "In Bed" → "Going to Sleep" → "Wake Up" → verify in History
+       Confirm the saved entry has the correct `bedTimeUtc`, `sleepStartUtc`,
+       `wakeUtc`, and that Sleep Onset Latency is non-zero.
+- [ ] Manual back-fill: open form → fill Bed Time + Sleep Start + Wake + Quality → save
+       Verify the entry appears in History under the correct calendar date and
+       cycle number.
+- [ ] Edit an existing entry and verify cycle numbers recompute across all
+       affected entries.
+- [ ] Delete an entry and verify cycle numbers close the gap correctly.
+- [ ] Export JSON → clear all data → restore JSON (Replace mode)
+       Verify all entries are present, and field values match the original export.
+- [ ] Sign in with Google → verify sync pill transitions to "Synced"
+       → sign out → verify sync pill returns to unsigned-out state.
+
+### Cross-Device Testing
+
+- [ ] Android — Chrome PWA
+       Install to home screen, verify PWA icons, test the complete timer flow,
+       verify the sync pill, test offline mode (airplane mode during a session).
+- [ ] iOS — Safari PWA
+       Add to home screen, verify `apple-mobile-web-app-*` meta tags take
+       effect (status bar style, title). Test the timer flow and offline mode.
+       Safari is the most restrictive PWA environment and the most likely to
+       surface edge cases in IndexedDB and service worker behavior.
+- [ ] Desktop — Chrome, Firefox, Edge
+       Verify keyboard navigation (Tab order through all interactive elements,
+       Enter to submit forms, Escape to close drawer/modals).
+       Verify the app layout holds at wide viewport widths without breaking.
+
+### Stress Testing
+
+- [ ] Seed the database with 500+ entries and verify:
+       - Actogram renders and scrolls without frame drops on a mid-range Android device
+       - History View filters and sorts without perceptible lag (< 300 ms)
+       - Insights calculations (drift, rolling averages, free-running period)
+         complete in under 500 ms
+       - JSON export produces a valid file and completes without timing out
+       - Cycle number recomputation after a bulk delete completes in under 1 s
+       Use the existing Vitest fixture generators to seed the data programmatically.
+
+### Offline Mode Testing
+
+- [ ] Verify all core flows work with no network connection
+       - Start Sleep / Wake Up flow saves to IndexedDB with no errors
+       - History, Chart, and Insights load from local data only
+       - Sync pill shows the "Offline" state, not "Synced" or "Pending"
+       - Attempting to sign in while offline shows a clear error, not a blank state
+       - No unhandled Promise rejections in the console during offline use
+
+---
+
 ### Open Source
 
 - [ ] Review codebase for any private/sensitive data
@@ -909,5 +1084,3 @@
 - [ ] Performance audit (Lighthouse PWA score target: 95+)
 - [ ] Keep dependencies updated
 - [ ] Update changelog with every meaningful release
-
----
