@@ -135,7 +135,7 @@
 > start. A health app used by people who are often cognitively impaired by
 > sleep deprivation has a higher accessibility obligation than most.
 
-- [ ] 🟡 ARIA labels on all interactive elements that lack visible text
+- [x] 🟡 ARIA labels on all interactive elements that lack visible text
        (icon-only buttons, the sync pill, the tab bar icons, the actogram
        toggle buttons, the drawer close button, the quality rating stars)
 - [ ] 🟡 Keyboard navigation — full Tab order through all interactive elements
