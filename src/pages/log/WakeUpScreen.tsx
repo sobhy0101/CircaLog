@@ -195,7 +195,7 @@ export default function WakeUpScreen({
 
       {/* Fell Asleep — pre-filled from bed time, editable */}
       <div>
-        <label className="block text-sm font-medium text-circa-text-primary mb-1">
+        <label htmlFor="sleepDate" className="block text-sm font-medium text-circa-text-primary mb-1">
           Fell Asleep
           <span className="text-circa-text-muted font-normal text-xs ml-1">
             (adjust if you lay awake)
@@ -212,6 +212,7 @@ export default function WakeUpScreen({
           <input
             id="sleepTime"
             type="time"
+            aria-label="Sleep start time"
             value={sleepTime}
             onChange={e => setSleepTime(e.target.value)}
             className={`${inputClass} w-32`}
@@ -222,7 +223,7 @@ export default function WakeUpScreen({
 
       {/* Wake Time */}
       <div>
-        <label className="block text-sm font-medium text-circa-text-primary mb-1">
+        <label htmlFor="wakeDate" className="block text-sm font-medium text-circa-text-primary mb-1">
           Wake Time
         </label>
         <div className="flex gap-2">
@@ -236,6 +237,7 @@ export default function WakeUpScreen({
           <input
             id="wakeTime"
             type="time"
+            aria-label="Wake time"
             value={wakeTime}
             onChange={e => setWakeTime(e.target.value)}
             className={`${inputClass} w-32`}
@@ -268,6 +270,7 @@ export default function WakeUpScreen({
       {/* Optional fields toggle */}
       <button
         type="button"
+        aria-expanded={showOptional}
         onClick={() => setShowOptional(v => !v)}
         className="flex items-center gap-1 text-circa-accent-light text-sm"
       >
@@ -286,6 +289,7 @@ export default function WakeUpScreen({
                 <button
                   key={String(v)}
                   type="button"
+                  aria-pressed={hadDreams === v}
                   onClick={() => setHadDreams(v)}
                   className={[
                     'px-5 py-2 rounded-lg text-sm font-medium min-w-[44px] min-h-[44px]',
@@ -326,6 +330,7 @@ export default function WakeUpScreen({
                   <button
                     key={type}
                     type="button"
+                    aria-pressed={active}
                     onClick={() => toggleInterruption(type)}
                     className={[
                       'px-3 py-1 rounded-full text-sm min-h-[44px]',
@@ -368,6 +373,7 @@ export default function WakeUpScreen({
                 <button
                   key={String(v)}
                   type="button"
+                  aria-pressed={medicationTaken === v}
                   onClick={() => setMedicationTaken(v)}
                   className={[
                     'px-5 py-2 rounded-lg text-sm font-medium min-w-[44px] min-h-[44px]',
@@ -390,6 +396,7 @@ export default function WakeUpScreen({
                   <button
                     key={t}
                     type="button"
+                    aria-pressed={medicationTiming === t}
                     onClick={() => setMedicationTiming(t)}
                     className={[
                       'px-4 py-2 rounded-lg text-sm font-medium capitalize min-h-[44px]',

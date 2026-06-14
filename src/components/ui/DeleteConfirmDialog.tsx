@@ -22,10 +22,13 @@ export default function DeleteConfirmDialog({
     >
       {/* Card — stop propagation so tapping the card doesn't cancel */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-dialog-title"
         className="bg-circa-surface border border-circa-border rounded-2xl w-full max-w-sm p-5"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="text-circa-text-primary font-semibold text-base mb-1">
+        <h2 id="delete-dialog-title" className="text-circa-text-primary font-semibold text-base mb-1">
           Delete this session?
         </h2>
         <p className="text-circa-text-secondary text-sm mb-5">

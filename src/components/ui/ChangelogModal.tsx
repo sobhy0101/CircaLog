@@ -15,7 +15,11 @@ export default function ChangelogModal({ isOpen, entries, currentVersion, onClos
     <div className="fixed inset-0 z-60 bg-black/70 flex items-end sm:items-center justify-center">
 
       {/* Modal panel — full width on mobile (bottom sheet), max-w-lg centred on larger screens */}
-      <div className="
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="changelog-title"
+        className="
         w-full sm:max-w-lg
         max-h-[85vh]
         bg-circa-surface border border-circa-border
@@ -27,7 +31,7 @@ export default function ChangelogModal({ isOpen, entries, currentVersion, onClos
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-circa-border shrink-0">
           <div>
-            <h2 className="font-heading font-semibold text-circa-text-primary">
+            <h2 id="changelog-title" className="font-heading font-semibold text-circa-text-primary">
               What's New
             </h2>
             <p className="text-xs text-circa-text-muted mt-0.5">

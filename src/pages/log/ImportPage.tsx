@@ -464,8 +464,13 @@ export default function ImportPage() {
         <>
           <div className="fixed inset-0 z-40 bg-black/60" aria-hidden="true" />
           <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
-            <div className="w-full max-w-sm rounded-2xl bg-circa-surface border border-circa-border p-6 space-y-4">
-              <h2 className="font-heading text-base font-semibold text-circa-text-primary">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="leave-warning-title"
+              className="w-full max-w-sm rounded-2xl bg-circa-surface border border-circa-border p-6 space-y-4"
+            >
+              <h2 id="leave-warning-title" className="font-heading text-base font-semibold text-circa-text-primary">
                 Import in progress
               </h2>
               <p className="text-sm text-circa-text-secondary">

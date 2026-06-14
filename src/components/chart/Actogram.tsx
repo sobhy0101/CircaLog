@@ -14,6 +14,16 @@ import type { ActogramData, ActogramCycle, SleepBlock, TimeRange } from '@/hooks
 
 const RANGES: TimeRange[] = ['1W', '2W', '1M', '3M', '6M', '1Y', 'All'];
 
+const RANGE_ARIA_LABELS: Record<TimeRange, string> = {
+  '1W':  '1 week',
+  '2W':  '2 weeks',
+  '1M':  '1 month',
+  '3M':  '3 months',
+  '6M':  '6 months',
+  '1Y':  '1 year',
+  'All': 'All time',
+};
+
 const CHART_MARGIN = { top: 8, right: 16, bottom: 8, left: 56 };
 const COL_WIDTH = 56; // pixels per cycle column
 
@@ -378,12 +388,18 @@ function RangeButtons({ selected, onChange }: {
   return (
     <div className="flex gap-2 px-4 py-3 overflow-x-auto whitespace-nowrap">
       {RANGES.map(r => (
-        <button key={r} type="button" onClick={() => onChange(r)}
+        <button
+          key={r}
+          type="button"
+          onClick={() => onChange(r)}
+          aria-label={RANGE_ARIA_LABELS[r]}
+          aria-pressed={selected === r}
           className={`rounded-full text-xs px-3 border min-h-9 ${
             selected === r
               ? 'text-circa-accent-light border-circa-accent-light'
               : 'text-circa-text-secondary border-circa-border'
-          }`}>
+          }`}
+        >
           {r}
         </button>
       ))}

@@ -108,3 +108,10 @@ globals
 ExportPage
 ImportPage
 RestorePage
+QualityPicker
+SideDrawer
+TalkBack
+VoiceOver
+Xh
+Ym
+WakeUpScreen

@@ -12,5 +12,7 @@
   },
   "[xml]": {
     "editor.defaultFormatter": "redhat.vscode-xml"
-  }
+  },
+  "axe-linter.enabled": true,
+  "axe-linter.runOnSave": true
 }

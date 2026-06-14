@@ -70,6 +70,7 @@ export default function EmailCapture() {
       <div className="flex w-full gap-2">
         <input
           type="email"
+          aria-label="Email address"
           value={email}
           onChange={e => { setEmail(e.target.value); setInputError('') }}
           placeholder="your@email.com"

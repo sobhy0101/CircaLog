@@ -186,7 +186,7 @@
 > The state between Step 1 and Step 2 (and between Step 2 and Wake Up)
 > must survive app close/reopen. Persist the in-progress session to
 > `localStorage` or as a draft `SleepEntry` in IndexedDB so that closing
-> the app mid-session does not lose the bed time.
+> the app mid-session does not lose the bedtime.
 >
 > **Manual entry form:**
 > The back-fill form already has an optional Bed Time field (implemented).
@@ -470,7 +470,7 @@
        Include a manual "Flush sync queue" button and a "Clear all local data" button
        (double-confirmed — this is destructive and irreversible).
 - [ ] 🟢 Error reporting to user — on unhandled errors caught by the Error Boundary,
-       offer a one-tap "Copy error details" button so the user can paste into an
+       offer a one-tap "Copy error details" button, so the user can paste into an
        email to `circalog.app@gmail.com`. No third-party service required.
 - [ ] 🟢 Production error tracking — evaluate options when real users exist
        Sentry free tier vs. Vercel's built-in error tracking. Defer until the app
@@ -864,7 +864,7 @@
        Google Fit API, or a direct Bluetooth/SDK path. Evaluate data availability,
        export granularity (onset time, wake time, duration, sleep stages if available),
        and whether the integration requires a companion app or can run entirely in-browser.
-- [ ] Map wearable sleep session fields to `SleepEntry` — decide what to auto-fill
+- [ ] Map wearable sleep session fields to `SleepEntry` — decide what to autofill
        vs. what to prompt the user to confirm (quality rating cannot come from the
        wearable; the user must still rate each session)
 - [ ] Build wearable import UI — similar to the CSV import flow:
@@ -1086,7 +1086,7 @@
        sync write or circadian engine error shipping to production risks
        data integrity for a real patient's health records.
        Add a GitHub Actions workflow that runs `npm run test` (Vitest) and
-       blocks the deploy if any test fails. Target milestone: before the
+       blocks the deployment if any test fails. Target milestone: before the
        first external user is given access to the app.
 - [ ] Test on Android (Chrome PWA)
 - [ ] Test on iOS (Safari PWA — limited but functional)

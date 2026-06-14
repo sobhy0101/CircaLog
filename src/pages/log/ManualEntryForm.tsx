@@ -232,7 +232,7 @@ export default function ManualEntryForm({
 
       {/* Bed Time — optional */}
       <div>
-        <label className="block text-sm font-medium text-circa-text-primary mb-1">
+        <label htmlFor="bedDate" className="block text-sm font-medium text-circa-text-primary mb-1">
           Bed Time{' '}
           <span className="text-circa-text-muted font-normal">(optional)</span>
         </label>
@@ -254,6 +254,7 @@ export default function ManualEntryForm({
           <input
             id="bedTime"
             type="time"
+            aria-label="Bed time"
             value={bedTime}
             onChange={e => setBedTime(e.target.value)}
             className={`${inputClass} w-32`}
@@ -266,7 +267,7 @@ export default function ManualEntryForm({
 
       {/* Sleep Start — required */}
       <div>
-        <label className="block text-sm font-medium text-circa-text-primary mb-1">
+        <label htmlFor="sleepDate" className="block text-sm font-medium text-circa-text-primary mb-1">
           Fell Asleep
         </label>
         <div className="flex gap-2 items-start">
@@ -287,6 +288,7 @@ export default function ManualEntryForm({
           <input
             id="sleepTime"
             type="time"
+            aria-label="Sleep start time"
             value={sleepTime}
             onChange={e => setSleepTime(e.target.value)}
             className={`${inputClass} w-32`}
@@ -297,7 +299,7 @@ export default function ManualEntryForm({
 
       {/* Wake Time — required */}
       <div>
-        <label className="block text-sm font-medium text-circa-text-primary mb-1">
+        <label htmlFor="wakeDate" className="block text-sm font-medium text-circa-text-primary mb-1">
           Woke Up
         </label>
         <div className="flex gap-2 items-start">
@@ -318,6 +320,7 @@ export default function ManualEntryForm({
           <input
             id="wakeTime"
             type="time"
+            aria-label="Wake time"
             value={wakeTime}
             onChange={e => setWakeTime(e.target.value)}
             className={`${inputClass} w-32`}
@@ -350,6 +353,7 @@ export default function ManualEntryForm({
       {/* Optional fields toggle */}
       <button
         type="button"
+        aria-expanded={showOptional}
         onClick={() => setShowOptional(v => !v)}
         className="flex items-center gap-1 text-circa-accent-light text-sm mt-1"
       >
@@ -368,6 +372,7 @@ export default function ManualEntryForm({
                 <button
                   key={String(v)}
                   type="button"
+                  aria-pressed={hadDreams === v}
                   onClick={() => setHadDreams(v)}
                   className={[
                     'px-5 py-2 rounded-lg text-sm font-medium min-w-[44px] min-h-[44px]',
@@ -409,6 +414,7 @@ export default function ManualEntryForm({
                   <button
                     key={type}
                     type="button"
+                    aria-pressed={active}
                     onClick={() => toggleInterruption(type)}
                     className={[
                       'px-3 py-1 rounded-full text-sm min-h-[44px]',
@@ -452,6 +458,7 @@ export default function ManualEntryForm({
                 <button
                   key={String(v)}
                   type="button"
+                  aria-pressed={medicationTaken === v}
                   onClick={() => setMedicationTaken(v)}
                   className={[
                     'px-5 py-2 rounded-lg text-sm font-medium min-w-[44px] min-h-[44px]',
@@ -475,6 +482,7 @@ export default function ManualEntryForm({
                   <button
                     key={t}
                     type="button"
+                    aria-pressed={medicationTiming === t}
                     onClick={() => setMedicationTiming(t)}
                     className={[
                       'px-4 py-2 rounded-lg text-sm font-medium capitalize min-h-[44px]',

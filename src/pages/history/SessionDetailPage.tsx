@@ -122,6 +122,7 @@ export default function SessionDetailPage() {
         <header className="px-4 pt-5 pb-2 flex items-center justify-between">
           <button
             type="button"
+            aria-label="Back to session details"
             onClick={() => setSearchParams({})}
             className="text-circa-accent-light text-sm"
           >
@@ -169,6 +170,7 @@ export default function SessionDetailPage() {
       <header className="px-4 pt-5 pb-2 flex items-center justify-between">
         <button
           type="button"
+          aria-label="Back to history"
           onClick={() => navigate(-1)}
           className="text-circa-accent-light text-sm min-w-14"
         >

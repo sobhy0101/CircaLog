@@ -48,6 +48,7 @@ export default function LogPage() {
         {view === 'manual' && (
           <button
             onClick={() => setView('start')}
+            aria-label="Back to log"
             className="text-circa-accent-light text-sm"
           >
             ← Back

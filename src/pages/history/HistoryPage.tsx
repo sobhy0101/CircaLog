@@ -297,6 +297,7 @@ export default function HistoryPage() {
               type="button"
               onClick={() => setIsFilterOpen(prev => !prev)}
               aria-label={isFilterOpen ? 'Close filters' : 'Open filters'}
+              aria-expanded={isFilterOpen}
               className={`min-h-11 min-w-11 flex items-center justify-center ${
                 isFilterActive ? 'text-circa-accent-light' : 'text-circa-text-secondary'
               }`}
@@ -365,6 +366,7 @@ export default function HistoryPage() {
               <button
                 key={mode}
                 type="button"
+                aria-pressed={sortMode === mode}
                 onClick={() => setSortMode(mode)}
                 className={`rounded-full text-xs px-3 border min-h-9 ${
                   sortMode === mode
@@ -396,6 +398,7 @@ export default function HistoryPage() {
                       <button
                         key={value}
                         type="button"
+                        aria-pressed={filterType === value}
                         onClick={() => setFilterType(value)}
                         className={`rounded-full text-xs px-2.5 border min-h-9 ${
                           filterType === value
@@ -426,6 +429,12 @@ export default function HistoryPage() {
                       <button
                         key={value}
                         type="button"
+                        aria-label={
+                          value === 0 ? 'All ratings' :
+                          value === 1 ? '1 star' :
+                          `${value} stars`
+                        }
+                        aria-pressed={filterQuality === value}
                         onClick={() => setFilterQuality(value)}
                         className={`rounded-full text-xs px-2.5 border min-h-9 ${
                           filterQuality === value
