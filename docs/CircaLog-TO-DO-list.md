@@ -118,38 +118,6 @@
 - [x] 🟢 App name + tagline
 - [x] 🟢 "Get notified at launch" email capture (optional, simple)
 
-### 🔍 SEO & Discoverability
-
-> Applies primarily to the landing page at `/`. The `/log` app itself does
-> not need search engine visibility — it is an authenticated tool, not a
-> public content page. The goal here is that when CircaLog is shared or
-> searched, it presents correctly: in Google results, in link previews on
-> WhatsApp/X/LinkedIn, and in browser/OS UI chrome.
-
-- [ ] 🟢 `<meta name="description">` — landing page summary, ≤160 characters
-- [ ] 🟢 Open Graph meta tags in `index.html`
-       (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`)
-       — controls link preview appearance on WhatsApp, X, LinkedIn, iMessage, etc.
-- [ ] 🟢 Twitter Card meta tags in `index.html`
-       (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`)
-- [ ] 🟢 Social preview image — design and export a 1200×630 px OG image
-       (`public/images/brand/og-image.png`); reference it in both OG and Twitter tags
-- [ ] 🟢 `robots.txt` — allow crawling of `/`, disallow `/log/*`
-       (the PWA app should not appear in search results)
-- [ ] 🟢 `sitemap.xml` — list the landing page URL only; submit to Google Search Console
-- [ ] 🟢 Google Search Console — add property, verify ownership, submit sitemap
-       (can be done with the `circalog.vercel.app` URL until the real domain is purchased)
-- [ ] 🟢 Security headers in `vercel.json`
-       (`Content-Security-Policy`, `X-Frame-Options: DENY`, `Referrer-Policy`,
-       `Permissions-Policy`, `X-Content-Type-Options: nosniff`)
-       — important for a health app; prevents clickjacking and data leakage
-- [ ] ⚪ Google Analytics (GA4) — **UNDETERMINED**
-       Dedicated planning session required before implementation.
-       Vercel Analytics already provides page views and web vitals.
-       GA4 adds funnel analysis and audience data but introduces GDPR obligations
-       (cookie consent banner, privacy policy update, data processing agreement).
-       Do not implement until the tradeoffs have been evaluated in full.
-
 ### 🏠 App Shell & Navigation
 
 - [x] 🟡 Build base app shell (bottom tab bar + side drawer layout)
@@ -724,7 +692,7 @@
 - [x] "About CircaLog" page at `/log/about` — wire "About" drawer button
        (App version, open-source attribution, contact/support link.
         Distinct from the "About Non-24" educational content below.)
-- [ ] "About Non-24" section in side drawer
+- [x] "About Non-24" section in side drawer
 - [ ] Brief explanation of Non-24, free-running period, actograms
 - [ ] Curated links to reputable resources (NIH, Sleep Foundation, etc.)
 
@@ -816,8 +784,52 @@
 
 - [ ] Purchase `circalog.app` domain
        Prerequisite for: full marketing page, Play Store listing URL, Google Search
-       Console real-domain property. Can use `circalog.vercel.app` for everything
-       until this point — purchase only when the app is otherwise ready for public launch.
+       Console real-domain property. Purchase only when the app is otherwise ready for public launch.
+
+### 🔍 SEO & Discoverability
+
+> CircaLog has two categories of publicly indexable content: the landing
+> page at `/`, and the public app pages (`/log/about`, `/log/help`,
+> `/log/educational-resources`, `/log/privacy`, `/log/terms`, etc.).
+> Private app routes — Log, Chart, History, Insights, Settings, Export,
+> Import — must not appear in search results; they are personal screens
+> with no public content. The goal here is that when CircaLog is shared
+> or searched, it presents correctly: in Google results, in link previews
+> on WhatsApp/X/LinkedIn, and in browser/OS UI chrome.
+
+- [ ] 🟢 `<meta name="description">` — describe CircaLog as an app, ≤160 characters
+       (this tag lives in `index.html` and applies to all routes in the SPA;
+       write it to describe the app itself, not the landing page specifically)
+- [ ] 🟢 Open Graph meta tags in `index.html`
+       (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`)
+       — controls link preview appearance on WhatsApp, X, LinkedIn, iMessage, etc.
+- [ ] 🟢 Twitter Card meta tags in `index.html`
+       (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`)
+- [ ] 🟢 Social preview image — design and export a 1200×630 px OG image
+       (`public/images/brand/og-image.png`); reference it in both OG and Twitter tags
+- [ ] 🟢 `robots.txt` — allow crawling of `/` and public app pages
+       (`/log/about`, `/log/help`, `/log/educational-resources`, `/log/privacy`,
+       `/log/terms`, etc.); disallow all other `/log/*` routes (Chart, History,
+       Insights, Settings, Export, Import have no indexable content)
+- [ ] 🟢 `sitemap.xml` — list all publicly indexable URLs: the landing page at `/`
+       and the public app pages (`/log/about`, `/log/help`,
+       `/log/educational-resources`, `/log/privacy`, `/log/terms`, etc.);
+       submit to Google Search Console
+- [ ] 🟢 Google Search Console — add property for `circalog.app`, verify ownership,
+       submit sitemap. Set up only after the domain is purchased — GSC properties
+       are domain-specific and data does not transfer; setting up under
+       `circalog.vercel.app` produces data that is permanently abandoned when
+       the real domain goes live.
+- [ ] 🟢 Security headers in `vercel.json`
+       (`Content-Security-Policy`, `X-Frame-Options: DENY`, `Referrer-Policy`,
+       `Permissions-Policy`, `X-Content-Type-Options: nosniff`)
+       — important for a health app; prevents clickjacking and data leakage
+- [ ] ⚪ Google Analytics (GA4) — **UNDETERMINED**
+       Dedicated planning session required before implementation.
+       Vercel Analytics already provides page views and web vitals.
+       GA4 adds funnel analysis and audience data but introduces GDPR obligations
+       (cookie consent banner, privacy policy update, data processing agreement).
+       Do not implement until the tradeoffs have been evaluated in full.
 
 ### Multi-User Architecture
 
