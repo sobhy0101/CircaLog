@@ -138,7 +138,7 @@
 - [x] 🟡 ARIA labels on all interactive elements that lack visible text
        (icon-only buttons, the sync pill, the tab bar icons, the actogram
        toggle buttons, the drawer close button, the quality rating stars)
-- [ ] 🟡 Keyboard navigation — full Tab order through all interactive elements
+- [x] 🟡 Keyboard navigation — full Tab order through all interactive elements
        on every screen; no keyboard traps except intentional modals/drawers
 - [ ] 🟡 Focus traps in modals and the side drawer
        When the drawer or a confirmation dialog is open, Tab must cycle within

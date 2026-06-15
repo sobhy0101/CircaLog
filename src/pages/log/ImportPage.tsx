@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useImport } from '@/hooks/useImport'
 import type { ParsedRow } from '@/utils/csvParser'
 import GoogleSignInButton from '@/components/ui/GoogleSignInButton'
+import { FocusTrap } from 'focus-trap-react'
 
 // ---------------------------------------------------------------------------
 // Small helper — session type label derived from duration
@@ -464,11 +465,21 @@ export default function ImportPage() {
         <>
           <div className="fixed inset-0 z-40 bg-black/60" aria-hidden="true" />
           <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
+            {/* allowOutsideClick: false — the positioning div has no click handler;
+                the import dialog has no "tap outside to dismiss" behaviour. */}
+            <FocusTrap
+              focusTrapOptions={{
+                escapeDeactivates: false,
+                returnFocusOnDeactivate: true,
+                allowOutsideClick: false,
+              }}
+            >
             <div
               role="dialog"
               aria-modal="true"
               aria-labelledby="leave-warning-title"
               className="w-full max-w-sm rounded-2xl bg-circa-surface border border-circa-border p-6 space-y-4"
+              onKeyDown={(e) => { if (e.key === 'Escape') cancelLeave(); }}
             >
               <h2 id="leave-warning-title" className="font-heading text-base font-semibold text-circa-text-primary">
                 Import in progress
@@ -503,6 +514,7 @@ export default function ImportPage() {
                 </button>
               </div>
             </div>
+            </FocusTrap>
           </div>
         </>
       )}

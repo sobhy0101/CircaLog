@@ -1,4 +1,5 @@
 import type { ChangelogEntry } from '@/hooks/useChangelog'
+import { FocusTrap } from 'focus-trap-react'
 
 interface ChangelogModalProps {
   isOpen: boolean
@@ -14,11 +15,25 @@ export default function ChangelogModal({ isOpen, entries, currentVersion, onClos
     // Full-screen backdrop — z-60 sits above the drawer (z-50)
     <div className="fixed inset-0 z-60 bg-black/70 flex items-end sm:items-center justify-center">
 
-      {/* Modal panel — full width on mobile (bottom sheet), max-w-lg centred on larger screens */}
+      {/* No active prop: FocusTrap defaults to active={true} on mount.
+          The component only renders when isOpen is true, so the trap is
+          always active while the modal is visible.
+          returnFocusOnDeactivate: true — returns focus to the trigger element
+            (e.g. the "What's New" button) when the modal closes.
+          allowOutsideClick: true — the backdrop has no click handler here,
+            but keeping this consistent prevents any interference. */}
+      <FocusTrap
+        focusTrapOptions={{
+          escapeDeactivates: false,
+          returnFocusOnDeactivate: true,
+          allowOutsideClick: true,
+        }}
+      >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="changelog-title"
+        onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
         className="
         w-full sm:max-w-lg
         max-h-[85vh]
@@ -131,6 +146,7 @@ export default function ChangelogModal({ isOpen, entries, currentVersion, onClos
         </div>
 
       </div>
+      </FocusTrap>
     </div>
   )
 }

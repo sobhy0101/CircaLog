@@ -14,6 +14,7 @@ import GoogleSignInButton  from '@/components/ui/GoogleSignInButton';
 import UserAvatar          from '@/components/ui/UserAvatar';
 import { useAuth }         from '@/hooks/useAuth';
 import { useNavigate }     from 'react-router-dom';
+import { FocusTrap }       from 'focus-trap-react';
 
 interface SideDrawerProps {
   isOpen: boolean;
@@ -36,8 +37,27 @@ export default function SideDrawer({ isOpen, onClose, onOpenChangelog }: SideDra
         />
       )}
 
-      {/* Drawer panel */}
+      {/* FocusTrap wraps the drawer panel only. The backdrop is outside the trap
+          so backdrop clicks pass through to onClose normally.
+          active={isOpen}: trap activates on open, deactivates on close.
+          escapeDeactivates: false — Escape is handled explicitly via onKeyDown.
+          returnFocusOnDeactivate: true — returns focus to the element that was
+            focused before the drawer opened (typically the hamburger button).
+          allowOutsideClick: true — backdrop click must still reach onClose. */}
+      <FocusTrap
+        active={isOpen}
+        focusTrapOptions={{
+          escapeDeactivates: false,
+          returnFocusOnDeactivate: true,
+          allowOutsideClick: true,
+        }}
+      >
+      {/* inert when closed: removes all child elements from the Tab order
+          and blocks keyboard/pointer events on the off-screen panel.
+          React 19 types accept inert as '' | undefined on HTMLElement props. */}
       <div
+        inert={!isOpen || undefined}
+        onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
         className={`
           fixed top-0 left-0 h-full w-72 z-50
           bg-circa-surface border-r border-circa-border
@@ -288,6 +308,7 @@ export default function SideDrawer({ isOpen, onClose, onOpenChangelog }: SideDra
         </div>
 
       </div>
+      </FocusTrap>
     </>
   );
 }

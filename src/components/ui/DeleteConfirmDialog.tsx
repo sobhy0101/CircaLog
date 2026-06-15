@@ -1,4 +1,5 @@
 import type { SleepEntry } from '@/lib/circadian';
+import { FocusTrap } from 'focus-trap-react';
 
 interface DeleteConfirmDialogProps {
   entry: SleepEntry;
@@ -20,6 +21,15 @@ export default function DeleteConfirmDialog({
       style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       onClick={onCancel}
     >
+      {/* allowOutsideClick: true — the backdrop's onClick={onCancel} must still fire
+          when the user taps outside the card. */}
+      <FocusTrap
+        focusTrapOptions={{
+          escapeDeactivates: false,
+          returnFocusOnDeactivate: true,
+          allowOutsideClick: true,
+        }}
+      >
       {/* Card — stop propagation so tapping the card doesn't cancel */}
       <div
         role="dialog"
@@ -27,6 +37,7 @@ export default function DeleteConfirmDialog({
         aria-labelledby="delete-dialog-title"
         className="bg-circa-surface border border-circa-border rounded-2xl w-full max-w-sm p-5"
         onClick={e => e.stopPropagation()}
+        onKeyDown={(e) => { if (e.key === 'Escape') onCancel(); }}
       >
         <h2 id="delete-dialog-title" className="text-circa-text-primary font-semibold text-base mb-1">
           Delete this session?
@@ -58,6 +69,7 @@ export default function DeleteConfirmDialog({
           </button>
         </div>
       </div>
+      </FocusTrap>
     </div>
   );
 }
