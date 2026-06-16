@@ -88,7 +88,10 @@ export default function ExportPage() {
 
         {/* Success */}
         {status === 'done' && (
-          <div className="rounded-xl bg-circa-success/10 border border-circa-success/30 px-4 py-3">
+          <div
+            role="status"
+            className="rounded-xl bg-circa-success/10 border border-circa-success/30 px-4 py-3"
+          >
             <p className="text-sm font-medium text-circa-success">
               ✓ Backup saved. Keep this file somewhere safe.
             </p>
@@ -97,7 +100,10 @@ export default function ExportPage() {
 
         {/* Error */}
         {status === 'error' && errorMessage && (
-          <div className="rounded-xl bg-circa-error/10 border border-circa-error/30 px-4 py-3">
+          <div
+            role="alert"
+            className="rounded-xl bg-circa-error/10 border border-circa-error/30 px-4 py-3"
+          >
             <p className="text-sm text-circa-error">{errorMessage}</p>
           </div>
         )}

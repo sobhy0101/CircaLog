@@ -80,7 +80,7 @@ export default function RestorePage() {
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
           </div>
-          <div className="space-y-2">
+          <div role="status" className="space-y-2">
             <h2 className="text-xl font-semibold text-circa-text-primary">Restore complete</h2>
             <p className="text-sm text-circa-text-secondary">
               <span className="text-circa-text-primary font-medium">{restoredCount ?? 0}</span> session(s) restored.
@@ -118,7 +118,7 @@ export default function RestorePage() {
               <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="3" strokeLinecap="round" />
             </svg>
           </div>
-          <div className="space-y-2">
+          <div role="alert" className="space-y-2">
             <h2 className="text-xl font-semibold text-circa-text-primary">Restore failed</h2>
             <p className="text-sm text-circa-text-secondary max-w-xs mx-auto">{errorMessage}</p>
           </div>
@@ -213,7 +213,7 @@ export default function RestorePage() {
         {phase === 'parsing' && (
           <div className="space-y-4">
             {Spinner}
-            <p className="text-center text-sm text-circa-text-secondary">Reading backup file…</p>
+            <p role="status" className="text-center text-sm text-circa-text-secondary">Reading backup file…</p>
           </div>
         )}
 
@@ -301,7 +301,7 @@ export default function RestorePage() {
         {phase === 'restoring' && (
           <div className="space-y-4">
             {Spinner}
-            <p className="text-center text-sm text-circa-text-secondary">Restoring sessions…</p>
+            <p role="status" className="text-center text-sm text-circa-text-secondary">Restoring sessions…</p>
           </div>
         )}
 

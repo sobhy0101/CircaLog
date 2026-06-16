@@ -208,7 +208,7 @@ export default function ImportPage() {
                 </button>
 
                 {gateError && (
-                  <p className="text-sm text-circa-error px-1">{gateError}</p>
+                  <p role="alert" className="text-sm text-circa-error px-1">{gateError}</p>
                 )}
               </div>
             )}
@@ -314,7 +314,10 @@ export default function ImportPage() {
 
                 {/* Gate error */}
                 {gateError && (
-                  <div className="rounded-lg bg-circa-error/10 border border-circa-error/30 px-4 py-3">
+                  <div
+                    role="alert"
+                    className="rounded-lg bg-circa-error/10 border border-circa-error/30 px-4 py-3"
+                  >
                     <p className="text-sm text-circa-error">{gateError}</p>
                     <button
                       onClick={() => startImport(ianaTimezone)}
@@ -362,7 +365,11 @@ export default function ImportPage() {
             {/* Phase: importing — progress */}
             {phase === 'importing' && progress && (
               <div className="space-y-4">
-                <p className="text-sm text-circa-text-secondary">
+                <p
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className="text-sm text-circa-text-secondary"
+                >
                   Importing row{' '}
                   <span className="text-circa-text-primary font-medium">{progress.current}</span>
                   {' '}of{' '}
@@ -371,7 +378,14 @@ export default function ImportPage() {
                 </p>
 
                 {/* Progress bar */}
-                <div className="w-full h-2 rounded-full bg-circa-surface-raised overflow-hidden">
+                <div
+                  role="progressbar"
+                  aria-valuenow={progress.current}
+                  aria-valuemin={0}
+                  aria-valuemax={progress.total}
+                  aria-label="Import progress"
+                  className="w-full h-2 rounded-full bg-circa-surface-raised overflow-hidden"
+                >
                   <div
                     className="h-full rounded-full bg-circa-accent transition-all duration-300"
                     style={{ width: `${Math.round((progress.current / progress.total) * 100)}%` }}
@@ -386,7 +400,7 @@ export default function ImportPage() {
 
             {/* Phase: done — result */}
             {phase === 'done' && result && (
-              <div className="space-y-4">
+              <div role="status" className="space-y-4">
 
                 {/* Success summary */}
                 <div className="rounded-xl bg-circa-success/10 border border-circa-success/30 px-4 py-4 space-y-1">
@@ -406,7 +420,10 @@ export default function ImportPage() {
 
                 {/* Sync error block */}
                 {result.syncError && (
-                  <div className="rounded-xl bg-circa-error/10 border border-circa-error/30 px-4 py-4 space-y-2">
+                  <div
+                    role="alert"
+                    className="rounded-xl bg-circa-error/10 border border-circa-error/30 px-4 py-4 space-y-2"
+                  >
                     <p className="text-sm font-medium text-circa-error">
                       ⚠️ SYNC_ERR_{result.syncError.code}: {result.syncError.message}
                     </p>

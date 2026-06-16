@@ -277,6 +277,7 @@ export default function ManualEntryForm({
               type="date"
               value={sleepDate}
               onChange={e => setSleepDate(e.target.value)}
+              aria-describedby={sleepError ? 'manual-sleep-error' : undefined}
               className={inputClass}
             />
             {sleepDate && (
@@ -291,10 +292,15 @@ export default function ManualEntryForm({
             aria-label="Sleep start time"
             value={sleepTime}
             onChange={e => setSleepTime(e.target.value)}
+            aria-describedby={sleepError ? 'manual-sleep-error' : undefined}
             className={`${inputClass} w-32`}
           />
         </div>
-        {sleepError && <p className="text-red-400 text-xs mt-1">{sleepError}</p>}
+        {sleepError && (
+          <p id="manual-sleep-error" role="alert" className="text-red-400 text-xs mt-1">
+            {sleepError}
+          </p>
+        )}
       </div>
 
       {/* Wake Time — required */}
@@ -309,6 +315,7 @@ export default function ManualEntryForm({
               type="date"
               value={wakeDate}
               onChange={e => setWakeDate(e.target.value)}
+              aria-describedby={wakeError ? 'manual-wake-error' : undefined}
               className={inputClass}
             />
             {wakeDate && (
@@ -323,16 +330,25 @@ export default function ManualEntryForm({
             aria-label="Wake time"
             value={wakeTime}
             onChange={e => setWakeTime(e.target.value)}
+            aria-describedby={wakeError ? 'manual-wake-error' : undefined}
             className={`${inputClass} w-32`}
           />
         </div>
-        {wakeError && <p className="text-red-400 text-xs mt-1">{wakeError}</p>}
+        {wakeError && (
+          <p id="manual-wake-error" role="alert" className="text-red-400 text-xs mt-1">
+            {wakeError}
+          </p>
+        )}
       </div>
 
       {/* Quality — required */}
       <div>
-        <QualityPicker label="Sleep Quality" value={quality} onChange={setQuality} />
-        {qualityError && <p className="text-red-400 text-xs mt-1 text-center">{qualityError}</p>}
+        <QualityPicker label="Sleep Quality" value={quality} onChange={setQuality} errorId={qualityError ? 'manual-quality-error' : undefined} />
+        {qualityError && (
+          <p id="manual-quality-error" role="alert" className="text-red-400 text-xs mt-1 text-center">
+            {qualityError}
+          </p>
+        )}
       </div>
 
       {/* Notes — optional */}
@@ -502,7 +518,10 @@ export default function ManualEntryForm({
 
       {/* DB error banner */}
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg px-3 py-2 text-red-400 text-sm">
+        <div
+          role="alert"
+          className="bg-red-900/30 border border-red-700 rounded-lg px-3 py-2 text-red-400 text-sm"
+        >
           {error}
         </div>
       )}

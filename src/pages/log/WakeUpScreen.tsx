@@ -207,6 +207,7 @@ export default function WakeUpScreen({
             type="date"
             value={sleepDate}
             onChange={e => setSleepDate(e.target.value)}
+            aria-describedby={sleepError ? 'wake-sleep-error' : undefined}
             className={`${inputClass} flex-1`}
           />
           <input
@@ -215,10 +216,15 @@ export default function WakeUpScreen({
             aria-label="Sleep start time"
             value={sleepTime}
             onChange={e => setSleepTime(e.target.value)}
+            aria-describedby={sleepError ? 'wake-sleep-error' : undefined}
             className={`${inputClass} w-32`}
           />
         </div>
-        {sleepError && <p className="text-red-400 text-xs mt-1">{sleepError}</p>}
+        {sleepError && (
+          <p id="wake-sleep-error" role="alert" className="text-red-400 text-xs mt-1">
+            {sleepError}
+          </p>
+        )}
       </div>
 
       {/* Wake Time */}
@@ -232,6 +238,7 @@ export default function WakeUpScreen({
             type="date"
             value={wakeDate}
             onChange={e => setWakeDate(e.target.value)}
+            aria-describedby={wakeError ? 'wake-wake-error' : undefined}
             className={`${inputClass} flex-1`}
           />
           <input
@@ -240,16 +247,25 @@ export default function WakeUpScreen({
             aria-label="Wake time"
             value={wakeTime}
             onChange={e => setWakeTime(e.target.value)}
+            aria-describedby={wakeError ? 'wake-wake-error' : undefined}
             className={`${inputClass} w-32`}
           />
         </div>
-        {wakeError && <p className="text-red-400 text-xs mt-1">{wakeError}</p>}
+        {wakeError && (
+          <p id="wake-wake-error" role="alert" className="text-red-400 text-xs mt-1">
+            {wakeError}
+          </p>
+        )}
       </div>
 
       {/* Quality */}
       <div>
-        <QualityPicker label="How did you sleep?" value={quality} onChange={setQuality} />
-        {qualityError && <p className="text-red-400 text-xs mt-1 text-center">{qualityError}</p>}
+        <QualityPicker label="How did you sleep?" value={quality} onChange={setQuality} errorId={qualityError ? 'wake-quality-error' : undefined} />
+        {qualityError && (
+          <p id="wake-quality-error" role="alert" className="text-red-400 text-xs mt-1 text-center">
+            {qualityError}
+          </p>
+        )}
       </div>
 
       {/* Notes */}
@@ -416,7 +432,10 @@ export default function WakeUpScreen({
 
       {/* DB error banner */}
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg px-3 py-2 text-red-400 text-sm">
+        <div
+          role="alert"
+          className="bg-red-900/30 border border-red-700 rounded-lg px-3 py-2 text-red-400 text-sm"
+        >
           {error}
         </div>
       )}

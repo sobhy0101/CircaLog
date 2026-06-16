@@ -4,6 +4,7 @@ interface QualityPickerProps {
   value: number | null;
   onChange: (v: number) => void;
   label?: string;
+  errorId?: string;
 }
 
 const LABELS: Record<number, string> = {
@@ -14,7 +15,7 @@ const LABELS: Record<number, string> = {
   5: 'Excellent',
 };
 
-export default function QualityPicker({ value, onChange, label }: QualityPickerProps) {
+export default function QualityPicker({ value, onChange, label, errorId }: QualityPickerProps) {
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Arrow key navigation for the radiogroup — moves focus and selection together.
@@ -40,6 +41,7 @@ export default function QualityPicker({ value, onChange, label }: QualityPickerP
       <div
         role="radiogroup"
         aria-label={label ?? 'Sleep quality rating'}
+        aria-describedby={errorId}
         className="flex items-center justify-center gap-3 w-full px-4"
       >
         {[1, 2, 3, 4, 5].map(n => {
