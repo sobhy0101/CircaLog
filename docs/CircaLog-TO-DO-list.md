@@ -147,10 +147,22 @@
 - [x] 🟢 Screen reader support — test with TalkBack (Android) and VoiceOver (iOS)
        Ensure all status changes (sync state, import progress, form errors) are
        announced; live regions (`aria-live`) where appropriate.
-- [ ] 🟡 Minimum tap target size — 44×44 px on all tappable elements
-       Audit the tab bar icons, the quality star buttons, the filter chips,
-       and the actogram range toggle buttons. Applies especially to elements
-       used when the patient is drowsy.
+- [x] 🟡 Minimum tap target size — 44×44 px on all tappable elements
+        Audit the tab bar icons, the quality star buttons, the filter chips,
+        and the actogram range toggle buttons. Applies especially to elements
+        used when the patient is drowsy.
+        Fixes applied (16 Jun 2026): actogram range buttons (min-h-9 → min-h-11),
+        actogram tooltip × button (32×32 → 44×44), History sort/filter chips
+        (min-h-9 → min-h-11), History "Clear" buttons (added min-h-11), EntryCard
+        Edit + Delete buttons (added min-w-11). QualityPicker stars and tab bar
+        buttons already compliant.
+- [ ] 🟢 Remaining tap target fixes — secondary text buttons in the log flow
+        Discovered during Phase 1 tap target audit; deferred as out of scope.
+        Three files, no new deps — Tier 1:
+        - LogPage.tsx: "Log manually" + "← Back" header buttons (no min-h)
+        - ManualEntryForm.tsx: "More details" toggle + "Cancel" (py-2 ≈ 37 px)
+        - WakeUpScreen.tsx: "More details" toggle + "Abandon session" (py-2 ≈ 37 px)
+        All need min-h-11. The two full-width buttons can use py-3 instead.
 - [ ] 🟢 Keyboard shortcuts on desktop (Tab to navigate, Enter to submit forms,
        Escape to close drawers/modals, arrow keys in the quality rating)
        Desktop PWA users should not need to reach for the mouse.

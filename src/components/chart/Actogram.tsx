@@ -191,7 +191,7 @@ function TooltipOverlay({ block, cycle, onClose }: TooltipOverlayProps) {
           {/* stopPropagation prevents card navigation from firing when × is tapped */}
           <button
             onClick={e => { e.stopPropagation(); onClose(); }}
-            className="text-circa-text-muted hover:text-circa-text-primary text-xl leading-none min-h-8 min-w-8 flex items-center justify-center"
+            className="text-circa-text-muted hover:text-circa-text-primary text-xl leading-none min-h-11 min-w-11 flex items-center justify-center"
             aria-label="Close"
           >
             ×
@@ -394,7 +394,7 @@ function RangeButtons({ selected, onChange }: {
           onClick={() => onChange(r)}
           aria-label={RANGE_ARIA_LABELS[r]}
           aria-pressed={selected === r}
-          className={`rounded-full text-xs px-3 border min-h-9 ${
+          className={`rounded-full text-xs px-3 border min-h-11 min-w-11 ${
             selected === r
               ? 'text-circa-accent-light border-circa-accent-light'
               : 'text-circa-text-secondary border-circa-border'

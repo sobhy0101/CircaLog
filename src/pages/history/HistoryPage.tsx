@@ -72,7 +72,7 @@ function EntryCard({ entry, onView, onEdit, onDelete }: EntryCardProps) {
 
   return (
     <div
-      className="bg-circa-surface border border-circa-border rounded-xl p-4 cursor-pointer"
+      className="bg-circa-surface border border-circa-border rounded-xl px-4 pt-4 pb-2 cursor-pointer"
       onClick={onView}
       role="button"
       tabIndex={0}
@@ -126,7 +126,7 @@ function EntryCard({ entry, onView, onEdit, onDelete }: EntryCardProps) {
             type="button"
             onClick={e => { e.stopPropagation(); onEdit(); }}
             aria-label="Edit session"
-            className="text-circa-accent-light text-xs font-medium min-h-11 px-2
+            className="text-circa-accent-light text-xs font-medium min-h-11 min-w-11 px-2
                        hover:text-circa-text-primary transition-colors"
           >
             Edit
@@ -137,7 +137,7 @@ function EntryCard({ entry, onView, onEdit, onDelete }: EntryCardProps) {
             type="button"
             onClick={e => { e.stopPropagation(); onDelete(); }}
             aria-label="Delete session"
-            className="text-circa-text-secondary text-xs min-h-11 px-2
+            className="text-circa-text-secondary text-xs min-h-11 min-w-11 px-2
                        hover:text-red-400 transition-colors"
           >
             {/* Trash icon */}
@@ -368,7 +368,7 @@ export default function HistoryPage() {
                 type="button"
                 aria-pressed={sortMode === mode}
                 onClick={() => setSortMode(mode)}
-                className={`rounded-full text-xs px-3 border min-h-9 ${
+                className={`rounded-full text-xs px-3 border min-h-11 ${
                   sortMode === mode
                     ? 'text-circa-accent-light border-circa-accent-light'
                     : 'text-circa-text-secondary border-circa-border'
@@ -400,7 +400,7 @@ export default function HistoryPage() {
                         type="button"
                         aria-pressed={filterType === value}
                         onClick={() => setFilterType(value)}
-                        className={`rounded-full text-xs px-2.5 border min-h-9 ${
+                        className={`rounded-full text-xs px-2.5 border min-h-11 ${
                           filterType === value
                             ? 'bg-circa-accent-subtle text-circa-accent-light border-circa-accent-light'
                             : 'bg-transparent text-circa-text-secondary border-circa-border'
@@ -436,7 +436,7 @@ export default function HistoryPage() {
                         }
                         aria-pressed={filterQuality === value}
                         onClick={() => setFilterQuality(value)}
-                        className={`rounded-full text-xs px-2.5 border min-h-9 ${
+                        className={`rounded-full text-xs px-2.5 border min-h-11 ${
                           filterQuality === value
                             ? 'bg-circa-accent-subtle text-circa-accent-light border-circa-accent-light'
                             : 'bg-transparent text-circa-text-secondary border-circa-border'
@@ -455,7 +455,7 @@ export default function HistoryPage() {
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="text-circa-accent-light text-xs"
+                    className="text-circa-accent-light text-xs min-h-11 flex items-center"
                   >
                     Clear
                   </button>
@@ -473,7 +473,7 @@ export default function HistoryPage() {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="text-circa-accent-light text-sm mt-2"
+                className="text-circa-accent-light text-sm mt-2 min-h-11"
               >
                 Clear filters
               </button>
