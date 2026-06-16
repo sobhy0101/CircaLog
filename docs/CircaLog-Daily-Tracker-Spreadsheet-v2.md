@@ -115,4 +115,5 @@ From `CircaLog-Daily-Tracker-Spreadsheet.md`:
 
 *Add any additional fixes or features here as you remember them.*
 
-- [ ]
+- [ ] Add a "Note" to each of the interpretations in the Sleep sheet, matching the app's interpretation notes. This is a reminder to check if the
+      app's interpretation notes are still relevant and accurate.

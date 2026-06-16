@@ -220,11 +220,11 @@ Cycle Number
 
 **SHEET: Medication Log**
 Print all rows in the dose log area (from row 14 onward) that have data as a
-markdown table with columns: Date, Medication Name, Scheduled Time, Actual Time
+CSV table with columns: Date, Medication Name, Scheduled Time, Actual Time
 Taken, Status, Notes
 
 **SHEET: Food Log**
-Print all rows that have data as a markdown table with columns: Date, Meal Time,
+Print all rows that have data as a CSV table with columns: Date, Meal Time,
 Meal Name, Meal Size, Notes, Safe to Sleep After, Hours Since Meal
 
 **SHEET: Dashboard**
@@ -234,6 +234,8 @@ they appear on screen, as a simple key: value list.
 Do not include empty rows. Do not include formula text — print the displayed
 values only. Do not add any commentary or explanation. Just the data,
 formatted as specified above.
+
+Save the CSV files in the `C:\Users\sobhy\OneDrive\CircaLog-Exports` folder with filenames that include the sheet name and current date, e.g. `Sleep_Log_2026-06-15.csv`.
 ```
 
 ---

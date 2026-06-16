@@ -140,11 +140,11 @@
        toggle buttons, the drawer close button, the quality rating stars)
 - [x] 🟡 Keyboard navigation — full Tab order through all interactive elements
        on every screen; no keyboard traps except intentional modals/drawers
-- [ ] 🟡 Focus traps in modals and the side drawer
+- [x] 🟡 Focus traps in modals and the side drawer
        When the drawer or a confirmation dialog is open, Tab must cycle within
        it and not reach elements behind it. Focus must return to the trigger
        element when closed.
-- [ ] 🟢 Screen reader support — test with TalkBack (Android) and VoiceOver (iOS)
+- [x] 🟢 Screen reader support — test with TalkBack (Android) and VoiceOver (iOS)
        Ensure all status changes (sync state, import progress, form errors) are
        announced; live regions (`aria-live`) where appropriate.
 - [ ] 🟡 Minimum tap target size — 44×44 px on all tappable elements
