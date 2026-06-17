@@ -17,7 +17,7 @@ CircaLog is an open-source, offline-first Progressive Web App (PWA) for people l
 - Framework: React + Vite
 - Styling: TailwindCSS
 - Charts: Recharts
-- Local Storage: IndexedDB via Dexie (currently v3)
+- Local Storage: IndexedDB via Dexie 4.x
 - Cloud DB: Supabase (PostgreSQL)
 - Auth: Google Sign-In (optional)
 - Hosting: Vercel

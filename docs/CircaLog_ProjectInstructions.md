@@ -48,22 +48,34 @@ Filesystem extension. Use it for:
 | Check if a file or path exists | `Filesystem:get_file_info` |
 | List a directory's contents | `Filesystem:list_directory` |
 | Search across files | `Filesystem:search_files` |
-| Write or create a single file | `Filesystem:write_file` |
-| Make a targeted edit to one file | Read → patch in memory → `write_file` |
+| Make a targeted edit to one file | `Filesystem:edit_file` (primary) · `Desktop Commander:edit_block` (backup) |
+| Create a brand-new file | `Filesystem:write_file` (primary) · `Desktop Commander:write_file` or `Windows-MCP:FileSystem` write (backup) |
+| Delete a file | `Windows-MCP:FileSystem` delete (native) · `Desktop Commander:start_process` with `Remove-Item` (fallback) |
 
 **Rules for using the Filesystem extension in this chat:**
 
 1. **Scan before you speak** — when in doubt about any file, path,
    component, or folder structure, use the Filesystem extension to check
    before advising or assuming. Never invent a path.
-2. **Read before you write** — always read a file's current contents before
-   patching or replacing it. The only exception is a brand-new file that is
-   confirmed not to exist yet.
-3. **Never blindly overwrite** — read first, patch second.
-4. **Single-file scope** — if a task touches more than one file in a
+2. **Read before you edit** — always read a file's current contents before
+   touching it, so `oldText` in `edit_file` matches exactly. The only
+   exception is a brand-new file confirmed not to exist yet.
+3. **Edit with `edit_file`, not `write_file`** — for any existing file,
+   use `Filesystem:edit_file` with `{ oldText, newText }` pairs. It is
+   surgical and never times out on large files. `write_file` is for new
+   files only. Never use the computer-use `str_replace` tool — it cannot
+   reach Windows paths and will always return "File not found".
+4. **Fallback order when a Filesystem tool fails** — use
+   `Desktop Commander:edit_block` for edits and `Desktop Commander:write_file`
+   for creates. For deletes (which Filesystem lacks entirely) use
+   `Windows-MCP:FileSystem` delete mode, or `Desktop Commander:start_process`
+   with PowerShell `Remove-Item` as a last resort.
+5. **Single-file scope** — if a task touches more than one file in a
    non-trivial way, hand it to Claude Code instead.
-5. **No commands** — the Filesystem extension cannot run `npm`, `git`,
-   `vite`, or any shell command. That is Claude Code's domain.
+6. **No build or dependency commands** — `Desktop Commander:start_process`
+   can run PowerShell for simple file operations (e.g. deletes), but `npm`,
+   `git`, `vite`, and all build or dependency commands belong to Claude
+   Code, not this chat.
 
 ### Claude Code — terminal, multi-file, full codebase
 
@@ -81,9 +93,11 @@ Use Claude Code (CC) for anything beyond reading/writing individual files:
 ### Decision summary
 
 ```txt
-Inspect / read a file                → Claude.ai (Filesystem extension)
+Inspect / read a file                → Claude.ai (Filesystem · DC · Windows-MCP)
 Check if something exists            → Claude.ai (Filesystem extension)
-Targeted single-file write or edit   → Claude.ai (Filesystem extension)
+Edit an existing file (any size)     → Claude.ai (`Filesystem:edit_file` · DC `edit_block` as backup)
+Create a new file                    → Claude.ai (`Filesystem:write_file` · DC `write_file` as backup)
+Delete a file                        → Claude.ai (`Windows-MCP:FileSystem` delete · DC PowerShell as backup)
 Multi-file work / commands / deps    → Claude Code
 Architecture / planning / review     → Claude.ai (this chat)
 ```
