@@ -47,17 +47,16 @@ e.g. `Pain, Hunger`. The import parser can split on comma.
 **Purpose:** One row per drink consumed. Used to track caffeine intake timing
 for future CircaLog V2 caffeine curve overlay, and hydration/GERD context.
 
-### ❓ Open question — caffeine mg tracking approach
+### ✅ Confirmed — caffeine mg tracking approach: Option C (hybrid)
 
-Choose one:
+**Decision:** Dropdown with optional mg override. Auto-fills an estimated
+caffeine value from a drink-type list; you can type in a real value when
+you know it. Chosen because it's the only option that holds up in practice —
+most instant coffee brands (including Misr Cafe) don't publish caffeine
+content at all, so manual-only entry (Option A) would mean no value most
+days anyway, and a pure auto-fill with no override (Option B) would lose
+accuracy on the rare day a real value becomes known.
 
-**Option A — Manual mg entry**
-You look up or know the caffeine content and type it in.
-More accurate. Requires one extra lookup per entry.
-
-**Option B — Drink-type dropdown with pre-estimated mg (auto-filled)**
-You pick the drink from a list; the sheet auto-fills estimated caffeine mg.
-Faster for daily logging. Less precise if your portion or brand differs.
 Pre-estimated values would include, for example:
 - Espresso (single shot) → 63 mg
 - Americano (double) → 126 mg
@@ -67,13 +66,18 @@ Pre-estimated values would include, for example:
 - Red Bull (250 ml) → 80 mg
 - Cola (330 ml) → 34 mg
 - Water / Juice → 0 mg
+- Misr Cafe instant coffee, home brew (1.5 tsp + splash of full-fat milk) → 90 mg
+  *(estimate only — manufacturer does not disclose caffeine content on the
+  label; based on general robusta/arabica instant coffee data, working
+  range ~70–110 mg)*
 
-**Option C — Dropdown with optional mg override (hybrid)**
-Auto-fills an estimate; you can override with the real value if you know it.
-Best of both — fast by default, accurate when you have the data.
-This is the recommended option for V2 import compatibility.
+**Note on undisclosed-brand estimates:** When a brand doesn't publish caffeine
+content, estimate using general per-gram/per-cup ranges for that coffee type
+and blend (robusta runs roughly double the caffeine of arabica) and document
+the assumption directly next to the value — as above — rather than presenting
+a guess as an exact figure.
 
-### Proposed column structure (pending caffeine question)
+### Proposed column structure
 
 | Col | Field | Type | Notes |
 |---|---|---|---|
@@ -115,5 +119,76 @@ From `CircaLog-Daily-Tracker-Spreadsheet.md`:
 
 *Add any additional fixes or features here as you remember them.*
 
-- [ ] Add a "Note" to each of the interpretations in the Sleep sheet, matching the app's interpretation notes. This is a reminder to check if the
-      app's interpretation notes are still relevant and accurate.
+- [ ] Add a "Note" to each of the interpretations in the Sleep sheet, matching the app's interpretation notes. This is a reminder to check if the app's interpretation notes are still relevant and accurate.
+- [ ] If possible, match all Supabase column names and types exactly to the app's database schema, to avoid any import issues. This may require reviewing the app's schema and adjusting the spreadsheet accordingly. Expect the UUID columns, isDeleted, createdAt, updatedAt, and iana_timezone.
+
+---
+
+## Executing the plan
+
+**Claude in Excel prompt:**
+
+```markdown
+Please make the following changes to this workbook:
+
+1. SLEEP LOG SHEET — Column L (Interruptions)
+   Replace the existing free-text entry with a dropdown (data validation,
+   List type) limited to these values, in this order:
+   - Bathroom
+   - Thirst
+   - Hunger
+   - Pain
+   - Other
+   Set the validation's error alert to "Warning" rather than "Stop", since
+   the user sometimes needs to type multiple comma-separated values (e.g.
+   "Pain, Hunger") that won't match the list exactly — the dropdown should
+   guide, not block. Preserve all existing entries in this column as-is.
+
+2. NEW SHEET — "Drinks Log"
+   Insert as a new sheet positioned immediately after "Food Log". Set the
+   tab color to Sky Blue (clearly distinct from Sleep Log's dark blue,
+   Medication Log's teal, and Food Log's green).
+
+   Add a small reference table (place it to the right of the main log, e.g.
+   starting around column K) with two columns, Drink Name and Estimated
+   Caffeine mg, populated with:
+   - Espresso (single shot) → 63
+   - Americano (double) → 126
+   - Filter coffee (250 ml) → 95
+   - Black tea (200 ml) → 47
+   - Green tea (200 ml) → 28
+   - Red Bull (250 ml) → 80
+   - Cola (330 ml) → 34
+   - Water / Juice → 0
+   - Misr Cafe instant coffee, home brew (1.5 tsp + splash of full-fat milk) → 90
+
+   Build the main log table with frozen header row and alternating row
+   shading, matching the style of the other sheets, with these columns:
+
+   | Col | Field | Type | Notes |
+   |---|---|---|---|
+   | A | Date | Date DD/MM/YYYY | — |
+   | B | Time | Time HH:MM | — |
+   | C | Drink Name | Dropdown (List, Warning alert, sourced from the reference table's Drink Name column) — but allow free text entry too, since not every drink will be in the list |
+   | D | Portion | Dropdown: Small / Medium / Large / Can / Bottle |
+   | E | Estimated Caffeine mg | =IFERROR(VLOOKUP(C[row],reference table range,2,FALSE),"") |
+   | F | Actual Caffeine mg | Manual number entry, optional |
+   | G | Effective Caffeine mg | =IF(F[row]<>"",F[row],E[row]) |
+   | H | GERD Risk | Dropdown: Low / Medium / High |
+   | I | Notes | Free text |
+
+   Apply conditional formatting to column H matching the workbook's
+   existing status-color convention: High = red, Medium = yellow, Low =
+   green.
+
+3. DASHBOARD SHEET — Section 2 (Food & GERD Safety)
+   Add a "Last Drink" row alongside the existing last-meal row, showing:
+   - Time of last caffeinated drink (pull from the most recent Drinks Log
+     row by latest Date+Time)
+   - Estimated caffeine still in system, using exponential decay with a
+     5.5-hour half-life: = EffectiveMg * 0.5^((NOW() - LastDrinkDateTime)*24/5.5)
+   - GERD risk of that last drink (pulled from column H)
+
+Do not change anything else in the workbook. After making these changes,
+list exactly what you changed so I can verify before saving.
+```
