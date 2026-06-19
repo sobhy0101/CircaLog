@@ -371,7 +371,7 @@ export default function ManualEntryForm({
         type="button"
         aria-expanded={showOptional}
         onClick={() => setShowOptional(v => !v)}
-        className="flex items-center gap-1 text-circa-accent-light text-sm mt-1"
+        className="flex items-center gap-1 text-circa-accent-light text-sm mt-1 min-h-11"
       >
         <span>{showOptional ? '▾' : '▸'}</span>
         <span>{showOptional ? 'Hide optional fields' : 'More details'}</span>
@@ -541,7 +541,7 @@ export default function ManualEntryForm({
       <button
         type="button"
         onClick={onCancel}
-        className="w-full text-circa-text-muted text-sm py-2"
+        className="w-full text-circa-text-muted text-sm py-2 min-h-11"
       >
         Cancel
       </button>

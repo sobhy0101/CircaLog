@@ -39,7 +39,7 @@ export default function LogPage() {
         {view === 'start' && (
           <button
             onClick={() => setView('manual')}
-            className="text-circa-accent-light text-sm"
+            className="text-circa-accent-light text-sm min-h-11 flex items-center"
           >
             Log manually
           </button>
@@ -49,7 +49,7 @@ export default function LogPage() {
           <button
             onClick={() => setView('start')}
             aria-label="Back to log"
-            className="text-circa-accent-light text-sm"
+            className="text-circa-accent-light text-sm min-h-11 flex items-center"
           >
             ← Back
           </button>

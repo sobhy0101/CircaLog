@@ -156,13 +156,13 @@
         (min-h-9 → min-h-11), History "Clear" buttons (added min-h-11), EntryCard
         Edit + Delete buttons (added min-w-11). QualityPicker stars and tab bar
         buttons already compliant.
-- [ ] 🟢 Remaining tap target fixes — secondary text buttons in the log flow
+- [x] 🟢 Remaining tap target fixes — secondary text buttons in the log flow
         Discovered during Phase 1 tap target audit; deferred as out of scope.
         Three files, no new deps — Tier 1:
         - LogPage.tsx: "Log manually" + "← Back" header buttons (no min-h)
         - ManualEntryForm.tsx: "More details" toggle + "Cancel" (py-2 ≈ 37 px)
         - WakeUpScreen.tsx: "More details" toggle + "Abandon session" (py-2 ≈ 37 px)
-        All need min-h-11. The two full-width buttons can use py-3 instead.
+        Fixed (19 Jun 2026): added min-h-11 (+ flex items-center on inline header buttons).
 - [ ] 🟢 Keyboard shortcuts on desktop (Tab to navigate, Enter to submit forms,
        Escape to close drawers/modals, arrow keys in the quality rating)
        Desktop PWA users should not need to reach for the mouse.

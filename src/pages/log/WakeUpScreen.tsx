@@ -288,7 +288,7 @@ export default function WakeUpScreen({
         type="button"
         aria-expanded={showOptional}
         onClick={() => setShowOptional(v => !v)}
-        className="flex items-center gap-1 text-circa-accent-light text-sm"
+        className="flex items-center gap-1 text-circa-accent-light text-sm min-h-11"
       >
         <span>{showOptional ? '▾' : '▸'}</span>
         <span>{showOptional ? 'Hide optional fields' : 'More details'}</span>
@@ -455,7 +455,7 @@ export default function WakeUpScreen({
       <button
         type="button"
         onClick={handleAbandon}
-        className="w-full text-circa-text-muted text-sm py-2"
+        className="w-full text-circa-text-muted text-sm py-2 min-h-11"
       >
         Abandon session
       </button>
