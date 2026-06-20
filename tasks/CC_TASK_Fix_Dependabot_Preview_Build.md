@@ -167,3 +167,5 @@ before running any git commit.
 - Do not merge or create any new branches.
 - Do not change any dependencies in `package.json`.
 - Do not modify any source files in `src/`.
+
+That's it!
