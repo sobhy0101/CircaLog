@@ -156,8 +156,8 @@ CircaLog was built from the ground up for people whose sleep cycle drifts contin
 
 ### Prerequisites
 
-- Node.js 20+ (LTS recommended; required by Vite 8)
-- npm
+- Node.js 20+ (v24.17.0 used in development)
+- npm 10+ (v11.17.0 used in development)
 
 ### Installation
 
@@ -183,11 +183,23 @@ npm run preview   # Preview the production build locally
 These commands are only needed for V2+ cloud sync work. The app runs
 fully offline without them.
 
+**Install the CLI globally first** (one-time per machine).
+
 ```bash
-supabase login                                    # Authenticate with the Supabase CLI
-supabase init                                     # Initialize Supabase in the project (creates supabase/ directory)
-supabase link --project-ref iarozmvqcsrkdgytqzws # Link to the CircaLog Supabase project
+npm install -g supabase
 ```
+
+Then authenticate and link the project:
+
+```bash
+supabase login   # Opens a browser tab to authenticate
+supabase init    # Creates supabase/ config directory (run once per project clone)
+supabase link    # Prompts you to select the project interactively
+```
+
+`supabase init` must run before `supabase link`. The `supabase link` command
+will prompt you to select the CircaLog project from a list — no need to
+pass the project ref manually.
 
 ### Environment Variables
 
