@@ -175,7 +175,7 @@ export default function WakeUpScreen({
   }
 
   return (
-    <div className="px-4 py-6 space-y-6 max-w-lg mx-auto">
+    <form onSubmit={e => { e.preventDefault(); handleComplete(); }} className="px-4 py-6 space-y-6 max-w-lg mx-auto">
 
       {/* Elapsed timer — digits blink a colon separator every second to
           confirm the timer is live. colonVisible toggles each interval tick. */}
@@ -442,8 +442,7 @@ export default function WakeUpScreen({
 
       {/* Primary action */}
       <button
-        type="button"
-        onClick={handleComplete}
+        type="submit"
         disabled={isLoading}
         className="w-full bg-circa-accent text-white font-semibold py-3 rounded-xl
                    disabled:opacity-50"
@@ -459,6 +458,6 @@ export default function WakeUpScreen({
       >
         Abandon session
       </button>
-    </div>
+    </form>
   );
 }

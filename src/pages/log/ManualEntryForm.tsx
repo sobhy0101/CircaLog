@@ -228,7 +228,7 @@ export default function ManualEntryForm({
   }
 
   return (
-    <div className="px-4 py-4 space-y-5 max-w-lg mx-auto">
+    <form onSubmit={e => { e.preventDefault(); handleSubmit(); }} className="px-4 py-4 space-y-5 max-w-lg mx-auto">
 
       {/* Bed Time — optional */}
       <div>
@@ -528,8 +528,7 @@ export default function ManualEntryForm({
 
       {/* Submit */}
       <button
-        type="button"
-        onClick={handleSubmit}
+        type="submit"
         disabled={isLoading}
         className="w-full bg-circa-accent text-white font-semibold py-3 rounded-xl
                    disabled:opacity-50 disabled:cursor-not-allowed"
@@ -545,6 +544,6 @@ export default function ManualEntryForm({
       >
         Cancel
       </button>
-    </div>
+    </form>
   );
 }

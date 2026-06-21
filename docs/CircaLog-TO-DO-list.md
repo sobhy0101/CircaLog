@@ -163,9 +163,15 @@
         - ManualEntryForm.tsx: "More details" toggle + "Cancel" (py-2 ≈ 37 px)
         - WakeUpScreen.tsx: "More details" toggle + "Abandon session" (py-2 ≈ 37 px)
         Fixed (19 Jun 2026): added min-h-11 (+ flex items-center on inline header buttons).
-- [ ] 🟢 Keyboard shortcuts on desktop (Tab to navigate, Enter to submit forms,
+- [x] 🟢 Keyboard shortcuts on desktop (Tab to navigate, Enter to submit forms,
        Escape to close drawers/modals, arrow keys in the quality rating)
        Desktop PWA users should not need to reach for the mouse.
+       Scoped (19 Jun 2026): Escape-to-close and arrow keys were already implemented
+       during Phase 1 keyboard-nav work (SideDrawer, ChangelogModal,
+       DeleteConfirmDialog, QualityPicker); Tab order already clean. Only
+       Enter-to-submit was missing — fixed by converting ManualEntryForm.tsx and
+       WakeUpScreen.tsx from div wrappers to `<form onSubmit>` with `type="submit"`
+       buttons. Verified manually before commit.
 
 ### 🛏️ Sleep Log — Core
 
