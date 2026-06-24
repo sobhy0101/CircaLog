@@ -7,13 +7,22 @@ import {
   hardDeleteEntry as dbHardDelete,
 } from '@/lib/db';
 import type { SleepEntry } from '@/lib/circadian';
-import { SLEEP_IN_PROGRESS_KEY } from '@/lib/constants';
+import { SLEEP_IN_PROGRESS_KEY, SLEEP_LOG_MODE_KEY } from '@/lib/constants';
 import { useAuth } from '@/hooks/useAuth';
+
+// UI-level state only — not a domain type. Exported (unlike
+// InProgressSession below, which stays unexported) because LogPage and
+// StartSleepScreen need it for prop typing.
+export type SleepLogMode = 'simple' | 'detailed';
 
 // UI-level state only — not a domain type; do not export
 interface InProgressSession {
-  bedTimeUtc: string;  // ISO 8601 UTC — when "Start Sleep" was tapped
-  startedAt: string;   // ISO 8601 UTC — same value, kept for display
+  mode: SleepLogMode;
+  bedTimeUtc: string;        // always set — Step 1 tap (detailed) or the
+                             // single tap (simple)
+  sleepStartUtc?: string;    // set once Step 2 happens. In simple mode this
+                             // is set immediately, equal to bedTimeUtc —
+                             // identical to today's behavior.
 }
 
 export function useSleepLog() {
@@ -22,16 +31,37 @@ export function useSleepLog() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Restore in-progress session from localStorage on first render
+  // Restore in-progress session from localStorage on first render.
+  // If the stored session is missing 'mode' it's from before the two-step
+  // redesign — discard it rather than risk an inconsistent mid-session state.
   const [inProgress, setInProgress] = useState<InProgressSession | null>(() => {
     try {
       const raw = localStorage.getItem(SLEEP_IN_PROGRESS_KEY);
       if (!raw) return null;
-      return JSON.parse(raw) as InProgressSession;
+      const parsed = JSON.parse(raw) as Partial<InProgressSession>;
+      if (!parsed.mode || !parsed.bedTimeUtc) {
+        // Stale shape from before the two-step redesign — discard rather
+        // than risk an inconsistent mid-session state.
+        localStorage.removeItem(SLEEP_IN_PROGRESS_KEY);
+        return null;
+      }
+      return parsed as InProgressSession;
     } catch {
       return null;
     }
   });
+
+  const [mode, setModeState] = useState<SleepLogMode>(() => {
+    const stored = localStorage.getItem(SLEEP_LOG_MODE_KEY);
+    return stored === 'detailed' ? 'detailed' : 'simple';
+  });
+
+  // Updates the active mode AND persists it as the new default. This is
+  // intentional — see the doc comment on SLEEP_LOG_MODE_KEY in constants.ts.
+  function setMode(next: SleepLogMode): void {
+    localStorage.setItem(SLEEP_LOG_MODE_KEY, next);
+    setModeState(next);
+  }
 
   // Load all entries on mount
   useEffect(() => {
@@ -122,11 +152,27 @@ export function useSleepLog() {
     return entries.find(e => e.id === id);
   }
 
-  function startSession(): void {
+  function startSession(currentMode: SleepLogMode): void {
     const now = new Date().toISOString();
-    const session: InProgressSession = { bedTimeUtc: now, startedAt: now };
+    const session: InProgressSession =
+      currentMode === 'simple'
+        ? { mode: 'simple', bedTimeUtc: now, sleepStartUtc: now }
+        : { mode: 'detailed', bedTimeUtc: now, sleepStartUtc: undefined };
     localStorage.setItem(SLEEP_IN_PROGRESS_KEY, JSON.stringify(session));
     setInProgress(session);
+  }
+
+  // Called when the user taps "Going to Sleep?" in detailed mode Step 1
+  function markSleepStart(): void {
+    setInProgress(prev => {
+      if (!prev) return prev;
+      const updated: InProgressSession = {
+        ...prev,
+        sleepStartUtc: new Date().toISOString(),
+      };
+      localStorage.setItem(SLEEP_IN_PROGRESS_KEY, JSON.stringify(updated));
+      return updated;
+    });
   }
 
   function clearSession(): void {
@@ -146,9 +192,13 @@ export function useSleepLog() {
     hardDeleteEntry,
     // Lookup
     getEntryById,
+    // Mode
+    mode,
+    setMode,
     // In-progress session
     inProgress,
     startSession,
+    markSleepStart,
     clearSession,
   };
 }

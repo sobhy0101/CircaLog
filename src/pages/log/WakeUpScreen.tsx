@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import type { createEntry } from '@/lib/db';
 import type { InterruptionType, MedicationTiming } from '@/lib/circadian';
 import QualityPicker from '@/components/ui/QualityPicker';
+import { parseElapsed } from '@/utils/parseElapsed';
 
 interface WakeUpScreenProps {
-  inProgress: { bedTimeUtc: string; startedAt: string };
+  inProgress: { mode: 'simple' | 'detailed'; bedTimeUtc: string; sleepStartUtc: string };
   onComplete: () => void;
   onAbandon: () => void;
   createEntry: (draft: Parameters<typeof createEntry>[0]) => Promise<void>;
@@ -33,11 +34,6 @@ function nowTimeLocal(): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-// Returns hours and minutes as separate numbers for split rendering
-function parseElapsed(ms: number): { h: number; m: number } {
-  const totalMin = Math.floor(ms / 60000);
-  return { h: Math.floor(totalMin / 60), m: totalMin % 60 };
-}
 
 const INTERRUPTION_TYPES: { value: InterruptionType; label: string }[] = [
   { value: 'bathroom', label: 'Bathroom' },
@@ -61,26 +57,26 @@ export default function WakeUpScreen({
   isLoading,
 }: WakeUpScreenProps) {
   const [elapsed, setElapsed] = useState(() =>
-    parseElapsed(Date.now() - new Date(inProgress.startedAt).getTime())
+    parseElapsed(Date.now() - new Date(inProgress.sleepStartUtc).getTime())
   );
   const [colonVisible, setColonVisible] = useState(true);
 
   // Update elapsed every second and blink the colon separator
   useEffect(() => {
     const id = setInterval(() => {
-      setElapsed(parseElapsed(Date.now() - new Date(inProgress.startedAt).getTime()));
+      setElapsed(parseElapsed(Date.now() - new Date(inProgress.sleepStartUtc).getTime()));
       setColonVisible(v => !v);
     }, 1000);
     return () => clearInterval(id);
-  }, [inProgress.startedAt]);
+  }, [inProgress.sleepStartUtc]);
 
-  // Sleep start — pre-filled from inProgress.bedTimeUtc, editable
+  // Sleep start — pre-filled from sleepStartUtc (= bedTimeUtc in simple mode), editable
   const [sleepDate, setSleepDate] = useState(() => {
-    const d = new Date(inProgress.bedTimeUtc);
+    const d = new Date(inProgress.sleepStartUtc);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   });
   const [sleepTime, setSleepTime] = useState(() => {
-    const d = new Date(inProgress.bedTimeUtc);
+    const d = new Date(inProgress.sleepStartUtc);
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   });
 
@@ -193,7 +189,35 @@ export default function WakeUpScreen({
         </p>
       </div>
 
-      {/* Fell Asleep — pre-filled from bed time, editable */}
+      {/* In Bed → Fell Asleep → Onset summary — read-only, updates live as the user edits */}
+      {(() => {
+        const bedMs = new Date(inProgress.bedTimeUtc).getTime();
+        // Use the editable sleepDate/sleepTime state so the onset figure
+        // updates live when the user adjusts the "Fell Asleep" fields below.
+        const sleepUtc = toUtcIso(sleepDate, sleepTime);
+        const sleepMs = sleepUtc ? new Date(sleepUtc).getTime() : bedMs;
+        const onsetMin = Math.max(0, Math.round((sleepMs - bedMs) / 60000));
+        const bedLabel = new Date(inProgress.bedTimeUtc).toLocaleTimeString([], {
+          hour: 'numeric', minute: '2-digit',
+        });
+        const sleepLabel = sleepUtc
+          ? new Date(sleepUtc).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+          : '—';
+        return (
+          <div className="text-center">
+            <p className="text-circa-text-secondary text-sm">
+              In bed: {bedLabel} → Fell asleep: {sleepLabel} → Onset: {onsetMin} min
+            </p>
+            {onsetMin === 0 && (
+              <p className="text-circa-text-muted text-xs mt-1">
+                Did you fall asleep immediately?
+              </p>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Fell Asleep — pre-filled from sleep start time, editable */}
       <div>
         <label htmlFor="sleepDate" className="block text-sm font-medium text-circa-text-primary mb-1">
           Fell Asleep

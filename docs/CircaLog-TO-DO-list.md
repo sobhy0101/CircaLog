@@ -229,22 +229,26 @@
         regardless of the browser's native picker format.)
 - [x] 🔴 Build "Start Sleep" one-tap timer screen
 - [x] 🔴 Build "Wake Up" completion screen
-- [ ] 🔴 Redesign timer screen: replace single "Start Sleep" button with two-step flow
+- [x] 🔴 Redesign timer screen: replace single "Start Sleep" button with two-step flow
        "In Bed" → elapsed-time counter → "Going to Sleep" (see architecture note above)
        This is a rework of the existing timer screen, not a new screen.
        The Wake Up screen needs a small companion change — see item below.
-- [ ] 🔴 Persist in-progress timer session across app close/reopen
+- [x] 🔴 Persist in-progress timer session across app close/reopen
        Between "In Bed?" and "Going to Sleep?", and between "Going to Sleep?" and
        "Wake Up", the partial session state must survive a browser close.
        Use `localStorage` for the active-session draft (not IndexedDB — simpler
        and fast enough for a single in-progress record).
+       Note (Jun 2026): a Simple/Detailed mode toggle was folded into this work.
+       Simple mode preserves the original one-tap behavior; Detailed mode is the
+       new two-step flow. See `tasks/CC_TASK_Phase1_TimerTwoStepRedesign.md` for
+       the full spec.
 - [x] 🟡 Add Bed Time field to the manual back-fill entry form
        Optional field, appears before Sleep Start.
        When both Bed Time and Sleep Start are filled, calculate and display
        Sleep Onset Latency inline (e.g., "Onset latency: 23 min").
        `bedTimeUtc` is already defined in `SleepEntry` — no schema change needed.
        (Already implemented in `ManualEntryForm.tsx` and `SessionDetailPage.tsx`)
-- [ ] 🟡 WakeUpScreen: show "In Bed" time read-only above the editable "Fell Asleep" field
+- [x] 🟡 WakeUpScreen: show "In Bed" time read-only above the editable "Fell Asleep" field
        After the two-step redesign, `bedTimeUtc` is captured intentionally in Step 1.
        The Wake Up form must display it for review before saving:
          "In bed: 11:00 PM  →  Fell asleep: 11:34 PM  →  Onset: 34 min"
