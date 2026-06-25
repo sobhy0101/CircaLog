@@ -121,8 +121,9 @@ export default function AppShell() {
       {/* Side drawer (fixed, sits above everything) */}
       <SideDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} onOpenChangelog={openChangelog} />
 
-      {/* Main scrollable content area — pb-16 clears the 64px tab bar */}
-      <main className="flex-1 overflow-y-auto pb-16">
+      {/* Main scrollable content area — pb-8 clears the 64px tab bar.
+          pt-4 clears the fixed sync-status pill (≈16px tall) when signed in. */}
+      <main className={`flex-1 overflow-y-auto pb-8${status !== 'signed-out' ? ' pt-4' : ''}`}>
         <Outlet />
       </main>
 
