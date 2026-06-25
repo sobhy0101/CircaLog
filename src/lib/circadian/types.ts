@@ -642,14 +642,39 @@ export interface SyncQueueEntry {
   /** The SleepEntry UUID that needs to be pushed to Supabase. */
   id: string;
 
-  /** ISO 8601 UTC — when this entry was added to the queue. */
+  /**
+   * ISO 8601 UTC — when this entry was first added to the queue (i.e.
+   * the first time it failed to push). Does not change on subsequent
+   * retries — see `lastFailedAt` for the most recent attempt.
+   */
   queuedAt: string;
 
   /**
    * Number of times this entry has failed to push to Supabase.
-   * When this reaches 3, the entry is considered errored and
-   * the UI shows a "Sync error" state until the next successful push.
+   * When this reaches 3, the entry is considered errored: the UI shows
+   * a "Sync error" state and `flushQueue()` stops automatically
+   * retrying it (see `syncService.ts`). A direct edit to the entry, or
+   * the next `syncOnConnect()` on sign-in, still gets a fresh attempt.
    * Defaults to 0 when first enqueued.
    */
   failCount: number;
+
+  /**
+   * Error code from the most recent failed push attempt, taken
+   * verbatim from the Supabase/PostgREST error (e.g. "42501" for an
+   * RLS violation) or "EXCEPTION" if the push call threw rather than
+   * returning an error object. Undefined until the first failure.
+   */
+  lastErrorCode?: string;
+
+  /**
+   * Human-readable message from the most recent failed push attempt,
+   * taken verbatim from the Supabase error. Shown to the user alongside
+   * `lastErrorCode` in the sync error detail panel so they can report
+   * it to the developer.
+   */
+  lastErrorMessage?: string;
+
+  /** ISO 8601 UTC — when the most recent failed push attempt occurred. */
+  lastFailedAt?: string;
 }

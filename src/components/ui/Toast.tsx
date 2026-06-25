@@ -2,12 +2,28 @@ import { useEffect, type ReactElement } from 'react';
 
 type ToastVariant = 'success' | 'neutral' | 'error';
 
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface ToastProps {
   message: string;
   onDismiss: () => void;
   variant?: ToastVariant;
-  /** Auto-dismiss delay in ms. Defaults to 4000. */
+  /**
+   * Auto-dismiss delay in ms. Defaults to 4000, or 8000 when `action`
+   * is set — giving the user enough time to notice and tap the button
+   * before the toast disappears on its own.
+   */
   duration?: number;
+  /**
+   * Optional action button rendered between the message and the
+   * dismiss (×). Tapping it calls both `onClick` and `onDismiss` — the
+   * toast always closes after the action fires. Used for the expired-
+   * session prompt ("Sign In") but generic for future use.
+   */
+  action?: ToastAction;
 }
 
 // Per-variant colour classes. neutral uses circa tokens; success/error use
@@ -64,12 +80,15 @@ export default function Toast({
   message,
   onDismiss,
   variant = 'success',
-  duration = 4000,
+  duration,
+  action,
 }: ToastProps) {
+  const effectiveDuration = duration ?? (action ? 8000 : 4000);
+
   useEffect(() => {
-    const id = setTimeout(onDismiss, duration);
+    const id = setTimeout(onDismiss, effectiveDuration);
     return () => clearTimeout(id);
-  }, [onDismiss, duration]);
+  }, [onDismiss, effectiveDuration]);
 
   const Icon = icons[variant];
 
@@ -83,7 +102,7 @@ export default function Toast({
         w-[90%] max-w-sm
         relative
         flex items-center justify-center gap-3
-        px-4 py-3 rounded-lg shadow-lg
+        pl-4 ${action ? 'pr-9' : 'pr-4'} py-3 rounded-lg shadow-lg
         border
         text-sm font-medium
         animate-slide-up
@@ -93,6 +112,19 @@ export default function Toast({
       <Icon />
 
       <span>{message}</span>
+
+      {action && (
+        <button
+          onClick={() => { action.onClick(); onDismiss(); }}
+          className="
+            shrink-0 ml-1 px-2.5 py-1 rounded-md
+            bg-circa-accent text-white text-xs font-semibold
+            hover:opacity-90 transition-opacity
+          "
+        >
+          {action.label}
+        </button>
+      )}
 
       <button
         onClick={onDismiss}

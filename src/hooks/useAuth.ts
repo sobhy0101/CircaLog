@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
@@ -10,6 +10,8 @@ const RETURN_PATH_KEY = 'circalog-auth-return-path';
 interface ToastState {
   variant: 'success' | 'neutral' | 'error';
   message: string;
+  /** Optional action button — used for the expired-session "Sign In" prompt. */
+  action?: { label: string; onClick: () => void };
 }
 
 export function useAuth() {
@@ -17,6 +19,12 @@ export function useAuth() {
   // true only while the initial getSession() call is in flight
   const [isLoading, setIsLoading]     = useState(true);
   const [activeToast, setActiveToast] = useState<ToastState | null>(null);
+  // Distinguishes a deliberate signOut() call from the SIGNED_OUT event
+  // Supabase also fires when a session's refresh token has expired or
+  // been revoked. Set to true right before calling supabase.auth.signOut(),
+  // read once when the SIGNED_OUT event fires, then reset — see signOut()
+  // and the onAuthStateChange handler below.
+  const isIntentionalSignOut = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,7 +75,22 @@ export function useAuth() {
         }
 
         if (event === 'SIGNED_OUT') {
-          setActiveToast({ variant: 'neutral', message: 'Signed out.' });
+          if (isIntentionalSignOut.current) {
+            setActiveToast({ variant: 'neutral', message: 'Signed out.' });
+          } else {
+            // Session expired (refresh token invalid/revoked) rather than
+            // a deliberate sign-out. Any local edits made from this point
+            // are still saved to IndexedDB as normal — they are not lost —
+            // and will be reconciled to Supabase by syncOnConnect()'s full
+            // merge the next time this user signs back in. This toast's
+            // job is purely to tell them to do that.
+            setActiveToast({
+              variant: 'error',
+              message: 'Your session expired. Sign in again to keep syncing.',
+              action: { label: 'Sign In', onClick: () => signInWithGoogle() },
+            });
+          }
+          isIntentionalSignOut.current = false;
         }
       }
     );
@@ -128,9 +151,13 @@ export function useAuth() {
 
   async function signOut(): Promise<void> {
     if (!supabase) return;
+    isIntentionalSignOut.current = true;
     try {
       await supabase.auth.signOut();
     } catch (err) {
+      // The signOut() call itself failed — this was not actually a
+      // sign-out, so don't leave the ref stuck true for next time.
+      isIntentionalSignOut.current = false;
       console.error('Sign-out failed:', err);
       setActiveToast({ variant: 'error', message: 'Sign-out failed. Please try again.' });
     }

@@ -1,10 +1,12 @@
 // useSyncStatus.ts — exposes the current sync state so the UI can show
-// an accurate status tab (synced / syncing / pending / error / offline / signed-out).
+// an accurate status tab (synced / syncing / pending / error / offline / signed-out)
+// plus diagnostic detail for any permanently-failed entries.
 
 import { useState, useEffect } from 'react'
 import { db } from '@/lib/db/db'
 import { useAuth } from '@/hooks/useAuth'
 import { isSyncing, errorCount } from '@/lib/supabase/syncService'
+import type { SyncQueueEntry } from '@/lib/circadian'
 
 export type SyncStatus =
   | 'signed-out'  // user is not signed in — tab hidden
@@ -19,6 +21,9 @@ export function useSyncStatus() {
   const [pendingCount, setPendingCount] = useState(0)
   const [isActivelySyncing, setIsActivelySyncing] = useState(false)
   const [hasError, setHasError] = useState(false)
+  // Entries with failCount >= 3 — surfaced in the sync error detail panel
+  // so the user can see the error code/message and report it.
+  const [erroredEntries, setErroredEntries] = useState<SyncQueueEntry[]>([])
   // Initialised from navigator.onLine so the very first render is correct.
   const [isOnline, setIsOnline] = useState(() => navigator.onLine)
 
@@ -39,17 +44,17 @@ export function useSyncStatus() {
       setPendingCount(0)
       setIsActivelySyncing(false)
       setHasError(false)
+      setErroredEntries([])
       return
     }
 
     // Poll every 2 seconds — fast enough to feel responsive without
-    // being expensive. Reads three values per tick:
-    //   - syncQueue row count (pending entries)
-    //   - isSyncing() flag from syncService (active operation in flight)
-    //   - errorCount() flag from syncService (entries that failed 3+ times)
+    // being expensive. Reads from the syncQueue table and the
+    // syncService module-level flags on every tick.
     async function poll() {
-      const count = await db.syncQueue.count()
-      setPendingCount(count)
+      const all = await db.syncQueue.toArray()
+      setPendingCount(all.length)
+      setErroredEntries(all.filter(e => e.failCount >= 3))
       setIsActivelySyncing(isSyncing())
       setHasError(errorCount() > 0)
     }
@@ -72,5 +77,5 @@ export function useSyncStatus() {
             ? 'pending'
             : 'synced'
 
-  return { status, pendingCount }
+  return { status, pendingCount, erroredEntries }
 }

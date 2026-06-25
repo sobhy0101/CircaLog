@@ -115,16 +115,26 @@ function fromSupabaseRow(row: Record<string, unknown>): SleepEntry {
 // ---------------------------------------------------------------------------
 
 /**
- * Adds a SleepEntry id to the sync queue.
- * Increments failCount if the entry is already queued (repeated failure),
- * rather than resetting it — so the error state accumulates correctly.
+ * Adds a SleepEntry id to the sync queue, capturing diagnostic
+ * information about why the push failed.
+ *
+ * Increments failCount if the entry is already queued (repeated
+ * failure), rather than resetting it — so the error state accumulates
+ * correctly. `queuedAt` is preserved from the first failure; only
+ * `lastFailedAt` updates on every retry.
  */
-async function enqueue(id: string): Promise<void> {
-  // Check if this entry is already queued (a previous push failed).
+async function enqueue(id: string, errorCode?: string, errorMessage?: string): Promise<void> {
   const existing = await db.syncQueue.get(id)
   const failCount = existing ? existing.failCount + 1 : 1
 
-  const item: SyncQueueEntry = { id, queuedAt: new Date().toISOString(), failCount }
+  const item: SyncQueueEntry = {
+    id,
+    queuedAt: existing?.queuedAt ?? new Date().toISOString(),
+    failCount,
+    lastErrorCode: errorCode,
+    lastErrorMessage: errorMessage,
+    lastFailedAt: new Date().toISOString(),
+  }
   await db.syncQueue.put(item)
 
   // Recount error entries (failCount >= 3) and update the module-level flag.
@@ -151,10 +161,16 @@ async function dequeue(id: string): Promise<void> {
  * Upserts a single SleepEntry to Supabase.
  *
  * On success: removes the entry from the sync queue (it is now in sync).
- * On failure: adds the entry to the sync queue so it will be retried.
+ * On failure: adds the entry to the sync queue with diagnostic
+ * information so it will be retried and the user can see why.
  *
  * `onConflict: 'id'` means: if a row with this id already exists,
  * update it in place rather than failing with a duplicate-key error.
+ *
+ * Wrapped in try/catch as a defensive measure — supabase-js normally
+ * returns `{ error }` rather than throwing, but an unexpected
+ * network-level exception must not crash the caller or silently drop
+ * the write. It is treated the same as a normal push failure.
  */
 async function pushEntry(entry: SleepEntry, userId: string): Promise<void> {
   if (!supabase) return
@@ -166,17 +182,21 @@ async function pushEntry(entry: SleepEntry, userId: string): Promise<void> {
 
   const row = toSupabaseRow(entry, userId)
 
-  const { error } = await supabase
-    .from('sleep_entries')
-    .upsert(row, { onConflict: 'id' })
+  try {
+    const { error } = await supabase
+      .from('sleep_entries')
+      .upsert(row, { onConflict: 'id' })
 
-  if (error) {
-    // Push failed (offline, network error, etc.) — queue for retry.
-    console.warn(`syncService: push failed for ${entry.id}, queuing.`, error.message)
-    await enqueue(entry.id)
-  } else {
-    // Push succeeded — remove from queue if it was there.
-    await dequeue(entry.id)
+    if (error) {
+      console.warn(`syncService: push failed for ${entry.id}, queuing.`, error.message)
+      await enqueue(entry.id, error.code, error.message)
+    } else {
+      await dequeue(entry.id)
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.warn(`syncService: push threw for ${entry.id}, queuing.`, message)
+    await enqueue(entry.id, 'EXCEPTION', message)
   }
 }
 
@@ -296,6 +316,15 @@ export async function syncOnConnect(user: User): Promise<void> {
  *   - At the end of syncOnConnect (catches anything missed above).
  *   - When the browser fires an `online` event (connectivity restored).
  *   - When the app returns to the foreground (visibilitychange event).
+ *
+ * Entries that have already failed 3+ times are skipped here — see the
+ * `failCount >= 3` check below. This stops the background retry path
+ * from repeatedly hitting Supabase with a request that cannot succeed
+ * (e.g. an RLS violation). The entry is NOT removed from the queue and
+ * stays fully visible via the sync error pill/detail panel. It gets a
+ * fresh attempt the next time it is directly edited (syncAfterMutation)
+ * or on the next sign-in (syncOnConnect) — both call pushEntry()
+ * directly and are not subject to this guard.
  */
 export async function flushQueue(user: User): Promise<void> {
   if (!supabase) return
@@ -309,17 +338,18 @@ export async function flushQueue(user: User): Promise<void> {
 
   _isSyncing = true
   try {
-    // Fetch each queued entry from IndexedDB and push it.
-    // We fetch fresh from IDB (not from a stale closure) so the pushed
-    // version always reflects the latest local edits.
     for (const item of queued) {
       const entry = await db.sleepEntries.get(item.id)
-      if (entry) {
-        await pushEntry(entry, user.id)
-      } else {
+      if (!entry) {
         // Entry was hard-deleted locally — remove from queue silently.
         await dequeue(item.id)
+        continue
       }
+      if (item.failCount >= 3) {
+        // Permanently failing — stop auto-retrying in the background.
+        continue
+      }
+      await pushEntry(entry, user.id)
     }
   } finally {
     _isSyncing = false
