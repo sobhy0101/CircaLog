@@ -35,7 +35,7 @@ Implemented all three items from `docs/CircaLog-TO-DO-list.md` lines 317–353:
 
 ## Build output
 
-```
+```bash
 ✓ built in 1.08s
 ```
 
