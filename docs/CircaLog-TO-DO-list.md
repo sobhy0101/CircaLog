@@ -336,21 +336,33 @@
         a neutral "Saved — Offline" state instead. Separate from "Pending sync" —
         offline is expected; pending while online is not.)
 - [x] 🟢 Allow sign-out (data remains local)
-- [ ] 🟡 Auth token refresh error handling
+- [x] 🟡 Auth token refresh error handling
        If the Supabase session expires mid-use (token refresh fails), the app
        must not silently drop sync writes or crash. Detect the expired session,
        prompt the user to re-authenticate, and queue any pending writes for
        retry after sign-in is restored.
-- [ ] 🟡 Supabase sync write rejection handling
+- [x] 🟡 Supabase sync write rejection handling
        If Supabase rejects a write (RLS violation, quota exceeded, network timeout),
        the entry must remain in the `syncQueue` with a visible retry state rather
        than being silently discarded. The sync status indicator must reflect this.
-- [ ] 🟢 Multi-device offline conflict resolution — design decision required
+- [x] 🟢 Multi-device offline conflict resolution — design decision required
        "Local wins" covers the first-time sync scenario (device A has data, Supabase
        does not). The distinct scenario: Device A and Device B both modify the same
        entry while offline, then both sync. Last-write-wins on `updatedAt` is the
        simplest resolution. Document the chosen strategy explicitly before implementing
        sync for multi-device users. At minimum, no data should be silently discarded.
+- [ ] 🟢 Server-side `sync_queue` mirror in Supabase (V2 candidate — diagnostic /
+       multi-device visibility only, not required for correctness)
+       Today `syncQueue` is IndexedDB-only and per-device — it just tracks "these
+       entry IDs failed to push, retry them." The actual data already reaches every
+       device once a push succeeds, via the synced `sleep_entries` rows themselves,
+       so this is not needed for sync to work correctly. A server-side mirror would
+       only add value for cross-device diagnostics — e.g. seeing on your laptop that
+       3 entries are still stuck retrying on your phone. Revisit if multi-device sync
+       issues become hard to debug without it. Raised during the Jun 2026 RLS audit
+       (the audit's original wording listed `sync_queue` as a table to check, but it
+       doesn't exist in Supabase today — this item is the decision record for that).
+       If built, it needs its own RLS owner-access policy like `sleep_entries`.
 
 ### 🔒 Security
 
