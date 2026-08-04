@@ -73,6 +73,7 @@ export default function EmailCapture() {
           aria-label="Email address"
           value={email}
           onChange={e => { setEmail(e.target.value); setInputError('') }}
+          onKeyDown={e => { if (e.key === 'Enter') handleSubmit() }}
           placeholder="your@email.com"
           disabled={state === 'loading'}
           className="
