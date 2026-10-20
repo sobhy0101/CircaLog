@@ -68,6 +68,10 @@ coverage/
 tasks/screenshots/
 tasks/*.png
 
+# Local backups of live database rows (e.g. migration history before a
+# repair). Kept on disk for restores only, never committed.
+tasks/db-backups/
+
 # ─── TypeScript ───────────────────────────────────────────────
 *.tsbuildinfo
 

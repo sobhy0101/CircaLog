@@ -1,0 +1,2 @@
+-- Local seed data, run by `supabase db reset` after migrations
+-- (config.toml: [db.seed] sql_paths). Intentionally empty for now.
